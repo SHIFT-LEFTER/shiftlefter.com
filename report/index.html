@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>sl-demo-053 — run report</title>
+<style>
+/* ShiftLefter HTML run report (sl-muq9).
+ *
+ * Tasteful-utilitarian v1; a future branding pass swaps this file wholesale
+ * (the renderer emits semantic classes only — no inline styles).
+ * All color/spacing decisions live in the custom properties below, so a
+ * restyle is a variable swap, not a selector rewrite. Class vocabulary:
+ *   .run-header .run-status .run-meta .run-selection .run-counts .controls
+ *   .feature .feature-name .feature-path
+ *   .scenario .scenario-name .tags .tag .duration
+ *   .steps .step .step-status .step-text .macro-marker .error-detail
+ *   .diagnostics .run-footer
+ * Status modifiers: .st-passed .st-failed .st-error .st-pending .st-skipped
+ * State: body.failures-only, .scenario.red, .feature.has-red
+ */
+
+:root {
+  --bg: #ffffff;
+  --fg: #1a1d21;
+  --fg-muted: #6b7280;
+  --surface: #f6f7f9;
+  --border: #e2e5e9;
+  --passed: #1a7f37;
+  --failed: #c93c37;
+  --error: #a13ac9;
+  --pending: #b58a1e;
+  --skipped: #6b7280;
+  --chip-bg: #eef1f4;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #16181c;
+    --fg: #e6e8eb;
+    --fg-muted: #9aa2ad;
+    --surface: #1f2228;
+    --border: #33373e;
+    --passed: #4bc26b;
+    --failed: #ef6a64;
+    --error: #c579e0;
+    --pending: #d9ae4a;
+    --skipped: #9aa2ad;
+    --chip-bg: #2a2e35;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0 auto;
+  max-width: 64rem;
+  padding: 1.5rem 1.25rem 3rem;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--sans);
+  line-height: 1.45;
+}
+
+.noscript-note {
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+}
+
+/* ---- run header ---------------------------------------------------- */
+
+.run-header h1 {
+  font-size: 1.35rem;
+  margin: 0 0 0.25rem;
+}
+
+.run-status {
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 0.1rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  vertical-align: middle;
+  color: var(--bg);
+}
+
+.run-status.st-passed {
+  background: var(--passed);
+}
+
+.run-status.st-failed {
+  background: var(--failed);
+}
+
+.run-meta,
+.run-selection {
+  margin: 0.15rem 0;
+  color: var(--fg-muted);
+  font-size: 0.85rem;
+}
+
+.run-selection {
+  font-weight: 600;
+}
+
+.run-counts {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0;
+  margin: 0.75rem 0;
+}
+
+.run-counts .count {
+  padding: 0.15rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.count.st-passed {
+  color: var(--passed);
+}
+
+.count.st-failed,
+.count.st-error {
+  color: var(--failed);
+}
+
+.count.st-pending {
+  color: var(--pending);
+}
+
+.count.st-skipped {
+  color: var(--skipped);
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.75rem 0 1.25rem;
+  font-size: 0.85rem;
+}
+
+.controls button {
+  padding: 0.25rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--fg);
+  font: inherit;
+  cursor: pointer;
+}
+
+.controls button:hover {
+  border-color: var(--fg-muted);
+}
+
+/* ---- features & scenarios ------------------------------------------ */
+
+.feature {
+  margin: 1.5rem 0;
+}
+
+.feature-name {
+  font-size: 1.05rem;
+  margin: 0 0 0.1rem;
+}
+
+.feature-path {
+  color: var(--fg-muted);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+}
+
+/* Gherkin description prose (sl-v85e): pre-line honors the authored
+   line breaks and indentation without allowing markup. */
+.feature-description,
+.scenario-description {
+  color: var(--fg-muted);
+  white-space: pre-line;
+  font-size: 0.85rem;
+  margin: 0.35rem 0 0.5rem;
+}
+
+.scenario-description {
+  margin: 0.5rem 0.75rem 0.25rem;
+}
+
+.scenario {
+  margin: 0.5rem 0;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+}
+
+.scenario > summary {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.45rem 0.75rem;
+  cursor: pointer;
+  list-style-position: inside;
+}
+
+.scenario .status-word {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  min-width: 4.2em;
+}
+
+.status-word.st-passed {
+  color: var(--passed);
+}
+
+.status-word.st-failed {
+  color: var(--failed);
+}
+
+.status-word.st-error {
+  color: var(--error);
+}
+
+.status-word.st-pending {
+  color: var(--pending);
+}
+
+.status-word.st-skipped {
+  color: var(--skipped);
+}
+
+.scenario-name {
+  flex: 1;
+}
+
+.tags {
+  display: inline-flex;
+  gap: 0.3rem;
+}
+
+.tag {
+  padding: 0 0.45rem;
+  border-radius: 999px;
+  background: var(--chip-bg);
+  color: var(--fg-muted);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+}
+
+/* Derived-scheduling annotation (sl-esq): a gate serialized this scenario.
+   Greyed + dashed = "ran as though this was also true" — never pretending
+   the tag was authored. */
+.tag.derived {
+  background: transparent;
+  border: 1px dashed var(--fg-muted);
+  opacity: 0.65;
+}
+
+.derived-note {
+  color: var(--fg-muted);
+  font-size: 0.72rem;
+  font-style: italic;
+}
+
+/* Lifecycle hook lines (sl-esq): rendered around the steps list, mirroring
+   execution order — before-phase above, after-phase below. */
+.hook-line {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.15rem 0.75rem;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--fg-muted);
+}
+
+.hook-line .hook-status {
+  font-size: 0.68rem;
+  font-weight: 600;
+}
+
+.hook-line.st-failed,
+.hook-line.st-failed .hook-status,
+.hook-line .hook-error {
+  color: var(--red, #c0392b);
+}
+
+.hook-line .contributed {
+  font-style: italic;
+}
+
+.hook-line .duration {
+  margin-left: auto;
+}
+
+.duration {
+  color: var(--fg-muted);
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- step transcript ------------------------------------------------ */
+
+.steps {
+  list-style: none;
+  margin: 0;
+  padding: 0.4rem 0.75rem 0.6rem;
+  border-top: 1px solid var(--border);
+  font-family: var(--mono);
+  font-size: 0.8rem;
+}
+
+.step {
+  display: flex;
+  flex-wrap: wrap; /* error-detail breaks onto its own full-width row */
+  gap: 0.5rem;
+  align-items: baseline;
+  padding: 0.1rem 0;
+}
+
+.step .step-status {
+  min-width: 4.2em;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.step.st-passed .step-status {
+  color: var(--passed);
+}
+
+.step.st-failed .step-status {
+  color: var(--failed);
+}
+
+.step.st-error .step-status {
+  color: var(--error);
+}
+
+.step.st-pending .step-status {
+  color: var(--pending);
+}
+
+.step.st-skipped .step-status,
+.step.st-skipped .step-text {
+  color: var(--skipped);
+}
+
+.step-text {
+  flex: 1;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.macro-marker {
+  color: var(--fg-muted);
+}
+
+.error-detail {
+  flex-basis: 100%;
+  margin: 0.35rem 0 0.35rem 4.7em;
+  padding: 0.5rem 0.65rem;
+  border-left: 3px solid var(--failed);
+  background: var(--bg);
+  border-radius: 0 4px 4px 0;
+}
+
+.error-detail .error-type {
+  font-weight: 700;
+  font-size: 0.75rem;
+  margin-bottom: 0.2rem;
+}
+
+.error-detail pre {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 0.78rem;
+}
+
+/* ---- diagnostics & footer ------------------------------------------- */
+
+.diagnostics {
+  margin: 2rem 0 0;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--pending);
+  border-radius: 6px;
+}
+
+.diagnostics h2 {
+  font-size: 0.95rem;
+  margin: 0 0 0.4rem;
+}
+
+.diagnostics ul {
+  margin: 0;
+  padding-left: 1.2rem;
+  font-size: 0.85rem;
+}
+
+.run-footer {
+  margin-top: 2.5rem;
+  color: var(--fg-muted);
+  font-size: 0.75rem;
+}
+
+/* ---- failures-only state -------------------------------------------- */
+
+body.failures-only .scenario:not(.red) {
+  display: none;
+}
+
+body.failures-only .feature:not(.has-red) {
+  display: none;
+}
+</style>
+</head>
+<body>
+<noscript><p class="noscript-note">This report renders with JavaScript. The complete run data is embedded in this file as readable EDN &mdash; view source and find <code>script type=&quot;application/edn&quot;</code>.</p></noscript>
+<div id="app"></div>
+<script type="application/edn" id="run-data">
+{:run-ctx {:run-id "a67ae684-40ee-4874-a13c-98a50426406a", :version "0.5.3", :mode :vanilla, :started-at "2026-07-28T15:01:35", :project-root "/private/tmp/sl-demo-053", :project-name "sl-demo-053", :allow-pending? false}, :scenarios [{:status :passed, :plan {:plan/pickle {:pickle/row-location nil, :pickle/row-index nil, :pickle/tags [{:name "@corpus-suite", :location {:line 1, :column 1}}], :pickle/steps [{:step/id #uuid "7e664654-b210-40b1-bd2f-e519f9543727", :step/text "corpus no-op", :step/template-text nil, :step/keyword "Given", :step/location {:line 5, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "49e288d7-17bc-47d9-a5b3-bd0c2de041ac", :step/text "corpus sleeps 39 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 6, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "b8c1dce9-155b-4bc1-b737-ae0efd45b2ab", :step/text "corpus no-op", :step/template-text nil, :step/keyword "When", :step/location {:line 7, :column 5}, :step/origin :scenario, :step/arguments []}], :pickle/location {:line 4, :column 3}, :pickle/source-file "/private/tmp/sl-demo-053/target/corpus/p61180/default-42/features/01_feature_tags.feature", :pickle/feature-description nil, :pickle/name "S-001 passes", :pickle/row-values nil, :pickle/id #uuid "95bee426-628c-43ce-88b2-9290a95b84ad", :pickle/description nil, :pickle/template-name nil, :pickle/scenario-location nil, :pickle/feature-name "Corpus feature tags"}}, :steps [{:step {:step/id #uuid "7e664654-b210-40b1-bd2f-e519f9543727", :step/text "corpus no-op", :step/template-text nil, :step/keyword "Given", :step/location {:line 5, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus no-op", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 16}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-b180a1cdfceb0f96", :actual 1, :metadata nil}, :status :passed, :duration-ms 0.028541} {:step {:step/id #uuid "49e288d7-17bc-47d9-a5b3-bd0c2de041ac", :step/text "corpus sleeps 39 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 6, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus sleeps (\\d+) ms", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 20}, :captures ["39"], :expected #{1 2}, :arity 2, :stepdef/id "sd-78a9908a5871463d", :actual 2, :metadata nil}, :status :passed, :duration-ms 41.291083} {:step {:step/id #uuid "b8c1dce9-155b-4bc1-b737-ae0efd45b2ab", :step/text "corpus no-op", :step/template-text nil, :step/keyword "When", :step/location {:line 7, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus no-op", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 16}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-b180a1cdfceb0f96", :actual 1, :metadata nil}, :status :passed, :duration-ms 0.027416}], :duration-ms 42.141, :scenario/id #uuid "95bee426-628c-43ce-88b2-9290a95b84ad"} {:status :failed, :plan {:plan/pickle {:pickle/row-location nil, :pickle/row-index nil, :pickle/tags [{:name "@corpus-suite", :location {:line 1, :column 1}}], :pickle/steps [{:step/id #uuid "9edec883-c80a-4660-804e-8878219ca98d", :step/text "corpus no-op", :step/template-text nil, :step/keyword "Given", :step/location {:line 10, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "56417682-1c2c-4ce2-b1cf-cb4ecc2ea864", :step/text "corpus sleeps 11 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 11, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "c837ce14-5dc2-4b7d-b3ab-6b0df9378e67", :step/text "corpus fails deliberately", :step/template-text nil, :step/keyword "Then", :step/location {:line 12, :column 5}, :step/origin :scenario, :step/arguments []}], :pickle/location {:line 9, :column 3}, :pickle/source-file "/private/tmp/sl-demo-053/target/corpus/p61180/default-42/features/01_feature_tags.feature", :pickle/feature-description nil, :pickle/name "S-002 fails at step 3", :pickle/row-values nil, :pickle/id #uuid "e15791d5-ebaa-4e7c-92f0-ae00ca47fc79", :pickle/description nil, :pickle/template-name nil, :pickle/scenario-location nil, :pickle/feature-name "Corpus feature tags"}}, :steps [{:step {:step/id #uuid "9edec883-c80a-4660-804e-8878219ca98d", :step/text "corpus no-op", :step/template-text nil, :step/keyword "Given", :step/location {:line 10, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus no-op", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 16}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-b180a1cdfceb0f96", :actual 1, :metadata nil}, :status :passed, :duration-ms 0.006} {:step {:step/id #uuid "56417682-1c2c-4ce2-b1cf-cb4ecc2ea864", :step/text "corpus sleeps 11 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 11, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus sleeps (\\d+) ms", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 20}, :captures ["11"], :expected #{1 2}, :arity 2, :stepdef/id "sd-78a9908a5871463d", :actual 2, :metadata nil}, :status :passed, :duration-ms 11.21375} {:step {:step/id #uuid "c837ce14-5dc2-4b7d-b3ab-6b0df9378e67", :step/text "corpus fails deliberately", :step/template-text nil, :step/keyword "Then", :step/location {:line 12, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus fails deliberately", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 25}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-7dcf7f1c3fad7897", :actual 1, :metadata nil}, :status :failed, :duration-ms 0.02075, :error {:type :step/invalid-return, :message "Step returned invalid type: class clojure.lang.Keyword. Expected map, nil, or :pending.", :value ":corpus/deliberate-failure"}}], :duration-ms 11.319792, :scenario/id #uuid "e15791d5-ebaa-4e7c-92f0-ae00ca47fc79"} {:status :pending, :plan {:plan/pickle {:pickle/row-location nil, :pickle/row-index nil, :pickle/tags [{:name "@corpus-suite", :location {:line 1, :column 1}}], :pickle/steps [{:step/id #uuid "d3a051d0-c239-4aa1-ade7-ca5b6c60f071", :step/text "corpus sleeps 39 ms", :step/template-text nil, :step/keyword "Given", :step/location {:line 15, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "69cb56c9-eaaa-41c4-9661-31957fb39f0b", :step/text "corpus no-op", :step/template-text nil, :step/keyword "When", :step/location {:line 16, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "f27ff717-cebf-4628-aaf7-aa9ccb23e2be", :step/text "corpus no-op", :step/template-text nil, :step/keyword "When", :step/location {:line 17, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "4898f285-1c82-4eb2-8882-02fe88eb7759", :step/text "corpus is pending", :step/template-text nil, :step/keyword "Then", :step/location {:line 18, :column 5}, :step/origin :scenario, :step/arguments []}], :pickle/location {:line 14, :column 3}, :pickle/source-file "/private/tmp/sl-demo-053/target/corpus/p61180/default-42/features/01_feature_tags.feature", :pickle/feature-description nil, :pickle/name "S-003 is pending at step 4", :pickle/row-values nil, :pickle/id #uuid "9740b07b-7c50-4aa2-8ef8-261a818db61b", :pickle/description nil, :pickle/template-name nil, :pickle/scenario-location nil, :pickle/feature-name "Corpus feature tags"}}, :steps [{:step {:step/id #uuid "d3a051d0-c239-4aa1-ade7-ca5b6c60f071", :step/text "corpus sleeps 39 ms", :step/template-text nil, :step/keyword "Given", :step/location {:line 15, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus sleeps (\\d+) ms", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 20}, :captures ["39"], :expected #{1 2}, :arity 2, :stepdef/id "sd-78a9908a5871463d", :actual 2, :metadata nil}, :status :passed, :duration-ms 44.051667} {:step {:step/id #uuid "69cb56c9-eaaa-41c4-9661-31957fb39f0b", :step/text "corpus no-op", :step/template-text nil, :step/keyword "When", :step/location {:line 16, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus no-op", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 16}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-b180a1cdfceb0f96", :actual 1, :metadata nil}, :status :passed, :duration-ms 0.016458} {:step {:step/id #uuid "f27ff717-cebf-4628-aaf7-aa9ccb23e2be", :step/text "corpus no-op", :step/template-text nil, :step/keyword "When", :step/location {:line 17, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus no-op", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 16}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-b180a1cdfceb0f96", :actual 1, :metadata nil}, :status :passed, :duration-ms 0.002125} {:step {:step/id #uuid "4898f285-1c82-4eb2-8882-02fe88eb7759", :step/text "corpus is pending", :step/template-text nil, :step/keyword "Then", :step/location {:line 18, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus is pending", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 35}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-7e724a3351ad99f4", :actual 1, :metadata nil}, :status :pending, :duration-ms 0.01125}], :duration-ms 44.197666, :scenario/id #uuid "9740b07b-7c50-4aa2-8ef8-261a818db61b"} {:status :passed, :plan {:plan/pickle {:pickle/row-location nil, :pickle/row-index nil, :pickle/tags [{:name "@corpus-suite", :location {:line 1, :column 1}}], :pickle/steps [{:step/id #uuid "b14283da-5b4d-4b60-8ba4-905a49a382ef", :step/text "corpus sleeps 58 ms", :step/template-text nil, :step/keyword "Given", :step/location {:line 21, :column 5}, :step/origin :scenario, :step/arguments []}], :pickle/location {:line 20, :column 3}, :pickle/source-file "/private/tmp/sl-demo-053/target/corpus/p61180/default-42/features/01_feature_tags.feature", :pickle/feature-description nil, :pickle/name "S-028 passes", :pickle/row-values nil, :pickle/id #uuid "72bf6b72-3ff3-40fe-8fd3-0a3a2a0d1873", :pickle/description nil, :pickle/template-name nil, :pickle/scenario-location nil, :pickle/feature-name "Corpus feature tags"}}, :steps [{:step {:step/id #uuid "b14283da-5b4d-4b60-8ba4-905a49a382ef", :step/text "corpus sleeps 58 ms", :step/template-text nil, :step/keyword "Given", :step/location {:line 21, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus sleeps (\\d+) ms", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 20}, :captures ["58"], :expected #{1 2}, :arity 2, :stepdef/id "sd-78a9908a5871463d", :actual 2, :metadata nil}, :status :passed, :duration-ms 59.397291}], :duration-ms 59.50825, :scenario/id #uuid "72bf6b72-3ff3-40fe-8fd3-0a3a2a0d1873"} {:status :passed, :plan {:plan/pickle {:pickle/row-location nil, :pickle/row-index nil, :pickle/tags [{:name "@corpus-suite", :location {:line 1, :column 1}}], :pickle/steps [{:step/id #uuid "e3b5e3c2-d43a-4bd8-8540-83683330e84d", :step/text "corpus no-op", :step/template-text nil, :step/keyword "Given", :step/location {:line 24, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "605fe461-ed9f-405b-9e47-1968682d80ee", :step/text "corpus no-op", :step/template-text nil, :step/keyword "When", :step/location {:line 25, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "01d641e8-e701-4089-9d1d-364dadfdc80d", :step/text "corpus sleeps 33 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 26, :column 5}, :step/origin :scenario, :step/arguments []}], :pickle/location {:line 23, :column 3}, :pickle/source-file "/private/tmp/sl-demo-053/target/corpus/p61180/default-42/features/01_feature_tags.feature", :pickle/feature-description nil, :pickle/name "S-038 passes", :pickle/row-values nil, :pickle/id #uuid "9a6bd759-34fa-4a53-b707-046465e31e08", :pickle/description nil, :pickle/template-name nil, :pickle/scenario-location nil, :pickle/feature-name "Corpus feature tags"}}, :steps [{:step {:step/id #uuid "e3b5e3c2-d43a-4bd8-8540-83683330e84d", :step/text "corpus no-op", :step/template-text nil, :step/keyword "Given", :step/location {:line 24, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus no-op", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 16}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-b180a1cdfceb0f96", :actual 1, :metadata nil}, :status :passed, :duration-ms 0.015625} {:step {:step/id #uuid "605fe461-ed9f-405b-9e47-1968682d80ee", :step/text "corpus no-op", :step/template-text nil, :step/keyword "When", :step/location {:line 25, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus no-op", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 16}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-b180a1cdfceb0f96", :actual 1, :metadata nil}, :status :passed, :duration-ms 0.003208} {:step {:step/id #uuid "01d641e8-e701-4089-9d1d-364dadfdc80d", :step/text "corpus sleeps 33 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 26, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus sleeps (\\d+) ms", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 20}, :captures ["33"], :expected #{1 2}, :arity 2, :stepdef/id "sd-78a9908a5871463d", :actual 2, :metadata nil}, :status :passed, :duration-ms 35.329625}], :duration-ms 35.565125, :scenario/id #uuid "9a6bd759-34fa-4a53-b707-046465e31e08"} {:status :passed, :plan {:plan/pickle {:pickle/row-location nil, :pickle/row-index nil, :pickle/tags [{:name "@corpus-a", :location {:line 3, :column 3}}], :pickle/steps [{:step/id #uuid "af7140b4-6209-4086-b103-8ea04599c8ef", :step/text "corpus sleeps 13 ms", :step/template-text nil, :step/keyword "Given", :step/location {:line 5, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "3a1d276c-18ad-43b6-a31d-da39499bfdf0", :step/text "corpus sleeps 50 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 6, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "141ad681-f147-4674-bd54-347115b08ad7", :step/text "corpus sleeps 45 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 7, :column 5}, :step/origin :scenario, :step/arguments []}], :pickle/location {:line 4, :column 3}, :pickle/source-file "/private/tmp/sl-demo-053/target/corpus/p61180/default-42/features/02_scenario_tags.feature", :pickle/feature-description nil, :pickle/name "S-004 passes", :pickle/row-values nil, :pickle/id #uuid "5424626b-2e12-42e1-8a74-dc61675cdfae", :pickle/description nil, :pickle/template-name nil, :pickle/scenario-location nil, :pickle/feature-name "Corpus scenario tags"}}, :steps [{:step {:step/id #uuid "af7140b4-6209-4086-b103-8ea04599c8ef", :step/text "corpus sleeps 13 ms", :step/template-text nil, :step/keyword "Given", :step/location {:line 5, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus sleeps (\\d+) ms", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 20}, :captures ["13"], :expected #{1 2}, :arity 2, :stepdef/id "sd-78a9908a5871463d", :actual 2, :metadata nil}, :status :passed, :duration-ms 15.719416} {:step {:step/id #uuid "3a1d276c-18ad-43b6-a31d-da39499bfdf0", :step/text "corpus sleeps 50 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 6, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus sleeps (\\d+) ms", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 20}, :captures ["50"], :expected #{1 2}, :arity 2, :stepdef/id "sd-78a9908a5871463d", :actual 2, :metadata nil}, :status :passed, :duration-ms 53.178291} {:step {:step/id #uuid "141ad681-f147-4674-bd54-347115b08ad7", :step/text "corpus sleeps 45 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 7, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus sleeps (\\d+) ms", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 20}, :captures ["45"], :expected #{1 2}, :arity 2, :stepdef/id "sd-78a9908a5871463d", :actual 2, :metadata nil}, :status :passed, :duration-ms 50.095667}], :duration-ms 119.275375, :scenario/id #uuid "5424626b-2e12-42e1-8a74-dc61675cdfae"} {:status :failed, :plan {:plan/pickle {:pickle/row-location nil, :pickle/row-index nil, :pickle/tags [{:name "@corpus-a", :location {:line 9, :column 3}} {:name "@corpus-b", :location {:line 9, :column 13}}], :pickle/steps [{:step/id #uuid "27e0062f-b95f-43d4-b46e-5fd0c4184749", :step/text "corpus no-op", :step/template-text nil, :step/keyword "Given", :step/location {:line 11, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "b9d96968-f650-47e9-a1cb-a0453fb6b590", :step/text "corpus no-op", :step/template-text nil, :step/keyword "When", :step/location {:line 12, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "86ca89d3-734d-46c2-8f46-209381fee21a", :step/text "corpus errors deliberately", :step/template-text nil, :step/keyword "Then", :step/location {:line 13, :column 5}, :step/origin :scenario, :step/arguments []}], :pickle/location {:line 10, :column 3}, :pickle/source-file "/private/tmp/sl-demo-053/target/corpus/p61180/default-42/features/02_scenario_tags.feature", :pickle/feature-description nil, :pickle/name "S-005 errors at step 3", :pickle/row-values nil, :pickle/id #uuid "563957ae-cd8a-418c-ab17-454c3c659050", :pickle/description nil, :pickle/template-name nil, :pickle/scenario-location nil, :pickle/feature-name "Corpus scenario tags"}}, :steps [{:step {:step/id #uuid "27e0062f-b95f-43d4-b46e-5fd0c4184749", :step/text "corpus no-op", :step/template-text nil, :step/keyword "Given", :step/location {:line 11, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus no-op", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 16}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-b180a1cdfceb0f96", :actual 1, :metadata nil}, :status :passed, :duration-ms 0.016291} {:step {:step/id #uuid "b9d96968-f650-47e9-a1cb-a0453fb6b590", :step/text "corpus no-op", :step/template-text nil, :step/keyword "When", :step/location {:line 12, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus no-op", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 16}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-b180a1cdfceb0f96", :actual 1, :metadata nil}, :status :passed, :duration-ms 0.00325} {:step {:step/id #uuid "86ca89d3-734d-46c2-8f46-209381fee21a", :step/text "corpus errors deliberately", :step/template-text nil, :step/keyword "Then", :step/location {:line 13, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus errors deliberately", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 31}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-7db2bca759a32979", :actual 1, :metadata nil}, :status :failed, :duration-ms 0.547625, :error {:type :step/exception, :message "corpus deliberate error", :exception-class "clojure.lang.ExceptionInfo", :data {:corpus/deliberate true}}}], :duration-ms 0.666959, :scenario/id #uuid "563957ae-cd8a-418c-ab17-454c3c659050"} {:status :passed, :plan {:plan/pickle {:pickle/row-location nil, :pickle/row-index nil, :pickle/tags [], :pickle/steps [{:step/id #uuid "467a711e-c884-41cd-8542-a97e5cd0d59a", :step/text "corpus sleeps 17 ms", :step/template-text nil, :step/keyword "Given", :step/location {:line 16, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "f6d89334-3c21-4a1a-a901-d4f0f860b81f", :step/text "corpus sleeps 29 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 17, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "9a35b027-5294-4108-9b89-7c331e208e17", :step/text "corpus no-op", :step/template-text nil, :step/keyword "When", :step/location {:line 18, :column 5}, :step/origin :scenario, :step/arguments []}], :pickle/location {:line 15, :column 3}, :pickle/source-file "/private/tmp/sl-demo-053/target/corpus/p61180/default-42/features/02_scenario_tags.feature", :pickle/feature-description nil, :pickle/name "S-006 passes", :pickle/row-values nil, :pickle/id #uuid "ea19a86e-9f9c-4e83-8a1a-a3a5921c2891", :pickle/description nil, :pickle/template-name nil, :pickle/scenario-location nil, :pickle/feature-name "Corpus scenario tags"}}, :steps [{:step {:step/id #uuid "467a711e-c884-41cd-8542-a97e5cd0d59a", :step/text "corpus sleeps 17 ms", :step/template-text nil, :step/keyword "Given", :step/location {:line 16, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus sleeps (\\d+) ms", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 20}, :captures ["17"], :expected #{1 2}, :arity 2, :stepdef/id "sd-78a9908a5871463d", :actual 2, :metadata nil}, :status :passed, :duration-ms 21.306958} {:step {:step/id #uuid "f6d89334-3c21-4a1a-a901-d4f0f860b81f", :step/text "corpus sleeps 29 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 17, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus sleeps (\\d+) ms", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 20}, :captures ["29"], :expected #{1 2}, :arity 2, :stepdef/id "sd-78a9908a5871463d", :actual 2, :metadata nil}, :status :passed, :duration-ms 31.46825} {:step {:step/id #uuid "9a35b027-5294-4108-9b89-7c331e208e17", :step/text "corpus no-op", :step/template-text nil, :step/keyword "When", :step/location {:line 18, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus no-op", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 16}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-b180a1cdfceb0f96", :actual 1, :metadata nil}, :status :passed, :duration-ms 0.076041}], :duration-ms 53.2865, :scenario/id #uuid "ea19a86e-9f9c-4e83-8a1a-a3a5921c2891"} {:status :passed, :plan {:plan/pickle {:pickle/row-location nil, :pickle/row-index nil, :pickle/tags [], :pickle/steps [{:step/id #uuid "a57a74a5-ff2a-45dd-bd0a-6ae932b9c25e", :step/text "corpus no-op", :step/template-text nil, :step/keyword "Given", :step/location {:line 21, :column 5}, :step/origin :scenario, :step/arguments []}], :pickle/location {:line 20, :column 3}, :pickle/source-file "/private/tmp/sl-demo-053/target/corpus/p61180/default-42/features/02_scenario_tags.feature", :pickle/feature-description nil, :pickle/name "S-029 passes", :pickle/row-values nil, :pickle/id #uuid "48762db7-e88b-4fc0-b54b-d432427c393e", :pickle/description nil, :pickle/template-name nil, :pickle/scenario-location nil, :pickle/feature-name "Corpus scenario tags"}}, :steps [{:step {:step/id #uuid "a57a74a5-ff2a-45dd-bd0a-6ae932b9c25e", :step/text "corpus no-op", :step/template-text nil, :step/keyword "Given", :step/location {:line 21, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus no-op", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 16}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-b180a1cdfceb0f96", :actual 1, :metadata nil}, :status :passed, :duration-ms 0.022375}], :duration-ms 0.167167, :scenario/id #uuid "48762db7-e88b-4fc0-b54b-d432427c393e"} {:status :passed, :plan {:plan/pickle {:pickle/row-location nil, :pickle/row-index nil, :pickle/tags [], :pickle/steps [{:step/id #uuid "0cbdb23c-4cb0-415f-b350-3de2757a7c8f", :step/text "corpus no-op", :step/template-text nil, :step/keyword "Given", :step/location {:line 24, :column 5}, :step/origin :scenario, :step/arguments []}], :pickle/location {:line 23, :column 3}, :pickle/source-file "/private/tmp/sl-demo-053/target/corpus/p61180/default-42/features/02_scenario_tags.feature", :pickle/feature-description nil, :pickle/name "S-031 passes", :pickle/row-values nil, :pickle/id #uuid "65b6a6bb-16fd-439a-ad39-a523ca445e98", :pickle/description nil, :pickle/template-name nil, :pickle/scenario-location nil, :pickle/feature-name "Corpus scenario tags"}}, :steps [{:step {:step/id #uuid "0cbdb23c-4cb0-415f-b350-3de2757a7c8f", :step/text "corpus no-op", :step/template-text nil, :step/keyword "Given", :step/location {:line 24, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus no-op", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 16}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-b180a1cdfceb0f96", :actual 1, :metadata nil}, :status :passed, :duration-ms 0.014125}], :duration-ms 0.107083, :scenario/id #uuid "65b6a6bb-16fd-439a-ad39-a523ca445e98"} {:status :failed, :plan {:plan/pickle {:pickle/row-location nil, :pickle/row-index nil, :pickle/tags [], :pickle/steps [{:step/id #uuid "ea72d2b1-ba81-49f2-b460-ebed42f3403f", :step/text "corpus no-op", :step/template-text nil, :step/keyword "Given", :step/location {:line 27, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "2d0aad60-d8a6-4bc8-a867-ddf0d87ea414", :step/text "corpus no-op", :step/template-text nil, :step/keyword "When", :step/location {:line 28, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "7b5ab23c-8122-4a24-a976-69f4b9340f4a", :step/text "corpus errors deliberately", :step/template-text nil, :step/keyword "Then", :step/location {:line 29, :column 5}, :step/origin :scenario, :step/arguments []}], :pickle/location {:line 26, :column 3}, :pickle/source-file "/private/tmp/sl-demo-053/target/corpus/p61180/default-42/features/02_scenario_tags.feature", :pickle/feature-description nil, :pickle/name "S-032 errors at step 3", :pickle/row-values nil, :pickle/id #uuid "306d99f0-71e6-4cda-a501-8bfca69cf998", :pickle/description nil, :pickle/template-name nil, :pickle/scenario-location nil, :pickle/feature-name "Corpus scenario tags"}}, :steps [{:step {:step/id #uuid "ea72d2b1-ba81-49f2-b460-ebed42f3403f", :step/text "corpus no-op", :step/template-text nil, :step/keyword "Given", :step/location {:line 27, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus no-op", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 16}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-b180a1cdfceb0f96", :actual 1, :metadata nil}, :status :passed, :duration-ms 0.0125} {:step {:step/id #uuid "2d0aad60-d8a6-4bc8-a867-ddf0d87ea414", :step/text "corpus no-op", :step/template-text nil, :step/keyword "When", :step/location {:line 28, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus no-op", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 16}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-b180a1cdfceb0f96", :actual 1, :metadata nil}, :status :passed, :duration-ms 0.005041} {:step {:step/id #uuid "7b5ab23c-8122-4a24-a976-69f4b9340f4a", :step/text "corpus errors deliberately", :step/template-text nil, :step/keyword "Then", :step/location {:line 29, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus errors deliberately", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 31}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-7db2bca759a32979", :actual 1, :metadata nil}, :status :failed, :duration-ms 0.260625, :error {:type :step/exception, :message "corpus deliberate error", :exception-class "clojure.lang.ExceptionInfo", :data {:corpus/deliberate true}}}], :duration-ms 0.384709, :scenario/id #uuid "306d99f0-71e6-4cda-a501-8bfca69cf998"} {:status :failed, :plan {:plan/pickle {:pickle/row-location nil, :pickle/row-index nil, :pickle/tags [{:name "@corpus-suite", :location {:line 1, :column 1}} {:name "@corpus-b", :location {:line 4, :column 3}}], :pickle/steps [{:step/id #uuid "60409e09-a12f-4228-80dc-e220e3bc02e3", :step/text "corpus no-op", :step/template-text nil, :step/keyword "Given", :step/location {:line 6, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "ea9d67e0-9275-4f5a-aa88-2e3a6719416e", :step/text "corpus no-op", :step/template-text nil, :step/keyword "When", :step/location {:line 7, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "bf7b0277-60f0-4169-958a-a2eb8ef8a691", :step/text "corpus fails deliberately", :step/template-text nil, :step/keyword "Then", :step/location {:line 8, :column 5}, :step/origin :scenario, :step/arguments []}], :pickle/location {:line 5, :column 3}, :pickle/source-file "/private/tmp/sl-demo-053/target/corpus/p61180/default-42/features/03_both_tags.feature", :pickle/feature-description nil, :pickle/name "S-007 fails at step 3", :pickle/row-values nil, :pickle/id #uuid "6e5bddeb-6a07-4a95-a2fb-4ca21660c737", :pickle/description nil, :pickle/template-name nil, :pickle/scenario-location nil, :pickle/feature-name "Corpus both tags"}}, :steps [{:step {:step/id #uuid "60409e09-a12f-4228-80dc-e220e3bc02e3", :step/text "corpus no-op", :step/template-text nil, :step/keyword "Given", :step/location {:line 6, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus no-op", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 16}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-b180a1cdfceb0f96", :actual 1, :metadata nil}, :status :passed, :duration-ms 0.009584} {:step {:step/id #uuid "ea9d67e0-9275-4f5a-aa88-2e3a6719416e", :step/text "corpus no-op", :step/template-text nil, :step/keyword "When", :step/location {:line 7, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus no-op", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 16}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-b180a1cdfceb0f96", :actual 1, :metadata nil}, :status :passed, :duration-ms 0.004333} {:step {:step/id #uuid "bf7b0277-60f0-4169-958a-a2eb8ef8a691", :step/text "corpus fails deliberately", :step/template-text nil, :step/keyword "Then", :step/location {:line 8, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus fails deliberately", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 25}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-7dcf7f1c3fad7897", :actual 1, :metadata nil}, :status :failed, :duration-ms 0.01925, :error {:type :step/invalid-return, :message "Step returned invalid type: class clojure.lang.Keyword. Expected map, nil, or :pending.", :value ":corpus/deliberate-failure"}}], :duration-ms 0.1125, :scenario/id #uuid "6e5bddeb-6a07-4a95-a2fb-4ca21660c737"} {:status :passed, :plan {:plan/pickle {:pickle/row-location nil, :pickle/row-index nil, :pickle/tags [{:name "@corpus-suite", :location {:line 1, :column 1}} {:name "@corpus-a", :location {:line 10, :column 3}}], :pickle/steps [{:step/id #uuid "931ffcbf-08bf-4f2d-a3cd-affdbd7c565f", :step/text "corpus sleeps 54 ms", :step/template-text nil, :step/keyword "Given", :step/location {:line 12, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "26afa35b-c926-4c8a-bf0d-e5a03c21efd4", :step/text "corpus no-op", :step/template-text nil, :step/keyword "When", :step/location {:line 13, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "09d390ad-af6c-4991-b370-1e8879d0d5f6", :step/text "corpus no-op", :step/template-text nil, :step/keyword "When", :step/location {:line 14, :column 5}, :step/origin :scenario, :step/arguments []}], :pickle/location {:line 11, :column 3}, :pickle/source-file "/private/tmp/sl-demo-053/target/corpus/p61180/default-42/features/03_both_tags.feature", :pickle/feature-description nil, :pickle/name "S-008 passes", :pickle/row-values nil, :pickle/id #uuid "7e8b4912-64bd-4c9f-9809-af26442335a8", :pickle/description nil, :pickle/template-name nil, :pickle/scenario-location nil, :pickle/feature-name "Corpus both tags"}}, :steps [{:step {:step/id #uuid "931ffcbf-08bf-4f2d-a3cd-affdbd7c565f", :step/text "corpus sleeps 54 ms", :step/template-text nil, :step/keyword "Given", :step/location {:line 12, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus sleeps (\\d+) ms", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 20}, :captures ["54"], :expected #{1 2}, :arity 2, :stepdef/id "sd-78a9908a5871463d", :actual 2, :metadata nil}, :status :passed, :duration-ms 54.690958} {:step {:step/id #uuid "26afa35b-c926-4c8a-bf0d-e5a03c21efd4", :step/text "corpus no-op", :step/template-text nil, :step/keyword "When", :step/location {:line 13, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus no-op", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 16}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-b180a1cdfceb0f96", :actual 1, :metadata nil}, :status :passed, :duration-ms 0.030583} {:step {:step/id #uuid "09d390ad-af6c-4991-b370-1e8879d0d5f6", :step/text "corpus no-op", :step/template-text nil, :step/keyword "When", :step/location {:line 14, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus no-op", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 16}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-b180a1cdfceb0f96", :actual 1, :metadata nil}, :status :passed, :duration-ms 0.005167}], :duration-ms 54.935083, :scenario/id #uuid "7e8b4912-64bd-4c9f-9809-af26442335a8"} {:status :passed, :plan {:plan/pickle {:pickle/row-location nil, :pickle/row-index nil, :pickle/tags [{:name "@corpus-suite", :location {:line 1, :column 1}}], :pickle/steps [{:step/id #uuid "50e8d8b0-6c57-4dc6-b279-0bce0661149a", :step/text "corpus sleeps 19 ms", :step/template-text nil, :step/keyword "Given", :step/location {:line 17, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "01658790-a0a3-4c8b-9edf-fc5766d0b7b4", :step/text "corpus no-op", :step/template-text nil, :step/keyword "When", :step/location {:line 18, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "14bd4629-5677-409b-86d4-edffde22a0c5", :step/text "corpus sleeps 18 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 19, :column 5}, :step/origin :scenario, :step/arguments []}], :pickle/location {:line 16, :column 3}, :pickle/source-file "/private/tmp/sl-demo-053/target/corpus/p61180/default-42/features/03_both_tags.feature", :pickle/feature-description nil, :pickle/name "S-030 passes", :pickle/row-values nil, :pickle/id #uuid "f6a91c89-0c12-4cb8-a3fd-0a5c6657ccf0", :pickle/description nil, :pickle/template-name nil, :pickle/scenario-location nil, :pickle/feature-name "Corpus both tags"}}, :steps [{:step {:step/id #uuid "50e8d8b0-6c57-4dc6-b279-0bce0661149a", :step/text "corpus sleeps 19 ms", :step/template-text nil, :step/keyword "Given", :step/location {:line 17, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus sleeps (\\d+) ms", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 20}, :captures ["19"], :expected #{1 2}, :arity 2, :stepdef/id "sd-78a9908a5871463d", :actual 2, :metadata nil}, :status :passed, :duration-ms 23.85725} {:step {:step/id #uuid "01658790-a0a3-4c8b-9edf-fc5766d0b7b4", :step/text "corpus no-op", :step/template-text nil, :step/keyword "When", :step/location {:line 18, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus no-op", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 16}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-b180a1cdfceb0f96", :actual 1, :metadata nil}, :status :passed, :duration-ms 0.063834} {:step {:step/id #uuid "14bd4629-5677-409b-86d4-edffde22a0c5", :step/text "corpus sleeps 18 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 19, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus sleeps (\\d+) ms", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 20}, :captures ["18"], :expected #{1 2}, :arity 2, :stepdef/id "sd-78a9908a5871463d", :actual 2, :metadata nil}, :status :passed, :duration-ms 22.641042}], :duration-ms 47.129917, :scenario/id #uuid "f6a91c89-0c12-4cb8-a3fd-0a5c6657ccf0"} {:status :pending, :plan {:plan/pickle {:pickle/row-location nil, :pickle/row-index nil, :pickle/tags [{:name "@corpus-suite", :location {:line 1, :column 1}}], :pickle/steps [{:step/id #uuid "826f6a2d-1132-4203-a414-2d421b44927b", :step/text "corpus no-op", :step/template-text nil, :step/keyword "Given", :step/location {:line 22, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "7502651a-af06-46d8-8a87-8170cc196939", :step/text "corpus sleeps 23 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 23, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "5f38d3b0-7743-427c-a1fe-501d996fd880", :step/text "corpus is pending", :step/template-text nil, :step/keyword "Then", :step/location {:line 24, :column 5}, :step/origin :scenario, :step/arguments []}], :pickle/location {:line 21, :column 3}, :pickle/source-file "/private/tmp/sl-demo-053/target/corpus/p61180/default-42/features/03_both_tags.feature", :pickle/feature-description nil, :pickle/name "S-034 is pending at step 3", :pickle/row-values nil, :pickle/id #uuid "fdc20a3d-43d4-4547-b915-3ba9242c07d9", :pickle/description nil, :pickle/template-name nil, :pickle/scenario-location nil, :pickle/feature-name "Corpus both tags"}}, :steps [{:step {:step/id #uuid "826f6a2d-1132-4203-a414-2d421b44927b", :step/text "corpus no-op", :step/template-text nil, :step/keyword "Given", :step/location {:line 22, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus no-op", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 16}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-b180a1cdfceb0f96", :actual 1, :metadata nil}, :status :passed, :duration-ms 0.090584} {:step {:step/id #uuid "7502651a-af06-46d8-8a87-8170cc196939", :step/text "corpus sleeps 23 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 23, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus sleeps (\\d+) ms", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 20}, :captures ["23"], :expected #{1 2}, :arity 2, :stepdef/id "sd-78a9908a5871463d", :actual 2, :metadata nil}, :status :passed, :duration-ms 26.472208} {:step {:step/id #uuid "5f38d3b0-7743-427c-a1fe-501d996fd880", :step/text "corpus is pending", :step/template-text nil, :step/keyword "Then", :step/location {:line 24, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus is pending", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 35}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-7e724a3351ad99f4", :actual 1, :metadata nil}, :status :pending, :duration-ms 0.030542}], :duration-ms 26.863666, :scenario/id #uuid "fdc20a3d-43d4-4547-b915-3ba9242c07d9"} {:status :pending, :plan {:plan/pickle {:pickle/row-location nil, :pickle/row-index nil, :pickle/tags [{:name "@corpus-suite", :location {:line 1, :column 1}}], :pickle/steps [{:step/id #uuid "d026843f-2e23-48eb-b84c-0e300ab5f0d3", :step/text "corpus sleeps 34 ms", :step/template-text nil, :step/keyword "Given", :step/location {:line 27, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "3492ccd4-731e-4453-99ba-af216b023ee0", :step/text "corpus sleeps 34 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 28, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "f3b84b4d-b991-4081-a659-7041bc94ef59", :step/text "corpus is pending", :step/template-text nil, :step/keyword "Then", :step/location {:line 29, :column 5}, :step/origin :scenario, :step/arguments []}], :pickle/location {:line 26, :column 3}, :pickle/source-file "/private/tmp/sl-demo-053/target/corpus/p61180/default-42/features/03_both_tags.feature", :pickle/feature-description nil, :pickle/name "S-035 is pending at step 3", :pickle/row-values nil, :pickle/id #uuid "2e0d3c03-5c29-4e0c-83c4-474be3b5ab98", :pickle/description nil, :pickle/template-name nil, :pickle/scenario-location nil, :pickle/feature-name "Corpus both tags"}}, :steps [{:step {:step/id #uuid "d026843f-2e23-48eb-b84c-0e300ab5f0d3", :step/text "corpus sleeps 34 ms", :step/template-text nil, :step/keyword "Given", :step/location {:line 27, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus sleeps (\\d+) ms", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 20}, :captures ["34"], :expected #{1 2}, :arity 2, :stepdef/id "sd-78a9908a5871463d", :actual 2, :metadata nil}, :status :passed, :duration-ms 37.981958} {:step {:step/id #uuid "3492ccd4-731e-4453-99ba-af216b023ee0", :step/text "corpus sleeps 34 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 28, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus sleeps (\\d+) ms", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 20}, :captures ["34"], :expected #{1 2}, :arity 2, :stepdef/id "sd-78a9908a5871463d", :actual 2, :metadata nil}, :status :passed, :duration-ms 36.381541} {:step {:step/id #uuid "f3b84b4d-b991-4081-a659-7041bc94ef59", :step/text "corpus is pending", :step/template-text nil, :step/keyword "Then", :step/location {:line 29, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus is pending", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 35}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-7e724a3351ad99f4", :actual 1, :metadata nil}, :status :pending, :duration-ms 0.087291}], :duration-ms 75.128083, :scenario/id #uuid "2e0d3c03-5c29-4e0c-83c4-474be3b5ab98"} {:status :pending, :plan {:plan/pickle {:pickle/row-location nil, :pickle/row-index nil, :pickle/tags [{:name "@corpus-suite", :location {:line 1, :column 1}}], :pickle/steps [{:step/id #uuid "c79bf3f2-f962-4d8f-a5e6-61711cfb2c69", :step/text "corpus no-op", :step/template-text nil, :step/keyword "Given", :step/location {:line 32, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "e9351ecc-7b71-4f89-a97a-42be0732178b", :step/text "corpus sleeps 50 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 33, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "2c0a0e19-dd53-43e8-b069-ae0c433637c3", :step/text "corpus is pending", :step/template-text nil, :step/keyword "Then", :step/location {:line 34, :column 5}, :step/origin :scenario, :step/arguments []}], :pickle/location {:line 31, :column 3}, :pickle/source-file "/private/tmp/sl-demo-053/target/corpus/p61180/default-42/features/03_both_tags.feature", :pickle/feature-description nil, :pickle/name "S-036 is pending at step 3", :pickle/row-values nil, :pickle/id #uuid "30453a3e-51f0-415e-9b7a-525c044ffaa1", :pickle/description nil, :pickle/template-name nil, :pickle/scenario-location nil, :pickle/feature-name "Corpus both tags"}}, :steps [{:step {:step/id #uuid "c79bf3f2-f962-4d8f-a5e6-61711cfb2c69", :step/text "corpus no-op", :step/template-text nil, :step/keyword "Given", :step/location {:line 32, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus no-op", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 16}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-b180a1cdfceb0f96", :actual 1, :metadata nil}, :status :passed, :duration-ms 0.033084} {:step {:step/id #uuid "e9351ecc-7b71-4f89-a97a-42be0732178b", :step/text "corpus sleeps 50 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 33, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus sleeps (\\d+) ms", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 20}, :captures ["50"], :expected #{1 2}, :arity 2, :stepdef/id "sd-78a9908a5871463d", :actual 2, :metadata nil}, :status :passed, :duration-ms 55.071375} {:step {:step/id #uuid "2c0a0e19-dd53-43e8-b069-ae0c433637c3", :step/text "corpus is pending", :step/template-text nil, :step/keyword "Then", :step/location {:line 34, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus is pending", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 35}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-7e724a3351ad99f4", :actual 1, :metadata nil}, :status :pending, :duration-ms 0.0245}], :duration-ms 55.352458, :scenario/id #uuid "30453a3e-51f0-415e-9b7a-525c044ffaa1"} {:status :passed, :plan {:plan/pickle {:pickle/row-location {:line 10, :column 7}, :pickle/row-index 0, :pickle/tags [{:name "@corpus-outline", :location {:line 3, :column 3}}], :pickle/steps [{:step/id #uuid "e0704786-e905-4798-a35e-609e37697af6", :step/text "corpus no-op", :step/template-text "corpus no-op", :step/keyword "Given", :step/location {:line 5, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "944fb5b5-4220-46b4-8225-6da0209e97e4", :step/text "corpus sleeps 11 ms", :step/template-text "corpus sleeps \u003cms> ms", :step/keyword "When", :step/location {:line 6, :column 5}, :step/origin :scenario, :step/arguments []}], :pickle/location {:line 10, :column 7}, :pickle/source-file "/private/tmp/sl-demo-053/target/corpus/p61180/default-42/features/04_outline.feature", :pickle/feature-description nil, :pickle/name "O-001 case alpha passes", :pickle/row-values {"case" "alpha", "ms" "11"}, :pickle/id #uuid "a8183725-1a1b-4e5e-9f71-e4c7316cd8d0", :pickle/description nil, :pickle/template-name "O-001 case \u003ccase> passes", :pickle/scenario-location {:line 4, :column 3}, :pickle/feature-name "Corpus outline"}}, :steps [{:step {:step/id #uuid "e0704786-e905-4798-a35e-609e37697af6", :step/text "corpus no-op", :step/template-text "corpus no-op", :step/keyword "Given", :step/location {:line 5, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus no-op", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 16}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-b180a1cdfceb0f96", :actual 1, :metadata nil}, :status :passed, :duration-ms 0.012459} {:step {:step/id #uuid "944fb5b5-4220-46b4-8225-6da0209e97e4", :step/text "corpus sleeps 11 ms", :step/template-text "corpus sleeps \u003cms> ms", :step/keyword "When", :step/location {:line 6, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus sleeps (\\d+) ms", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 20}, :captures ["11"], :expected #{1 2}, :arity 2, :stepdef/id "sd-78a9908a5871463d", :actual 2, :metadata nil}, :status :passed, :duration-ms 13.79625}], :duration-ms 13.938208, :scenario/id #uuid "a8183725-1a1b-4e5e-9f71-e4c7316cd8d0"} {:status :passed, :plan {:plan/pickle {:pickle/row-location {:line 11, :column 7}, :pickle/row-index 1, :pickle/tags [{:name "@corpus-outline", :location {:line 3, :column 3}}], :pickle/steps [{:step/id #uuid "0b0db036-a8c6-406c-a8fd-48564f643749", :step/text "corpus no-op", :step/template-text "corpus no-op", :step/keyword "Given", :step/location {:line 5, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "5e23e396-0809-4740-ab64-6616c84785b7", :step/text "corpus sleeps 46 ms", :step/template-text "corpus sleeps \u003cms> ms", :step/keyword "When", :step/location {:line 6, :column 5}, :step/origin :scenario, :step/arguments []}], :pickle/location {:line 11, :column 7}, :pickle/source-file "/private/tmp/sl-demo-053/target/corpus/p61180/default-42/features/04_outline.feature", :pickle/feature-description nil, :pickle/name "O-001 case beta passes", :pickle/row-values {"case" "beta", "ms" "46"}, :pickle/id #uuid "28c379a7-8778-496c-aeeb-12d3b5c909e3", :pickle/description nil, :pickle/template-name "O-001 case \u003ccase> passes", :pickle/scenario-location {:line 4, :column 3}, :pickle/feature-name "Corpus outline"}}, :steps [{:step {:step/id #uuid "0b0db036-a8c6-406c-a8fd-48564f643749", :step/text "corpus no-op", :step/template-text "corpus no-op", :step/keyword "Given", :step/location {:line 5, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus no-op", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 16}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-b180a1cdfceb0f96", :actual 1, :metadata nil}, :status :passed, :duration-ms 0.011291} {:step {:step/id #uuid "5e23e396-0809-4740-ab64-6616c84785b7", :step/text "corpus sleeps 46 ms", :step/template-text "corpus sleeps \u003cms> ms", :step/keyword "When", :step/location {:line 6, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus sleeps (\\d+) ms", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 20}, :captures ["46"], :expected #{1 2}, :arity 2, :stepdef/id "sd-78a9908a5871463d", :actual 2, :metadata nil}, :status :passed, :duration-ms 50.288542}], :duration-ms 50.417083, :scenario/id #uuid "28c379a7-8778-496c-aeeb-12d3b5c909e3"} {:status :passed, :plan {:plan/pickle {:pickle/row-location {:line 16, :column 7}, :pickle/row-index 0, :pickle/tags [{:name "@corpus-outline", :location {:line 3, :column 3}} {:name "@corpus-row", :location {:line 13, :column 5}}], :pickle/steps [{:step/id #uuid "48dca1d0-7566-4aec-af61-8bdd34e7bb9b", :step/text "corpus no-op", :step/template-text "corpus no-op", :step/keyword "Given", :step/location {:line 5, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "5aa944c7-ea6e-4e71-94ee-1a2edd29dd11", :step/text "corpus sleeps 33 ms", :step/template-text "corpus sleeps \u003cms> ms", :step/keyword "When", :step/location {:line 6, :column 5}, :step/origin :scenario, :step/arguments []}], :pickle/location {:line 16, :column 7}, :pickle/source-file "/private/tmp/sl-demo-053/target/corpus/p61180/default-42/features/04_outline.feature", :pickle/feature-description nil, :pickle/name "O-001 case gamma passes", :pickle/row-values {"case" "gamma", "ms" "33"}, :pickle/id #uuid "f7c4dcd6-42ff-4be3-ae0c-9be315af97d3", :pickle/description nil, :pickle/template-name "O-001 case \u003ccase> passes", :pickle/scenario-location {:line 4, :column 3}, :pickle/feature-name "Corpus outline"}}, :steps [{:step {:step/id #uuid "48dca1d0-7566-4aec-af61-8bdd34e7bb9b", :step/text "corpus no-op", :step/template-text "corpus no-op", :step/keyword "Given", :step/location {:line 5, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus no-op", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 16}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-b180a1cdfceb0f96", :actual 1, :metadata nil}, :status :passed, :duration-ms 0.007084} {:step {:step/id #uuid "5aa944c7-ea6e-4e71-94ee-1a2edd29dd11", :step/text "corpus sleeps 33 ms", :step/template-text "corpus sleeps \u003cms> ms", :step/keyword "When", :step/location {:line 6, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus sleeps (\\d+) ms", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 20}, :captures ["33"], :expected #{1 2}, :arity 2, :stepdef/id "sd-78a9908a5871463d", :actual 2, :metadata nil}, :status :passed, :duration-ms 38.04525}], :duration-ms 38.208666, :scenario/id #uuid "f7c4dcd6-42ff-4be3-ae0c-9be315af97d3"} {:status :passed, :plan {:plan/pickle {:pickle/row-location nil, :pickle/row-index nil, :pickle/tags [], :pickle/steps [{:step/id #uuid "a032d681-f7c6-4174-af46-773c0aa00f63", :step/text "corpus no-op", :step/template-text nil, :step/keyword "Given", :step/location {:line 4, :column 5}, :step/origin :feature-background, :step/arguments []} {:step/id #uuid "7c0d4f44-356c-4905-a5c2-82124e90ff9d", :step/text "corpus sleeps 56 ms", :step/template-text nil, :step/keyword "Given", :step/location {:line 7, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "00390209-eeac-4111-b021-30d39bb0101c", :step/text "corpus sleeps 37 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 8, :column 5}, :step/origin :scenario, :step/arguments []}], :pickle/location {:line 6, :column 3}, :pickle/source-file "/private/tmp/sl-demo-053/target/corpus/p61180/default-42/features/05_background.feature", :pickle/feature-description nil, :pickle/name "S-009 passes", :pickle/row-values nil, :pickle/id #uuid "9b1c3f68-24ac-436f-b87d-a31012b37713", :pickle/description nil, :pickle/template-name nil, :pickle/scenario-location nil, :pickle/feature-name "Corpus background"}}, :steps [{:step {:step/id #uuid "a032d681-f7c6-4174-af46-773c0aa00f63", :step/text "corpus no-op", :step/template-text nil, :step/keyword "Given", :step/location {:line 4, :column 5}, :step/origin :feature-background, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus no-op", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 16}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-b180a1cdfceb0f96", :actual 1, :metadata nil}, :status :passed, :duration-ms 0.03825} {:step {:step/id #uuid "7c0d4f44-356c-4905-a5c2-82124e90ff9d", :step/text "corpus sleeps 56 ms", :step/template-text nil, :step/keyword "Given", :step/location {:line 7, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus sleeps (\\d+) ms", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 20}, :captures ["56"], :expected #{1 2}, :arity 2, :stepdef/id "sd-78a9908a5871463d", :actual 2, :metadata nil}, :status :passed, :duration-ms 61.090042} {:step {:step/id #uuid "00390209-eeac-4111-b021-30d39bb0101c", :step/text "corpus sleeps 37 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 8, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus sleeps (\\d+) ms", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 20}, :captures ["37"], :expected #{1 2}, :arity 2, :stepdef/id "sd-78a9908a5871463d", :actual 2, :metadata nil}, :status :passed, :duration-ms 42.10775}], :duration-ms 103.546125, :scenario/id #uuid "9b1c3f68-24ac-436f-b87d-a31012b37713"} {:status :failed, :plan {:plan/pickle {:pickle/row-location nil, :pickle/row-index nil, :pickle/tags [], :pickle/steps [{:step/id #uuid "9d805ce0-103c-42a8-a691-d1228f877797", :step/text "corpus no-op", :step/template-text nil, :step/keyword "Given", :step/location {:line 4, :column 5}, :step/origin :feature-background, :step/arguments []} {:step/id #uuid "a8be22aa-1b11-4ab5-b7db-771ce19fe42f", :step/text "corpus sleeps 23 ms", :step/template-text nil, :step/keyword "Given", :step/location {:line 11, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "b89d76e8-25b9-462a-a597-ee1109099449", :step/text "corpus no-op", :step/template-text nil, :step/keyword "When", :step/location {:line 12, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "76b03f32-5d53-4a69-b7db-37622f496791", :step/text "corpus errors deliberately", :step/template-text nil, :step/keyword "Then", :step/location {:line 13, :column 5}, :step/origin :scenario, :step/arguments []}], :pickle/location {:line 10, :column 3}, :pickle/source-file "/private/tmp/sl-demo-053/target/corpus/p61180/default-42/features/05_background.feature", :pickle/feature-description nil, :pickle/name "S-010 errors at step 3", :pickle/row-values nil, :pickle/id #uuid "cc0a2474-d4a3-4977-9583-ba1d251e0624", :pickle/description nil, :pickle/template-name nil, :pickle/scenario-location nil, :pickle/feature-name "Corpus background"}}, :steps [{:step {:step/id #uuid "9d805ce0-103c-42a8-a691-d1228f877797", :step/text "corpus no-op", :step/template-text nil, :step/keyword "Given", :step/location {:line 4, :column 5}, :step/origin :feature-background, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus no-op", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 16}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-b180a1cdfceb0f96", :actual 1, :metadata nil}, :status :passed, :duration-ms 0.012625} {:step {:step/id #uuid "a8be22aa-1b11-4ab5-b7db-771ce19fe42f", :step/text "corpus sleeps 23 ms", :step/template-text nil, :step/keyword "Given", :step/location {:line 11, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus sleeps (\\d+) ms", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 20}, :captures ["23"], :expected #{1 2}, :arity 2, :stepdef/id "sd-78a9908a5871463d", :actual 2, :metadata nil}, :status :passed, :duration-ms 26.519625} {:step {:step/id #uuid "b89d76e8-25b9-462a-a597-ee1109099449", :step/text "corpus no-op", :step/template-text nil, :step/keyword "When", :step/location {:line 12, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus no-op", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 16}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-b180a1cdfceb0f96", :actual 1, :metadata nil}, :status :passed, :duration-ms 0.018667} {:step {:step/id #uuid "76b03f32-5d53-4a69-b7db-37622f496791", :step/text "corpus errors deliberately", :step/template-text nil, :step/keyword "Then", :step/location {:line 13, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus errors deliberately", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 31}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-7db2bca759a32979", :actual 1, :metadata nil}, :status :failed, :duration-ms 0.123459, :error {:type :step/exception, :message "corpus deliberate error", :exception-class "clojure.lang.ExceptionInfo", :data {:corpus/deliberate true}}}], :duration-ms 26.806708, :scenario/id #uuid "cc0a2474-d4a3-4977-9583-ba1d251e0624"} {:status :passed, :plan {:plan/pickle {:pickle/row-location nil, :pickle/row-index nil, :pickle/tags [], :pickle/steps [{:step/id #uuid "09661f32-a915-492e-b428-1491a44f54f1", :step/text "corpus no-op", :step/template-text nil, :step/keyword "Given", :step/location {:line 4, :column 5}, :step/origin :feature-background, :step/arguments []} {:step/id #uuid "b448b58f-64e6-490d-8158-01bf6245d8f6", :step/text "corpus no-op", :step/template-text nil, :step/keyword "Given", :step/location {:line 16, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "69800279-1583-4c77-b310-7389914d771b", :step/text "corpus no-op", :step/template-text nil, :step/keyword "When", :step/location {:line 17, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "00d8509d-8690-4707-bfd3-c9b4fde0babf", :step/text "corpus sleeps 45 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 18, :column 5}, :step/origin :scenario, :step/arguments []}], :pickle/location {:line 15, :column 3}, :pickle/source-file "/private/tmp/sl-demo-053/target/corpus/p61180/default-42/features/05_background.feature", :pickle/feature-description nil, :pickle/name "S-037 passes", :pickle/row-values nil, :pickle/id #uuid "6c7b61d1-aa33-4bf7-a963-19a5eb4f9313", :pickle/description nil, :pickle/template-name nil, :pickle/scenario-location nil, :pickle/feature-name "Corpus background"}}, :steps [{:step {:step/id #uuid "09661f32-a915-492e-b428-1491a44f54f1", :step/text "corpus no-op", :step/template-text nil, :step/keyword "Given", :step/location {:line 4, :column 5}, :step/origin :feature-background, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus no-op", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 16}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-b180a1cdfceb0f96", :actual 1, :metadata nil}, :status :passed, :duration-ms 0.004708} {:step {:step/id #uuid "b448b58f-64e6-490d-8158-01bf6245d8f6", :step/text "corpus no-op", :step/template-text nil, :step/keyword "Given", :step/location {:line 16, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus no-op", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 16}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-b180a1cdfceb0f96", :actual 1, :metadata nil}, :status :passed, :duration-ms 0.003083} {:step {:step/id #uuid "69800279-1583-4c77-b310-7389914d771b", :step/text "corpus no-op", :step/template-text nil, :step/keyword "When", :step/location {:line 17, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus no-op", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 16}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-b180a1cdfceb0f96", :actual 1, :metadata nil}, :status :passed, :duration-ms 0.00175} {:step {:step/id #uuid "00d8509d-8690-4707-bfd3-c9b4fde0babf", :step/text "corpus sleeps 45 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 18, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus sleeps (\\d+) ms", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 20}, :captures ["45"], :expected #{1 2}, :arity 2, :stepdef/id "sd-78a9908a5871463d", :actual 2, :metadata nil}, :status :passed, :duration-ms 50.027625}], :duration-ms 50.133375, :scenario/id #uuid "6c7b61d1-aa33-4bf7-a963-19a5eb4f9313"} {:status :passed, :plan {:plan/pickle {:pickle/row-location nil, :pickle/row-index nil, :pickle/tags [], :pickle/steps [{:step/id #uuid "32215042-19a2-48ee-aa84-5d46328339ec", :step/text "corpus no-op", :step/template-text nil, :step/keyword "Given", :step/location {:line 4, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "641b80d8-38a5-4d60-9995-0f71700db8ee", :step/text "corpus sleeps 41 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 5, :column 5}, :step/origin :scenario, :step/arguments []}], :pickle/location {:line 3, :column 3}, :pickle/source-file "/private/tmp/sl-demo-053/target/corpus/p61180/default-42/features/06_untagged.feature", :pickle/feature-description nil, :pickle/name "S-011 passes", :pickle/row-values nil, :pickle/id #uuid "69027d20-014e-49ab-a808-0f29435305d2", :pickle/description nil, :pickle/template-name nil, :pickle/scenario-location nil, :pickle/feature-name "Corpus untagged"}}, :steps [{:step {:step/id #uuid "32215042-19a2-48ee-aa84-5d46328339ec", :step/text "corpus no-op", :step/template-text nil, :step/keyword "Given", :step/location {:line 4, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus no-op", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 16}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-b180a1cdfceb0f96", :actual 1, :metadata nil}, :status :passed, :duration-ms 0.018041} {:step {:step/id #uuid "641b80d8-38a5-4d60-9995-0f71700db8ee", :step/text "corpus sleeps 41 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 5, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus sleeps (\\d+) ms", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 20}, :captures ["41"], :expected #{1 2}, :arity 2, :stepdef/id "sd-78a9908a5871463d", :actual 2, :metadata nil}, :status :passed, :duration-ms 46.043791}], :duration-ms 46.210334, :scenario/id #uuid "69027d20-014e-49ab-a808-0f29435305d2"} {:status :pending, :plan {:plan/pickle {:pickle/row-location nil, :pickle/row-index nil, :pickle/tags [], :pickle/steps [{:step/id #uuid "a63338ff-dc72-44b2-a401-3aa6a097520e", :step/text "corpus sleeps 44 ms", :step/template-text nil, :step/keyword "Given", :step/location {:line 8, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "c8795a6e-decb-459e-9d97-3f7b683b304b", :step/text "corpus no-op", :step/template-text nil, :step/keyword "When", :step/location {:line 9, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "a31b3ec1-1bab-458d-8215-e3a3942cb231", :step/text "corpus sleeps 16 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 10, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "debf7949-f41a-425a-8105-c6536a7245ca", :step/text "corpus is pending", :step/template-text nil, :step/keyword "Then", :step/location {:line 11, :column 5}, :step/origin :scenario, :step/arguments []}], :pickle/location {:line 7, :column 3}, :pickle/source-file "/private/tmp/sl-demo-053/target/corpus/p61180/default-42/features/06_untagged.feature", :pickle/feature-description nil, :pickle/name "S-012 is pending at step 4", :pickle/row-values nil, :pickle/id #uuid "d04c4c1e-fef3-43f2-b0c3-d8f2322ac09c", :pickle/description nil, :pickle/template-name nil, :pickle/scenario-location nil, :pickle/feature-name "Corpus untagged"}}, :steps [{:step {:step/id #uuid "a63338ff-dc72-44b2-a401-3aa6a097520e", :step/text "corpus sleeps 44 ms", :step/template-text nil, :step/keyword "Given", :step/location {:line 8, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus sleeps (\\d+) ms", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 20}, :captures ["44"], :expected #{1 2}, :arity 2, :stepdef/id "sd-78a9908a5871463d", :actual 2, :metadata nil}, :status :passed, :duration-ms 45.24675} {:step {:step/id #uuid "c8795a6e-decb-459e-9d97-3f7b683b304b", :step/text "corpus no-op", :step/template-text nil, :step/keyword "When", :step/location {:line 9, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus no-op", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 16}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-b180a1cdfceb0f96", :actual 1, :metadata nil}, :status :passed, :duration-ms 0.101291} {:step {:step/id #uuid "a31b3ec1-1bab-458d-8215-e3a3942cb231", :step/text "corpus sleeps 16 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 10, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus sleeps (\\d+) ms", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 20}, :captures ["16"], :expected #{1 2}, :arity 2, :stepdef/id "sd-78a9908a5871463d", :actual 2, :metadata nil}, :status :passed, :duration-ms 16.373417} {:step {:step/id #uuid "debf7949-f41a-425a-8105-c6536a7245ca", :step/text "corpus is pending", :step/template-text nil, :step/keyword "Then", :step/location {:line 11, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus is pending", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 35}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-7e724a3351ad99f4", :actual 1, :metadata nil}, :status :pending, :duration-ms 0.060083}], :duration-ms 62.2655, :scenario/id #uuid "d04c4c1e-fef3-43f2-b0c3-d8f2322ac09c"} {:status :passed, :plan {:plan/pickle {:pickle/row-location nil, :pickle/row-index nil, :pickle/tags [], :pickle/steps [{:step/id #uuid "354c9f98-8b00-4505-8e6d-0dcb7e6b3512", :step/text "corpus no-op", :step/template-text nil, :step/keyword "Given", :step/location {:line 14, :column 5}, :step/origin :scenario, :step/arguments []}], :pickle/location {:line 13, :column 3}, :pickle/source-file "/private/tmp/sl-demo-053/target/corpus/p61180/default-42/features/06_untagged.feature", :pickle/feature-description nil, :pickle/name "S-027 passes", :pickle/row-values nil, :pickle/id #uuid "069532ea-d6c6-47f1-ad5c-ed77c93c6913", :pickle/description nil, :pickle/template-name nil, :pickle/scenario-location nil, :pickle/feature-name "Corpus untagged"}}, :steps [{:step {:step/id #uuid "354c9f98-8b00-4505-8e6d-0dcb7e6b3512", :step/text "corpus no-op", :step/template-text nil, :step/keyword "Given", :step/location {:line 14, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus no-op", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 16}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-b180a1cdfceb0f96", :actual 1, :metadata nil}, :status :passed, :duration-ms 0.03225}], :duration-ms 0.25125, :scenario/id #uuid "069532ea-d6c6-47f1-ad5c-ed77c93c6913"} {:status :pending, :plan {:plan/pickle {:pickle/row-location nil, :pickle/row-index nil, :pickle/tags [], :pickle/steps [{:step/id #uuid "784cfb4b-e7e8-4be4-b086-7d6ec565afe6", :step/text "corpus sleeps 20 ms", :step/template-text nil, :step/keyword "Given", :step/location {:line 17, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "e037113d-9058-4158-a9b4-d4df518e4242", :step/text "corpus is pending", :step/template-text nil, :step/keyword "Then", :step/location {:line 18, :column 5}, :step/origin :scenario, :step/arguments []}], :pickle/location {:line 16, :column 3}, :pickle/source-file "/private/tmp/sl-demo-053/target/corpus/p61180/default-42/features/06_untagged.feature", :pickle/feature-description nil, :pickle/name "S-033 is pending at step 2", :pickle/row-values nil, :pickle/id #uuid "ecc50bb3-9215-41e9-bce7-7fd2de430685", :pickle/description nil, :pickle/template-name nil, :pickle/scenario-location nil, :pickle/feature-name "Corpus untagged"}}, :steps [{:step {:step/id #uuid "784cfb4b-e7e8-4be4-b086-7d6ec565afe6", :step/text "corpus sleeps 20 ms", :step/template-text nil, :step/keyword "Given", :step/location {:line 17, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus sleeps (\\d+) ms", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 20}, :captures ["20"], :expected #{1 2}, :arity 2, :stepdef/id "sd-78a9908a5871463d", :actual 2, :metadata nil}, :status :passed, :duration-ms 24.014708} {:step {:step/id #uuid "e037113d-9058-4158-a9b4-d4df518e4242", :step/text "corpus is pending", :step/template-text nil, :step/keyword "Then", :step/location {:line 18, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus is pending", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 35}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-7e724a3351ad99f4", :actual 1, :metadata nil}, :status :pending, :duration-ms 0.02975}], :duration-ms 24.238084, :scenario/id #uuid "ecc50bb3-9215-41e9-bce7-7fd2de430685"} {:status :passed, :plan {:plan/pickle {:pickle/row-location nil, :pickle/row-index nil, :pickle/tags [{:name "@serial", :location {:line 3, :column 3}}], :pickle/steps [{:step/id #uuid "dd2eeb4c-bf86-47e2-94ea-5cce22f9a334", :step/text "corpus marks begin of \"S-016 serial g1 passes\" in group \"g1\" at \"target/corpus/p61180/default-42/scratch/g1.log\"", :step/template-text nil, :step/keyword "When", :step/location {:line 5, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "ee84d710-deee-4c98-bcee-dc0b59ad4df4", :step/text "corpus sleeps 47 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 6, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "840df388-ad63-4641-9469-b296c9fb269c", :step/text "corpus marks end of \"S-016 serial g1 passes\" in group \"g1\" at \"target/corpus/p61180/default-42/scratch/g1.log\"", :step/template-text nil, :step/keyword "When", :step/location {:line 7, :column 5}, :step/origin :scenario, :step/arguments []}], :pickle/location {:line 4, :column 3}, :pickle/source-file "/private/tmp/sl-demo-053/target/corpus/p61180/default-42/features/07_serial.feature", :pickle/feature-description nil, :pickle/name "S-016 serial g1 passes", :pickle/row-values nil, :pickle/id #uuid "7d69feeb-8cec-4bbf-a663-6f1021ac0754", :pickle/description nil, :pickle/template-name nil, :pickle/scenario-location nil, :pickle/feature-name "Corpus serial groups"}}, :steps [{:step {:step/id #uuid "dd2eeb4c-bf86-47e2-94ea-5cce22f9a334", :step/text "corpus marks begin of \"S-016 serial g1 passes\" in group \"g1\" at \"target/corpus/p61180/default-42/scratch/g1.log\"", :step/template-text nil, :step/keyword "When", :step/location {:line 5, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus marks (begin|end) of \\\"([^\\\"]+)\\\" in group \\\"([^\\\"]+)\\\" at \\\"(.+)\\\"", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 39}, :captures ["begin" "S-016 serial g1 passes" "g1" "target/corpus/p61180/default-42/scratch/g1.log"], :expected #{4 5}, :arity 5, :stepdef/id "sd-cff58e564807bb4b", :actual 5, :metadata nil}, :status :passed, :duration-ms 1.543709} {:step {:step/id #uuid "ee84d710-deee-4c98-bcee-dc0b59ad4df4", :step/text "corpus sleeps 47 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 6, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus sleeps (\\d+) ms", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 20}, :captures ["47"], :expected #{1 2}, :arity 2, :stepdef/id "sd-78a9908a5871463d", :actual 2, :metadata nil}, :status :passed, :duration-ms 52.118708} {:step {:step/id #uuid "840df388-ad63-4641-9469-b296c9fb269c", :step/text "corpus marks end of \"S-016 serial g1 passes\" in group \"g1\" at \"target/corpus/p61180/default-42/scratch/g1.log\"", :step/template-text nil, :step/keyword "When", :step/location {:line 7, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus marks (begin|end) of \\\"([^\\\"]+)\\\" in group \\\"([^\\\"]+)\\\" at \\\"(.+)\\\"", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 39}, :captures ["end" "S-016 serial g1 passes" "g1" "target/corpus/p61180/default-42/scratch/g1.log"], :expected #{4 5}, :arity 5, :stepdef/id "sd-cff58e564807bb4b", :actual 5, :metadata nil}, :status :passed, :duration-ms 1.0665}], :duration-ms 55.120292, :schedule {:serial? true, :reason :tag}, :scenario/id #uuid "7d69feeb-8cec-4bbf-a663-6f1021ac0754"} {:status :passed, :plan {:plan/pickle {:pickle/row-location nil, :pickle/row-index nil, :pickle/tags [{:name "@serial", :location {:line 9, :column 3}}], :pickle/steps [{:step/id #uuid "625d766b-d925-4589-a49e-3648a6ae5326", :step/text "corpus marks begin of \"S-017 serial g1 passes\" in group \"g1\" at \"target/corpus/p61180/default-42/scratch/g1.log\"", :step/template-text nil, :step/keyword "When", :step/location {:line 11, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "8eb00a29-336b-4994-9f16-c434967787b1", :step/text "corpus sleeps 32 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 12, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "3a4a09ca-36d7-4590-b60c-0b7fa834070d", :step/text "corpus marks end of \"S-017 serial g1 passes\" in group \"g1\" at \"target/corpus/p61180/default-42/scratch/g1.log\"", :step/template-text nil, :step/keyword "When", :step/location {:line 13, :column 5}, :step/origin :scenario, :step/arguments []}], :pickle/location {:line 10, :column 3}, :pickle/source-file "/private/tmp/sl-demo-053/target/corpus/p61180/default-42/features/07_serial.feature", :pickle/feature-description nil, :pickle/name "S-017 serial g1 passes", :pickle/row-values nil, :pickle/id #uuid "4f0f7c6f-87b1-4f8d-82e6-e02a34bc1357", :pickle/description nil, :pickle/template-name nil, :pickle/scenario-location nil, :pickle/feature-name "Corpus serial groups"}}, :steps [{:step {:step/id #uuid "625d766b-d925-4589-a49e-3648a6ae5326", :step/text "corpus marks begin of \"S-017 serial g1 passes\" in group \"g1\" at \"target/corpus/p61180/default-42/scratch/g1.log\"", :step/template-text nil, :step/keyword "When", :step/location {:line 11, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus marks (begin|end) of \\\"([^\\\"]+)\\\" in group \\\"([^\\\"]+)\\\" at \\\"(.+)\\\"", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 39}, :captures ["begin" "S-017 serial g1 passes" "g1" "target/corpus/p61180/default-42/scratch/g1.log"], :expected #{4 5}, :arity 5, :stepdef/id "sd-cff58e564807bb4b", :actual 5, :metadata nil}, :status :passed, :duration-ms 0.50975} {:step {:step/id #uuid "8eb00a29-336b-4994-9f16-c434967787b1", :step/text "corpus sleeps 32 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 12, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus sleeps (\\d+) ms", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 20}, :captures ["32"], :expected #{1 2}, :arity 2, :stepdef/id "sd-78a9908a5871463d", :actual 2, :metadata nil}, :status :passed, :duration-ms 37.106792} {:step {:step/id #uuid "3a4a09ca-36d7-4590-b60c-0b7fa834070d", :step/text "corpus marks end of \"S-017 serial g1 passes\" in group \"g1\" at \"target/corpus/p61180/default-42/scratch/g1.log\"", :step/template-text nil, :step/keyword "When", :step/location {:line 13, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus marks (begin|end) of \\\"([^\\\"]+)\\\" in group \\\"([^\\\"]+)\\\" at \\\"(.+)\\\"", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 39}, :captures ["end" "S-017 serial g1 passes" "g1" "target/corpus/p61180/default-42/scratch/g1.log"], :expected #{4 5}, :arity 5, :stepdef/id "sd-cff58e564807bb4b", :actual 5, :metadata nil}, :status :passed, :duration-ms 0.583167}], :duration-ms 38.516667, :schedule {:serial? true, :reason :tag}, :scenario/id #uuid "4f0f7c6f-87b1-4f8d-82e6-e02a34bc1357"} {:status :passed, :plan {:plan/pickle {:pickle/row-location nil, :pickle/row-index nil, :pickle/tags [{:name "@serial", :location {:line 15, :column 3}}], :pickle/steps [{:step/id #uuid "c520e28c-541b-4e4d-90f2-ab4cec7aeee6", :step/text "corpus marks begin of \"S-018 serial g1 passes\" in group \"g1\" at \"target/corpus/p61180/default-42/scratch/g1.log\"", :step/template-text nil, :step/keyword "When", :step/location {:line 17, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "8f13f4cd-d384-432b-9b6d-e0ef896a19d8", :step/text "corpus sleeps 51 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 18, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "04dee6b0-f879-4f6c-8e34-6b1316a1a98a", :step/text "corpus marks end of \"S-018 serial g1 passes\" in group \"g1\" at \"target/corpus/p61180/default-42/scratch/g1.log\"", :step/template-text nil, :step/keyword "When", :step/location {:line 19, :column 5}, :step/origin :scenario, :step/arguments []}], :pickle/location {:line 16, :column 3}, :pickle/source-file "/private/tmp/sl-demo-053/target/corpus/p61180/default-42/features/07_serial.feature", :pickle/feature-description nil, :pickle/name "S-018 serial g1 passes", :pickle/row-values nil, :pickle/id #uuid "1ec5d52f-a99c-4f7d-b673-dc05bf02332b", :pickle/description nil, :pickle/template-name nil, :pickle/scenario-location nil, :pickle/feature-name "Corpus serial groups"}}, :steps [{:step {:step/id #uuid "c520e28c-541b-4e4d-90f2-ab4cec7aeee6", :step/text "corpus marks begin of \"S-018 serial g1 passes\" in group \"g1\" at \"target/corpus/p61180/default-42/scratch/g1.log\"", :step/template-text nil, :step/keyword "When", :step/location {:line 17, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus marks (begin|end) of \\\"([^\\\"]+)\\\" in group \\\"([^\\\"]+)\\\" at \\\"(.+)\\\"", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 39}, :captures ["begin" "S-018 serial g1 passes" "g1" "target/corpus/p61180/default-42/scratch/g1.log"], :expected #{4 5}, :arity 5, :stepdef/id "sd-cff58e564807bb4b", :actual 5, :metadata nil}, :status :passed, :duration-ms 0.372208} {:step {:step/id #uuid "8f13f4cd-d384-432b-9b6d-e0ef896a19d8", :step/text "corpus sleeps 51 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 18, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus sleeps (\\d+) ms", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 20}, :captures ["51"], :expected #{1 2}, :arity 2, :stepdef/id "sd-78a9908a5871463d", :actual 2, :metadata nil}, :status :passed, :duration-ms 54.748792} {:step {:step/id #uuid "04dee6b0-f879-4f6c-8e34-6b1316a1a98a", :step/text "corpus marks end of \"S-018 serial g1 passes\" in group \"g1\" at \"target/corpus/p61180/default-42/scratch/g1.log\"", :step/template-text nil, :step/keyword "When", :step/location {:line 19, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus marks (begin|end) of \\\"([^\\\"]+)\\\" in group \\\"([^\\\"]+)\\\" at \\\"(.+)\\\"", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 39}, :captures ["end" "S-018 serial g1 passes" "g1" "target/corpus/p61180/default-42/scratch/g1.log"], :expected #{4 5}, :arity 5, :stepdef/id "sd-cff58e564807bb4b", :actual 5, :metadata nil}, :status :passed, :duration-ms 0.385041}], :duration-ms 55.732334, :schedule {:serial? true, :reason :tag}, :scenario/id #uuid "1ec5d52f-a99c-4f7d-b673-dc05bf02332b"} {:status :passed, :plan {:plan/pickle {:pickle/row-location nil, :pickle/row-index nil, :pickle/tags [{:name "@serial", :location {:line 21, :column 3}}], :pickle/steps [{:step/id #uuid "d872e4f2-6585-4fc7-94af-ee4e114f6383", :step/text "corpus marks begin of \"S-019 serial g2 passes\" in group \"g2\" at \"target/corpus/p61180/default-42/scratch/g2.log\"", :step/template-text nil, :step/keyword "When", :step/location {:line 23, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "a74e2d74-e2e9-4afd-95f7-7db491a94acb", :step/text "corpus sleeps 57 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 24, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "7ca56b77-f27c-4cf9-9ef7-5a24af9b42ea", :step/text "corpus marks end of \"S-019 serial g2 passes\" in group \"g2\" at \"target/corpus/p61180/default-42/scratch/g2.log\"", :step/template-text nil, :step/keyword "When", :step/location {:line 25, :column 5}, :step/origin :scenario, :step/arguments []}], :pickle/location {:line 22, :column 3}, :pickle/source-file "/private/tmp/sl-demo-053/target/corpus/p61180/default-42/features/07_serial.feature", :pickle/feature-description nil, :pickle/name "S-019 serial g2 passes", :pickle/row-values nil, :pickle/id #uuid "7ead2eba-d127-4c0d-a3b5-5833e840afe5", :pickle/description nil, :pickle/template-name nil, :pickle/scenario-location nil, :pickle/feature-name "Corpus serial groups"}}, :steps [{:step {:step/id #uuid "d872e4f2-6585-4fc7-94af-ee4e114f6383", :step/text "corpus marks begin of \"S-019 serial g2 passes\" in group \"g2\" at \"target/corpus/p61180/default-42/scratch/g2.log\"", :step/template-text nil, :step/keyword "When", :step/location {:line 23, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus marks (begin|end) of \\\"([^\\\"]+)\\\" in group \\\"([^\\\"]+)\\\" at \\\"(.+)\\\"", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 39}, :captures ["begin" "S-019 serial g2 passes" "g2" "target/corpus/p61180/default-42/scratch/g2.log"], :expected #{4 5}, :arity 5, :stepdef/id "sd-cff58e564807bb4b", :actual 5, :metadata nil}, :status :passed, :duration-ms 0.404333} {:step {:step/id #uuid "a74e2d74-e2e9-4afd-95f7-7db491a94acb", :step/text "corpus sleeps 57 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 24, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus sleeps (\\d+) ms", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 20}, :captures ["57"], :expected #{1 2}, :arity 2, :stepdef/id "sd-78a9908a5871463d", :actual 2, :metadata nil}, :status :passed, :duration-ms 62.068083} {:step {:step/id #uuid "7ca56b77-f27c-4cf9-9ef7-5a24af9b42ea", :step/text "corpus marks end of \"S-019 serial g2 passes\" in group \"g2\" at \"target/corpus/p61180/default-42/scratch/g2.log\"", :step/template-text nil, :step/keyword "When", :step/location {:line 25, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus marks (begin|end) of \\\"([^\\\"]+)\\\" in group \\\"([^\\\"]+)\\\" at \\\"(.+)\\\"", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 39}, :captures ["end" "S-019 serial g2 passes" "g2" "target/corpus/p61180/default-42/scratch/g2.log"], :expected #{4 5}, :arity 5, :stepdef/id "sd-cff58e564807bb4b", :actual 5, :metadata nil}, :status :passed, :duration-ms 0.430291}], :duration-ms 63.125292, :schedule {:serial? true, :reason :tag}, :scenario/id #uuid "7ead2eba-d127-4c0d-a3b5-5833e840afe5"} {:status :passed, :plan {:plan/pickle {:pickle/row-location nil, :pickle/row-index nil, :pickle/tags [{:name "@serial", :location {:line 27, :column 3}}], :pickle/steps [{:step/id #uuid "06fc058b-3df7-4e52-b973-8896a864f42e", :step/text "corpus marks begin of \"S-020 serial g2 passes\" in group \"g2\" at \"target/corpus/p61180/default-42/scratch/g2.log\"", :step/template-text nil, :step/keyword "When", :step/location {:line 29, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "858e9b0c-f1c7-4839-b5ef-a190db3b44d4", :step/text "corpus sleeps 32 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 30, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "0027ad08-3826-4b7b-803f-957a28acae1c", :step/text "corpus marks end of \"S-020 serial g2 passes\" in group \"g2\" at \"target/corpus/p61180/default-42/scratch/g2.log\"", :step/template-text nil, :step/keyword "When", :step/location {:line 31, :column 5}, :step/origin :scenario, :step/arguments []}], :pickle/location {:line 28, :column 3}, :pickle/source-file "/private/tmp/sl-demo-053/target/corpus/p61180/default-42/features/07_serial.feature", :pickle/feature-description nil, :pickle/name "S-020 serial g2 passes", :pickle/row-values nil, :pickle/id #uuid "da37aaf4-9973-4a9b-8c76-bb89930e6505", :pickle/description nil, :pickle/template-name nil, :pickle/scenario-location nil, :pickle/feature-name "Corpus serial groups"}}, :steps [{:step {:step/id #uuid "06fc058b-3df7-4e52-b973-8896a864f42e", :step/text "corpus marks begin of \"S-020 serial g2 passes\" in group \"g2\" at \"target/corpus/p61180/default-42/scratch/g2.log\"", :step/template-text nil, :step/keyword "When", :step/location {:line 29, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus marks (begin|end) of \\\"([^\\\"]+)\\\" in group \\\"([^\\\"]+)\\\" at \\\"(.+)\\\"", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 39}, :captures ["begin" "S-020 serial g2 passes" "g2" "target/corpus/p61180/default-42/scratch/g2.log"], :expected #{4 5}, :arity 5, :stepdef/id "sd-cff58e564807bb4b", :actual 5, :metadata nil}, :status :passed, :duration-ms 0.287084} {:step {:step/id #uuid "858e9b0c-f1c7-4839-b5ef-a190db3b44d4", :step/text "corpus sleeps 32 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 30, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus sleeps (\\d+) ms", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 20}, :captures ["32"], :expected #{1 2}, :arity 2, :stepdef/id "sd-78a9908a5871463d", :actual 2, :metadata nil}, :status :passed, :duration-ms 32.390083} {:step {:step/id #uuid "0027ad08-3826-4b7b-803f-957a28acae1c", :step/text "corpus marks end of \"S-020 serial g2 passes\" in group \"g2\" at \"target/corpus/p61180/default-42/scratch/g2.log\"", :step/template-text nil, :step/keyword "When", :step/location {:line 31, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus marks (begin|end) of \\\"([^\\\"]+)\\\" in group \\\"([^\\\"]+)\\\" at \\\"(.+)\\\"", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 39}, :captures ["end" "S-020 serial g2 passes" "g2" "target/corpus/p61180/default-42/scratch/g2.log"], :expected #{4 5}, :arity 5, :stepdef/id "sd-cff58e564807bb4b", :actual 5, :metadata nil}, :status :passed, :duration-ms 0.386792}], :duration-ms 33.236458, :schedule {:serial? true, :reason :tag}, :scenario/id #uuid "da37aaf4-9973-4a9b-8c76-bb89930e6505"} {:status :passed, :plan {:plan/pickle {:pickle/row-location nil, :pickle/row-index nil, :pickle/tags [{:name "@serial", :location {:line 33, :column 3}}], :pickle/steps [{:step/id #uuid "ff3ebc8a-83b3-4b5f-82ba-d767fe5ca2a6", :step/text "corpus marks begin of \"S-021 serial g2 passes\" in group \"g2\" at \"target/corpus/p61180/default-42/scratch/g2.log\"", :step/template-text nil, :step/keyword "When", :step/location {:line 35, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "d6d83a81-420b-4241-978f-5e467e6eed0d", :step/text "corpus sleeps 48 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 36, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "dd813838-9bde-489d-a822-66129dcba5ee", :step/text "corpus marks end of \"S-021 serial g2 passes\" in group \"g2\" at \"target/corpus/p61180/default-42/scratch/g2.log\"", :step/template-text nil, :step/keyword "When", :step/location {:line 37, :column 5}, :step/origin :scenario, :step/arguments []}], :pickle/location {:line 34, :column 3}, :pickle/source-file "/private/tmp/sl-demo-053/target/corpus/p61180/default-42/features/07_serial.feature", :pickle/feature-description nil, :pickle/name "S-021 serial g2 passes", :pickle/row-values nil, :pickle/id #uuid "ccab1c6f-305e-42c1-81db-df8bb8ea9446", :pickle/description nil, :pickle/template-name nil, :pickle/scenario-location nil, :pickle/feature-name "Corpus serial groups"}}, :steps [{:step {:step/id #uuid "ff3ebc8a-83b3-4b5f-82ba-d767fe5ca2a6", :step/text "corpus marks begin of \"S-021 serial g2 passes\" in group \"g2\" at \"target/corpus/p61180/default-42/scratch/g2.log\"", :step/template-text nil, :step/keyword "When", :step/location {:line 35, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus marks (begin|end) of \\\"([^\\\"]+)\\\" in group \\\"([^\\\"]+)\\\" at \\\"(.+)\\\"", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 39}, :captures ["begin" "S-021 serial g2 passes" "g2" "target/corpus/p61180/default-42/scratch/g2.log"], :expected #{4 5}, :arity 5, :stepdef/id "sd-cff58e564807bb4b", :actual 5, :metadata nil}, :status :passed, :duration-ms 0.202291} {:step {:step/id #uuid "d6d83a81-420b-4241-978f-5e467e6eed0d", :step/text "corpus sleeps 48 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 36, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus sleeps (\\d+) ms", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 20}, :captures ["48"], :expected #{1 2}, :arity 2, :stepdef/id "sd-78a9908a5871463d", :actual 2, :metadata nil}, :status :passed, :duration-ms 53.137542} {:step {:step/id #uuid "dd813838-9bde-489d-a822-66129dcba5ee", :step/text "corpus marks end of \"S-021 serial g2 passes\" in group \"g2\" at \"target/corpus/p61180/default-42/scratch/g2.log\"", :step/template-text nil, :step/keyword "When", :step/location {:line 37, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus marks (begin|end) of \\\"([^\\\"]+)\\\" in group \\\"([^\\\"]+)\\\" at \\\"(.+)\\\"", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 39}, :captures ["end" "S-021 serial g2 passes" "g2" "target/corpus/p61180/default-42/scratch/g2.log"], :expected #{4 5}, :arity 5, :stepdef/id "sd-cff58e564807bb4b", :actual 5, :metadata nil}, :status :passed, :duration-ms 1.173916}], :duration-ms 54.883417, :schedule {:serial? true, :reason :tag}, :scenario/id #uuid "ccab1c6f-305e-42c1-81db-df8bb8ea9446"} {:status :passed, :plan {:plan/pickle {:pickle/row-location nil, :pickle/row-index nil, :pickle/tags [], :pickle/steps [{:step/id #uuid "8938da21-4fbe-401f-a1d7-035fdef4ffa0", :step/text "corpus marks begin of \"S-022 control passes\" in group \"control\" at \"target/corpus/p61180/default-42/scratch/control.log\"", :step/template-text nil, :step/keyword "When", :step/location {:line 4, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "bce6c5b7-dd53-489d-8988-a0aecb5181a2", :step/text "corpus sleeps 40 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 5, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "f664b0d0-9412-4149-aba6-ad12b2f43223", :step/text "corpus marks end of \"S-022 control passes\" in group \"control\" at \"target/corpus/p61180/default-42/scratch/control.log\"", :step/template-text nil, :step/keyword "When", :step/location {:line 6, :column 5}, :step/origin :scenario, :step/arguments []}], :pickle/location {:line 3, :column 3}, :pickle/source-file "/private/tmp/sl-demo-053/target/corpus/p61180/default-42/features/08_control.feature", :pickle/feature-description nil, :pickle/name "S-022 control passes", :pickle/row-values nil, :pickle/id #uuid "b0e05c02-f4fc-4025-8bbc-2393271b845c", :pickle/description nil, :pickle/template-name nil, :pickle/scenario-location nil, :pickle/feature-name "Corpus control"}}, :steps [{:step {:step/id #uuid "8938da21-4fbe-401f-a1d7-035fdef4ffa0", :step/text "corpus marks begin of \"S-022 control passes\" in group \"control\" at \"target/corpus/p61180/default-42/scratch/control.log\"", :step/template-text nil, :step/keyword "When", :step/location {:line 4, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus marks (begin|end) of \\\"([^\\\"]+)\\\" in group \\\"([^\\\"]+)\\\" at \\\"(.+)\\\"", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 39}, :captures ["begin" "S-022 control passes" "control" "target/corpus/p61180/default-42/scratch/control.log"], :expected #{4 5}, :arity 5, :stepdef/id "sd-cff58e564807bb4b", :actual 5, :metadata nil}, :status :passed, :duration-ms 0.632542} {:step {:step/id #uuid "bce6c5b7-dd53-489d-8988-a0aecb5181a2", :step/text "corpus sleeps 40 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 5, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus sleeps (\\d+) ms", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 20}, :captures ["40"], :expected #{1 2}, :arity 2, :stepdef/id "sd-78a9908a5871463d", :actual 2, :metadata nil}, :status :passed, :duration-ms 41.780208} {:step {:step/id #uuid "f664b0d0-9412-4149-aba6-ad12b2f43223", :step/text "corpus marks end of \"S-022 control passes\" in group \"control\" at \"target/corpus/p61180/default-42/scratch/control.log\"", :step/template-text nil, :step/keyword "When", :step/location {:line 6, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus marks (begin|end) of \\\"([^\\\"]+)\\\" in group \\\"([^\\\"]+)\\\" at \\\"(.+)\\\"", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 39}, :captures ["end" "S-022 control passes" "control" "target/corpus/p61180/default-42/scratch/control.log"], :expected #{4 5}, :arity 5, :stepdef/id "sd-cff58e564807bb4b", :actual 5, :metadata nil}, :status :passed, :duration-ms 0.386292}], :duration-ms 43.059584, :scenario/id #uuid "b0e05c02-f4fc-4025-8bbc-2393271b845c"} {:status :passed, :plan {:plan/pickle {:pickle/row-location nil, :pickle/row-index nil, :pickle/tags [], :pickle/steps [{:step/id #uuid "38696e7b-eac2-423b-a5a4-98daa7ba1b05", :step/text "corpus marks begin of \"S-023 control passes\" in group \"control\" at \"target/corpus/p61180/default-42/scratch/control.log\"", :step/template-text nil, :step/keyword "When", :step/location {:line 9, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "6561faad-542a-47fd-b9f8-571caad9c1bc", :step/text "corpus sleeps 34 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 10, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "8c596159-faa4-490a-93f5-14a9a721ee81", :step/text "corpus marks end of \"S-023 control passes\" in group \"control\" at \"target/corpus/p61180/default-42/scratch/control.log\"", :step/template-text nil, :step/keyword "When", :step/location {:line 11, :column 5}, :step/origin :scenario, :step/arguments []}], :pickle/location {:line 8, :column 3}, :pickle/source-file "/private/tmp/sl-demo-053/target/corpus/p61180/default-42/features/08_control.feature", :pickle/feature-description nil, :pickle/name "S-023 control passes", :pickle/row-values nil, :pickle/id #uuid "7d43f528-6430-4347-b8c3-290c4a42afec", :pickle/description nil, :pickle/template-name nil, :pickle/scenario-location nil, :pickle/feature-name "Corpus control"}}, :steps [{:step {:step/id #uuid "38696e7b-eac2-423b-a5a4-98daa7ba1b05", :step/text "corpus marks begin of \"S-023 control passes\" in group \"control\" at \"target/corpus/p61180/default-42/scratch/control.log\"", :step/template-text nil, :step/keyword "When", :step/location {:line 9, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus marks (begin|end) of \\\"([^\\\"]+)\\\" in group \\\"([^\\\"]+)\\\" at \\\"(.+)\\\"", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 39}, :captures ["begin" "S-023 control passes" "control" "target/corpus/p61180/default-42/scratch/control.log"], :expected #{4 5}, :arity 5, :stepdef/id "sd-cff58e564807bb4b", :actual 5, :metadata nil}, :status :passed, :duration-ms 0.168333} {:step {:step/id #uuid "6561faad-542a-47fd-b9f8-571caad9c1bc", :step/text "corpus sleeps 34 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 10, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus sleeps (\\d+) ms", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 20}, :captures ["34"], :expected #{1 2}, :arity 2, :stepdef/id "sd-78a9908a5871463d", :actual 2, :metadata nil}, :status :passed, :duration-ms 39.10825} {:step {:step/id #uuid "8c596159-faa4-490a-93f5-14a9a721ee81", :step/text "corpus marks end of \"S-023 control passes\" in group \"control\" at \"target/corpus/p61180/default-42/scratch/control.log\"", :step/template-text nil, :step/keyword "When", :step/location {:line 11, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus marks (begin|end) of \\\"([^\\\"]+)\\\" in group \\\"([^\\\"]+)\\\" at \\\"(.+)\\\"", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 39}, :captures ["end" "S-023 control passes" "control" "target/corpus/p61180/default-42/scratch/control.log"], :expected #{4 5}, :arity 5, :stepdef/id "sd-cff58e564807bb4b", :actual 5, :metadata nil}, :status :passed, :duration-ms 1.022042}], :duration-ms 40.6215, :scenario/id #uuid "7d43f528-6430-4347-b8c3-290c4a42afec"} {:status :passed, :plan {:plan/pickle {:pickle/row-location nil, :pickle/row-index nil, :pickle/tags [], :pickle/steps [{:step/id #uuid "89e202ef-e2ed-428f-9bb8-0e9cab3a612b", :step/text "corpus marks begin of \"S-024 control passes\" in group \"control\" at \"target/corpus/p61180/default-42/scratch/control.log\"", :step/template-text nil, :step/keyword "When", :step/location {:line 14, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "e5bd641c-324d-496a-95d4-d2800b4d4787", :step/text "corpus sleeps 32 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 15, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "3fe4b056-7a14-4e1e-9376-b78abf8ed5f7", :step/text "corpus marks end of \"S-024 control passes\" in group \"control\" at \"target/corpus/p61180/default-42/scratch/control.log\"", :step/template-text nil, :step/keyword "When", :step/location {:line 16, :column 5}, :step/origin :scenario, :step/arguments []}], :pickle/location {:line 13, :column 3}, :pickle/source-file "/private/tmp/sl-demo-053/target/corpus/p61180/default-42/features/08_control.feature", :pickle/feature-description nil, :pickle/name "S-024 control passes", :pickle/row-values nil, :pickle/id #uuid "8f7ec944-6978-4750-8a3d-3aaaeb12fda2", :pickle/description nil, :pickle/template-name nil, :pickle/scenario-location nil, :pickle/feature-name "Corpus control"}}, :steps [{:step {:step/id #uuid "89e202ef-e2ed-428f-9bb8-0e9cab3a612b", :step/text "corpus marks begin of \"S-024 control passes\" in group \"control\" at \"target/corpus/p61180/default-42/scratch/control.log\"", :step/template-text nil, :step/keyword "When", :step/location {:line 14, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus marks (begin|end) of \\\"([^\\\"]+)\\\" in group \\\"([^\\\"]+)\\\" at \\\"(.+)\\\"", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 39}, :captures ["begin" "S-024 control passes" "control" "target/corpus/p61180/default-42/scratch/control.log"], :expected #{4 5}, :arity 5, :stepdef/id "sd-cff58e564807bb4b", :actual 5, :metadata nil}, :status :passed, :duration-ms 0.509583} {:step {:step/id #uuid "e5bd641c-324d-496a-95d4-d2800b4d4787", :step/text "corpus sleeps 32 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 15, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus sleeps (\\d+) ms", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 20}, :captures ["32"], :expected #{1 2}, :arity 2, :stepdef/id "sd-78a9908a5871463d", :actual 2, :metadata nil}, :status :passed, :duration-ms 36.06575} {:step {:step/id #uuid "3fe4b056-7a14-4e1e-9376-b78abf8ed5f7", :step/text "corpus marks end of \"S-024 control passes\" in group \"control\" at \"target/corpus/p61180/default-42/scratch/control.log\"", :step/template-text nil, :step/keyword "When", :step/location {:line 16, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus marks (begin|end) of \\\"([^\\\"]+)\\\" in group \\\"([^\\\"]+)\\\" at \\\"(.+)\\\"", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 39}, :captures ["end" "S-024 control passes" "control" "target/corpus/p61180/default-42/scratch/control.log"], :expected #{4 5}, :arity 5, :stepdef/id "sd-cff58e564807bb4b", :actual 5, :metadata nil}, :status :passed, :duration-ms 1.0365}], :duration-ms 38.078792, :scenario/id #uuid "8f7ec944-6978-4750-8a3d-3aaaeb12fda2"} {:status :passed, :plan {:plan/pickle {:pickle/row-location nil, :pickle/row-index nil, :pickle/tags [], :pickle/steps [{:step/id #uuid "f3485943-2da4-4d32-b9ea-58983dbe74e6", :step/text "corpus sleeps 30 ms", :step/template-text nil, :step/keyword "Given", :step/location {:line 4, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "b04947ca-2641-4e65-896b-94b336103981", :step/text "corpus no-op", :step/template-text nil, :step/keyword "When", :step/location {:line 5, :column 5}, :step/origin :scenario, :step/arguments []}], :pickle/location {:line 3, :column 3}, :pickle/source-file "/private/tmp/sl-demo-053/target/corpus/p61180/default-42/features/09_rule_tags.feature", :pickle/feature-description nil, :pickle/name "S-013 passes", :pickle/row-values nil, :pickle/id #uuid "e76f4602-4403-48f3-a6b4-3a1e1409885d", :pickle/description nil, :pickle/template-name nil, :pickle/scenario-location nil, :pickle/feature-name "Corpus rule tags"}}, :steps [{:step {:step/id #uuid "f3485943-2da4-4d32-b9ea-58983dbe74e6", :step/text "corpus sleeps 30 ms", :step/template-text nil, :step/keyword "Given", :step/location {:line 4, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus sleeps (\\d+) ms", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 20}, :captures ["30"], :expected #{1 2}, :arity 2, :stepdef/id "sd-78a9908a5871463d", :actual 2, :metadata nil}, :status :passed, :duration-ms 34.710416} {:step {:step/id #uuid "b04947ca-2641-4e65-896b-94b336103981", :step/text "corpus no-op", :step/template-text nil, :step/keyword "When", :step/location {:line 5, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus no-op", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 16}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-b180a1cdfceb0f96", :actual 1, :metadata nil}, :status :passed, :duration-ms 0.032208}], :duration-ms 34.964583, :scenario/id #uuid "e76f4602-4403-48f3-a6b4-3a1e1409885d"} {:status :passed, :plan {:plan/pickle {:pickle/row-location nil, :pickle/row-index nil, :pickle/tags [{:name "@corpus-rule", :location {:line 7, :column 3}}], :pickle/steps [{:step/id #uuid "88a97d6a-c83f-42ed-b30c-da4e3d135ac3", :step/text "corpus sleeps 30 ms", :step/template-text nil, :step/keyword "Given", :step/location {:line 11, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "daa1e919-1566-42f5-a78f-b7a6c7cbc3b3", :step/text "corpus no-op", :step/template-text nil, :step/keyword "When", :step/location {:line 12, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "ba8d3e1b-4b9b-453f-b609-fa1a64c08cc2", :step/text "corpus sleeps 13 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 13, :column 5}, :step/origin :scenario, :step/arguments []}], :pickle/location {:line 10, :column 3}, :pickle/source-file "/private/tmp/sl-demo-053/target/corpus/p61180/default-42/features/09_rule_tags.feature", :pickle/feature-description nil, :pickle/name "S-014 passes", :pickle/row-values nil, :pickle/id #uuid "76a21268-8328-489e-ad94-ebfe4a5f5f7b", :pickle/description nil, :pickle/template-name nil, :pickle/scenario-location nil, :pickle/feature-name "Corpus rule tags"}}, :steps [{:step {:step/id #uuid "88a97d6a-c83f-42ed-b30c-da4e3d135ac3", :step/text "corpus sleeps 30 ms", :step/template-text nil, :step/keyword "Given", :step/location {:line 11, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus sleeps (\\d+) ms", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 20}, :captures ["30"], :expected #{1 2}, :arity 2, :stepdef/id "sd-78a9908a5871463d", :actual 2, :metadata nil}, :status :passed, :duration-ms 33.546292} {:step {:step/id #uuid "daa1e919-1566-42f5-a78f-b7a6c7cbc3b3", :step/text "corpus no-op", :step/template-text nil, :step/keyword "When", :step/location {:line 12, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus no-op", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 16}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-b180a1cdfceb0f96", :actual 1, :metadata nil}, :status :passed, :duration-ms 0.027541} {:step {:step/id #uuid "ba8d3e1b-4b9b-453f-b609-fa1a64c08cc2", :step/text "corpus sleeps 13 ms", :step/template-text nil, :step/keyword "When", :step/location {:line 13, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus sleeps (\\d+) ms", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 20}, :captures ["13"], :expected #{1 2}, :arity 2, :stepdef/id "sd-78a9908a5871463d", :actual 2, :metadata nil}, :status :passed, :duration-ms 15.02825}], :duration-ms 48.893625, :scenario/id #uuid "76a21268-8328-489e-ad94-ebfe4a5f5f7b"} {:status :failed, :plan {:plan/pickle {:pickle/row-location nil, :pickle/row-index nil, :pickle/tags [{:name "@corpus-rule", :location {:line 7, :column 3}}], :pickle/steps [{:step/id #uuid "04202e8e-a8eb-406f-8aed-7b37ffb5837d", :step/text "corpus no-op", :step/template-text nil, :step/keyword "Given", :step/location {:line 16, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "3c19f140-3e8a-47cd-8a60-3cb033850267", :step/text "corpus no-op", :step/template-text nil, :step/keyword "When", :step/location {:line 17, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "b801923b-f99b-4d25-875b-8d59a9259ffa", :step/text "corpus fails deliberately", :step/template-text nil, :step/keyword "Then", :step/location {:line 18, :column 5}, :step/origin :scenario, :step/arguments []}], :pickle/location {:line 15, :column 3}, :pickle/source-file "/private/tmp/sl-demo-053/target/corpus/p61180/default-42/features/09_rule_tags.feature", :pickle/feature-description nil, :pickle/name "S-015 fails at step 3", :pickle/row-values nil, :pickle/id #uuid "9eae668b-aa51-4c09-a0bc-646d4590daa3", :pickle/description nil, :pickle/template-name nil, :pickle/scenario-location nil, :pickle/feature-name "Corpus rule tags"}}, :steps [{:step {:step/id #uuid "04202e8e-a8eb-406f-8aed-7b37ffb5837d", :step/text "corpus no-op", :step/template-text nil, :step/keyword "Given", :step/location {:line 16, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus no-op", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 16}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-b180a1cdfceb0f96", :actual 1, :metadata nil}, :status :passed, :duration-ms 0.017291} {:step {:step/id #uuid "3c19f140-3e8a-47cd-8a60-3cb033850267", :step/text "corpus no-op", :step/template-text nil, :step/keyword "When", :step/location {:line 17, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus no-op", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 16}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-b180a1cdfceb0f96", :actual 1, :metadata nil}, :status :passed, :duration-ms 0.005292} {:step {:step/id #uuid "b801923b-f99b-4d25-875b-8d59a9259ffa", :step/text "corpus fails deliberately", :step/template-text nil, :step/keyword "Then", :step/location {:line 18, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus fails deliberately", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 25}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-7dcf7f1c3fad7897", :actual 1, :metadata nil}, :status :failed, :duration-ms 0.019375, :error {:type :step/invalid-return, :message "Step returned invalid type: class clojure.lang.Keyword. Expected map, nil, or :pending.", :value ":corpus/deliberate-failure"}}], :duration-ms 0.15125, :scenario/id #uuid "9eae668b-aa51-4c09-a0bc-646d4590daa3"} {:status :passed, :plan {:plan/pickle {:pickle/row-location nil, :pickle/row-index nil, :pickle/tags [{:name "@hook=corpus-audit", :location {:line 7, :column 3}}], :pickle/steps [{:step/id #uuid "a897c40f-d135-439b-bf60-493dca7936f0", :step/text "corpus no-op", :step/template-text nil, :step/keyword "Given", :step/location {:line 11, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "65ef07cb-b727-4738-a771-aaec9b88dec2", :step/text "corpus no-op", :step/template-text nil, :step/keyword "When", :step/location {:line 12, :column 5}, :step/origin :scenario, :step/arguments []} {:step/id #uuid "b6dc75e2-6555-4bf3-9817-fd49206bc3d7", :step/text "corpus no-op", :step/template-text nil, :step/keyword "When", :step/location {:line 13, :column 5}, :step/origin :scenario, :step/arguments []}], :pickle/location {:line 8, :column 3}, :pickle/source-file "/private/tmp/sl-demo-053/target/corpus/p61180/default-42/features/10_hooks.feature", :pickle/feature-description "  Scenarios name their lifecycle hooks with @hook= value-tags; the\n  registrations live in hooks.clj at the corpus root. Every hook that\n  runs is stamped into the report transcript with phase, status, and\n  contributed keys.", :pickle/name "S-025 passes with hooks", :pickle/row-values nil, :pickle/id #uuid "78e77a4a-9516-40aa-973d-d7089620868f", :pickle/description "    A named Before seeds a value into the scenario data plane;\n    the transcript hook line records the contribution.", :pickle/template-name nil, :pickle/scenario-location nil, :pickle/feature-name "Corpus lifecycle hooks"}}, :steps [{:step {:step/id #uuid "a897c40f-d135-439b-bf60-493dca7936f0", :step/text "corpus no-op", :step/template-text nil, :step/keyword "Given", :step/location {:line 11, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus no-op", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 16}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-b180a1cdfceb0f96", :actual 1, :metadata nil}, :status :passed, :duration-ms 0.015958} {:step {:step/id #uuid "65ef07cb-b727-4738-a771-aaec9b88dec2", :step/text "corpus no-op", :step/template-text nil, :step/keyword "When", :step/location {:line 12, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus no-op", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 16}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-b180a1cdfceb0f96", :actual 1, :metadata nil}, :status :passed, :duration-ms 0.006208} {:step {:step/id #uuid "b6dc75e2-6555-4bf3-9817-fd49206bc3d7", :step/text "corpus no-op", :step/template-text nil, :step/keyword "When", :step/location {:line 13, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus no-op", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 16}, :captures [], :expected #{0 1}, :arity 1, :stepdef/id "sd-b180a1cdfceb0f96", :actual 1, :metadata nil}, :status :passed, :duration-ms 0.004292}], :duration-ms 1.590333, :hooks [{:name "corpus-audit", :phase :before, :status :ok, :duration-ms 1.041417, :contributed [:corpusSeeded]} {:name "corpus-audit", :phase :after, :status :ok, :duration-ms 0.214208}], :scenario/id #uuid "78e77a4a-9516-40aa-973d-d7089620868f"} {:status :error, :plan {:plan/pickle {:pickle/row-location nil, :pickle/row-index nil, :pickle/tags [{:name "@hook=corpus-audit", :location {:line 15, :column 3}} {:name "@hook=corpus-cleanup-fails", :location {:line 15, :column 22}}], :pickle/steps [{:step/id #uuid "875607e7-359e-4123-81cf-fbacb4f10f0a", :step/text "corpus sleeps 48 ms", :step/template-text nil, :step/keyword "Given", :step/location {:line 17, :column 5}, :step/origin :scenario, :step/arguments []}], :pickle/location {:line 16, :column 3}, :pickle/source-file "/private/tmp/sl-demo-053/target/corpus/p61180/default-42/features/10_hooks.feature", :pickle/feature-description "  Scenarios name their lifecycle hooks with @hook= value-tags; the\n  registrations live in hooks.clj at the corpus root. Every hook that\n  runs is stamped into the report transcript with phase, status, and\n  contributed keys.", :pickle/name "S-026 errors from failing after hook", :pickle/row-values nil, :pickle/id #uuid "2e171238-7941-43b3-ad0c-68c7337e88d0", :pickle/description nil, :pickle/template-name nil, :pickle/scenario-location nil, :pickle/feature-name "Corpus lifecycle hooks"}}, :steps [{:step {:step/id #uuid "875607e7-359e-4123-81cf-fbacb4f10f0a", :step/text "corpus sleeps 48 ms", :step/template-text nil, :step/keyword "Given", :step/location {:line 17, :column 5}, :step/origin :scenario, :step/arguments []}, :binding {:svo nil, :arity-ok? true, :pattern-src "corpus sleeps (\\d+) ms", :source {:ns fixtures.steps.corpus-steps, :file "/private/tmp/sl-demo-053/test/fixtures/steps/corpus_steps.clj", :line 20}, :captures ["48"], :expected #{1 2}, :arity 2, :stepdef/id "sd-78a9908a5871463d", :actual 2, :metadata nil}, :status :passed, :duration-ms 53.051042}], :duration-ms 53.819666, :error {:type :hook/after-failed, :message "corpus after-hook fails deliberately", :exception-class "clojure.lang.ExceptionInfo", :data {:corpus/deliberate true}, :hook "corpus-cleanup-fails", :registration {:path "/private/tmp/sl-demo-053/hooks.clj"}, :tag-source {:file "/private/tmp/sl-demo-053/target/corpus/p61180/default-42/features/10_hooks.feature", :line 15}}, :hooks [{:name "corpus-audit", :phase :before, :status :ok, :duration-ms 0.043791, :contributed [:corpusSeeded]} {:name "corpus-cleanup-fails", :phase :after, :status :failed, :duration-ms 0.316791, :error {:type :hook/after-failed, :message "corpus after-hook fails deliberately", :exception-class "clojure.lang.ExceptionInfo", :data {:corpus/deliberate true}, :hook "corpus-cleanup-fails", :registration {:path "/private/tmp/sl-demo-053/hooks.clj"}, :tag-source {:file "/private/tmp/sl-demo-053/target/corpus/p61180/default-42/features/10_hooks.feature", :line 15}}} {:name "corpus-audit", :phase :after, :status :ok, :duration-ms 0.002625}], :scenario/id #uuid "2e171238-7941-43b3-ad0c-68c7337e88d0"}], :diagnostics {:undefined [], :ambiguous [], :invalid-arity [], :svo-issues [], :counts {:undefined-count 0, :ambiguous-count 0, :invalid-arity-count 0, :svo-issue-count 0, :total-issues 0}}, :summary {:run-id "a67ae684-40ee-4874-a13c-98a50426406a", :exit-code 1, :counts {:passed 28, :failed 6, :pending 6, :skipped 0, :error 1}, :status :failed}}
+</script>
+<script>
+// ShiftLefter HTML run report renderer (sl-muq9).
+//
+// The report is a VIEWER: the sole source of truth is the EDN data island
+// (the script element with type application/edn, id run-data) — run-ctx,
+// scenario envelopes, diagnostics, summary. This file parses that island and
+// builds the DOM from it. Deliberately liftable into the served multi-run
+// viewer (sl-zztu): nothing here assumes file:// or a single run beyond
+// render().
+//
+// SAFETY: all island data is untrusted (scenario names, step text, error
+// messages come from user feature files and arbitrary exceptions). Every
+// data value reaches the page via textContent — never via HTML parsing,
+// never via attribute interpolation. (No literal angle-bracket tag text in
+// these comments either: this file is inlined into the document, and tests
+// count tag occurrences.)
+
+"use strict";
+
+// ---------------------------------------------------------------------------
+// EDN parser — the subset reporter envelopes can contain (invariant 3):
+// nil, booleans, numbers, strings, keywords, symbols, vectors/lists, maps,
+// sets, #uuid (and generic tagged literals, tag dropped). Keywords parse to
+// their literal string form (":status"); maps to Map; sets to arrays.
+// ---------------------------------------------------------------------------
+
+function parseEdn(text) {
+  let pos = 0;
+
+  function err(msg) {
+    throw new Error("EDN parse error at " + pos + ": " + msg);
+  }
+
+  function skipWs() {
+    while (pos < text.length) {
+      const c = text[pos];
+      if (c === " " || c === "\t" || c === "\n" || c === "\r" || c === ",") {
+        pos++;
+      } else if (c === ";") {
+        while (pos < text.length && text[pos] !== "\n") pos++;
+      } else {
+        return;
+      }
+    }
+  }
+
+  function readString() {
+    pos++; // opening quote
+    let out = "";
+    while (pos < text.length) {
+      const c = text[pos];
+      if (c === '"') {
+        pos++;
+        return out;
+      }
+      if (c === "\\") {
+        const e = text[pos + 1];
+        if (e === "u") {
+          out += String.fromCharCode(parseInt(text.substr(pos + 2, 4), 16));
+          pos += 6;
+        } else {
+          const map = { n: "\n", t: "\t", r: "\r", f: "\f", b: "\b" };
+          out += map[e] !== undefined ? map[e] : e;
+          pos += 2;
+        }
+      } else {
+        out += c;
+        pos++;
+      }
+    }
+    err("unterminated string");
+  }
+
+  const TOKEN_END = /[\s,()\[\]{}"]/;
+
+  function readToken() {
+    const start = pos;
+    while (pos < text.length && !TOKEN_END.test(text[pos])) pos++;
+    return text.slice(start, pos);
+  }
+
+  function readChar() {
+    pos++; // backslash
+    const tok = readToken();
+    const named = { newline: "\n", space: " ", tab: "\t", return: "\r" };
+    return named[tok] !== undefined ? named[tok] : tok.charAt(0);
+  }
+
+  function readColl(close) {
+    pos++; // opening delimiter
+    const items = [];
+    for (;;) {
+      skipWs();
+      if (pos >= text.length) err("unterminated collection");
+      if (text[pos] === close) {
+        pos++;
+        return items;
+      }
+      items.push(readValue());
+    }
+  }
+
+  function readMap() {
+    const items = readColl("}");
+    if (items.length % 2 !== 0) err("map with odd entry count");
+    const m = new Map();
+    for (let i = 0; i < items.length; i += 2) m.set(items[i], items[i + 1]);
+    return m;
+  }
+
+  function readDispatch() {
+    pos++; // '#'
+    if (text[pos] === "{") return readColl("}"); // set -> array
+    if (text[pos] === "_") {
+      pos++;
+      readValue(); // discard
+      return readValue();
+    }
+    readToken(); // tag symbol (uuid, inst, ...) — value stands in for it
+    skipWs();
+    return readValue();
+  }
+
+  function readValue() {
+    skipWs();
+    if (pos >= text.length) err("unexpected end of input");
+    const c = text[pos];
+    if (c === '"') return readString();
+    if (c === "{") return readMap();
+    if (c === "[") return readColl("]");
+    if (c === "(") return readColl(")");
+    if (c === "#") return readDispatch();
+    if (c === "\\") return readChar();
+    const tok = readToken();
+    if (tok === "") err("unexpected character " + c);
+    if (tok === "nil") return null;
+    if (tok === "true") return true;
+    if (tok === "false") return false;
+    if (/^[+-]?(\d+\.?\d*([eE][+-]?\d+)?|\.\d+)[MN]?$/.test(tok)) {
+      return parseFloat(tok);
+    }
+    return tok; // keyword (":status") or symbol, as its literal text
+  }
+
+  const v = readValue();
+  skipWs();
+  return v;
+}
+
+// ---------------------------------------------------------------------------
+// Data access helpers
+// ---------------------------------------------------------------------------
+
+function k(m, key) {
+  return m instanceof Map ? m.get(key) : undefined;
+}
+
+function kIn(m, keys) {
+  let v = m;
+  for (const key of keys) {
+    v = k(v, key);
+    if (v === undefined || v === null) return v;
+  }
+  return v;
+}
+
+function fmtMs(ms) {
+  return ((ms || 0) / 1000).toFixed(3) + "s";
+}
+
+function relativePath(projectRoot, path) {
+  if (projectRoot && path && path.startsWith(projectRoot)) {
+    return path.slice(projectRoot.length).replace(/^[/\\]+/, "");
+  }
+  return path || "";
+}
+
+// ---------------------------------------------------------------------------
+// Status classification
+// ---------------------------------------------------------------------------
+
+function isSynthetic(step) {
+  return kIn(step, [":step", ":step/synthetic?"]) === true;
+}
+
+function isExpandedChild(step) {
+  return kIn(step, [":step", ":step/macro", ":role"]) === ":expanded";
+}
+
+function firstStepOfStatus(scenario, status) {
+  return (k(scenario, ":steps") || []).find((s) => k(s, ":status") === status && !isSynthetic(s));
+}
+
+// A failed scenario whose failing step threw (carries :exception-class) is
+// rendered as an ERROR — the same failure/error split the JUnit reporter
+// makes (sl-40to D-rules).
+function scenarioStatusClass(scenario) {
+  const status = k(scenario, ":status");
+  if (status === ":failed") {
+    const fs = firstStepOfStatus(scenario, ":failed");
+    if (fs && k(k(fs, ":error"), ":exception-class")) return "st-error";
+    return "st-failed";
+  }
+  return "st-" + (status || ":unknown").slice(1);
+}
+
+// "Red" mirrors exit-code semantics: failed always; :error (a lifecycle
+// hook threw, sl-esq) always; pending only when the run was strict
+// (allow-pending? false). Red scenarios render default-open.
+function isRed(scenario, allowPending) {
+  const status = k(scenario, ":status");
+  if (status === ":failed") return true;
+  if (status === ":error") return true;
+  if (status === ":pending" && !allowPending) return true;
+  return false;
+}
+
+const STATUS_WORDS = {
+  "st-passed": "PASSED",
+  "st-failed": "FAILED",
+  "st-error": "ERROR",
+  "st-pending": "PENDING",
+  "st-skipped": "SKIPPED",
+};
+
+// ---------------------------------------------------------------------------
+// Macro transcript rules — authored-primary rendering, ported from the JUnit
+// reporter's D6 rules: the synthetic wrapper (:role :call) is the authored
+// line; expanded children carry a "+ [key N/M]" marker.
+// ---------------------------------------------------------------------------
+
+function macroCounts(steps) {
+  const counts = {};
+  for (const s of steps) {
+    const macro = kIn(s, [":step", ":step/macro"]);
+    if (macro && k(macro, ":role") === ":call") {
+      const key = k(macro, ":key") + "|" + kIn(macro, [":call-site", ":line"]);
+      counts[key] = k(macro, ":step-count");
+    }
+  }
+  return counts;
+}
+
+function childMarker(step, counts) {
+  const macro = kIn(step, [":step", ":step/macro"]);
+  const n = (k(macro, ":index") || 0) + 1;
+  const key = k(macro, ":key") + "|" + kIn(macro, [":call-site", ":line"]);
+  const m = counts[key];
+  return "+ [" + k(macro, ":key") + " " + n + "/" + (m || "?") + "] ";
+}
+
+function macroAttribution(step, counts) {
+  if (!isExpandedChild(step)) return "";
+  const macro = kIn(step, [":step", ":step/macro"]);
+  const n = (k(macro, ":index") || 0) + 1;
+  const key = k(macro, ":key") + "|" + kIn(macro, [":call-site", ":line"]);
+  const m = counts[key];
+  return (
+    "\n[via macro '" +
+    k(macro, ":key") +
+    "' called at feature line " +
+    kIn(macro, [":call-site", ":line"]) +
+    ", step " +
+    n +
+    "/" +
+    (m || "?") +
+    ": " +
+    kIn(step, [":step", ":step/text"]) +
+    "]"
+  );
+}
+
+// ---------------------------------------------------------------------------
+// DOM construction (textContent only — data is never parsed as HTML)
+// ---------------------------------------------------------------------------
+
+function el(tag, className, textContent) {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (textContent !== undefined) node.textContent = textContent;
+  return node;
+}
+
+function renderHeader(runCtx, summary, scenarios) {
+  const header = el("header", "run-header");
+  const failed = summary ? k(summary, ":exit-code") !== 0 : null;
+
+  const h1 = el("h1", null, k(runCtx, ":project-name") || "ShiftLefter run");
+  if (failed !== null) {
+    const badge = el(
+      "span",
+      "run-status " + (failed ? "st-failed" : "st-passed"),
+      failed ? "FAILED" : "PASSED",
+    );
+    h1.appendChild(badge);
+  }
+  header.appendChild(h1);
+
+  const totalMs = scenarios.reduce((t, s) => t + (k(s, ":duration-ms") || 0), 0);
+  const meta = [
+    k(runCtx, ":started-at"),
+    fmtMs(totalMs),
+    k(runCtx, ":version") ? "v" + k(runCtx, ":version") : null,
+    k(runCtx, ":mode") ? k(runCtx, ":mode").slice(1) + " mode" : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+  header.appendChild(el("p", "run-meta", meta));
+
+  const selection = k(runCtx, ":selection");
+  if (selection) {
+    const selected = k(selection, ":selected");
+    const filteredOut = k(selection, ":filtered-out");
+    const filter = k(selection, ":filter");
+    const parts = [];
+    for (const which of [":include", ":exclude"]) {
+      const tags = k(filter, which) || [];
+      if (tags.length) {
+        parts.push(which.slice(1) + " " + tags.join(", "));
+      }
+    }
+    header.appendChild(
+      el(
+        "p",
+        "run-selection",
+        "Ran " +
+          selected +
+          " of " +
+          (selected + filteredOut) +
+          " scenarios (" +
+          filteredOut +
+          " filtered out by tags)" +
+          (parts.length ? " — filter: " + parts.join("; ") : ""),
+      ),
+    );
+  }
+
+  const counts = summary ? k(summary, ":counts") : null;
+  const countsList = el("ul", "run-counts");
+  countsList.appendChild(el("li", "count", scenarios.length + " scenario(s)"));
+  for (const status of [":passed", ":failed", ":pending", ":skipped"]) {
+    const n = counts ? k(counts, status) || 0 : 0;
+    countsList.appendChild(el("li", "count st-" + status.slice(1), n + " " + status.slice(1)));
+  }
+  // :error (hook threw, sl-esq) — only when present, so hook-less reports
+  // keep the historical four-count row.
+  const errorCount = counts ? k(counts, ":error") || 0 : 0;
+  if (errorCount > 0) {
+    countsList.appendChild(el("li", "count st-error", errorCount + " error"));
+  }
+  header.appendChild(countsList);
+
+  const controls = el("div", "controls");
+  const expand = el("button", null, "Expand all");
+  expand.addEventListener("click", () => setAllOpen(true));
+  const collapse = el("button", null, "Collapse all");
+  collapse.addEventListener("click", () => setAllOpen(false));
+  const label = el("label");
+  const checkbox = el("input");
+  checkbox.type = "checkbox";
+  checkbox.addEventListener("change", () =>
+    document.body.classList.toggle("failures-only", checkbox.checked),
+  );
+  label.appendChild(checkbox);
+  label.appendChild(document.createTextNode(" Failures only"));
+  controls.appendChild(expand);
+  controls.appendChild(collapse);
+  controls.appendChild(label);
+  header.appendChild(controls);
+
+  return header;
+}
+
+function setAllOpen(open) {
+  for (const d of document.querySelectorAll("details.scenario")) {
+    d.open = open;
+  }
+}
+
+function renderStep(step, counts) {
+  const status = k(step, ":status");
+  const error = k(step, ":error");
+  const statusClass =
+    status === ":failed" && error && k(error, ":exception-class")
+      ? "st-error"
+      : "st-" + (status || ":unknown").slice(1);
+  const li = el("li", "step " + statusClass);
+  li.appendChild(el("span", "step-status", STATUS_WORDS[statusClass] || ""));
+
+  const text = el("span", "step-text");
+  if (isExpandedChild(step)) {
+    text.appendChild(el("span", "macro-marker", childMarker(step, counts)));
+  }
+  text.appendChild(
+    document.createTextNode(
+      kIn(step, [":step", ":step/keyword"]) + " " + kIn(step, [":step", ":step/text"]),
+    ),
+  );
+  li.appendChild(text);
+  li.appendChild(el("span", "duration", fmtMs(k(step, ":duration-ms"))));
+
+  if (error) {
+    const detail = el("div", "error-detail");
+    detail.appendChild(
+      el(
+        "div",
+        "error-type",
+        k(error, ":exception-class") || (k(error, ":type") || "").slice(1) || "failure",
+      ),
+    );
+    let message = k(error, ":message") || "";
+    // Dual attribution (D6): a failing expanded child names BOTH the
+    // authored macro call and the child step.
+    message += macroAttribution(step, counts);
+    if (k(error, ":value")) message += "\nvalue: " + k(error, ":value");
+    detail.appendChild(el("pre", null, message));
+    li.appendChild(detail);
+  }
+  return li;
+}
+
+// One row per lifecycle hook that ran (sl-esq): name, phase, status,
+// duration, and the ctx keys a Before contributed.
+function renderHookLine(record) {
+  const status = k(record, ":status"); // ":ok" | ":failed"
+  const line = el("div", "hook-line" + (status === ":failed" ? " st-failed" : ""));
+  line.appendChild(el("span", "hook-status", status === ":failed" ? "FAILED" : "OK"));
+  line.appendChild(
+    el(
+      "span",
+      "hook-text",
+      "hook " + k(record, ":name") + " [" + String(k(record, ":phase")).slice(1) + "]",
+    ),
+  );
+  const contributed = k(record, ":contributed") || [];
+  if (contributed.length) {
+    line.appendChild(el("span", "contributed", "-> " + contributed.join(", ")));
+  }
+  const err = k(record, ":error");
+  if (err && k(err, ":message")) {
+    line.appendChild(el("span", "hook-error", k(err, ":message")));
+  }
+  line.appendChild(el("span", "duration", fmtMs(k(record, ":duration-ms"))));
+  return line;
+}
+
+function renderScenario(scenario, allowPending) {
+  const statusClass = scenarioStatusClass(scenario);
+  const red = isRed(scenario, allowPending);
+  const details = el("details", "scenario " + statusClass + (red ? " red" : ""));
+  details.open = red; // failures + errors default-open (strict pending too)
+
+  const pickle = kIn(scenario, [":plan", ":plan/pickle"]);
+  const summary = el("summary");
+  summary.appendChild(el("span", "status-word " + statusClass, STATUS_WORDS[statusClass] || ""));
+  summary.appendChild(el("span", "scenario-name", k(pickle, ":pickle/name") || "(unnamed)"));
+  const tags = k(pickle, ":pickle/tags") || [];
+  if (tags.length) {
+    const tagSpan = el("span", "tags");
+    for (const tag of tags) {
+      tagSpan.appendChild(el("span", "tag", k(tag, ":name")));
+    }
+    summary.appendChild(tagSpan);
+  }
+  // Derived-scheduling annotation (sl-esq round-5 unification): a scenario
+  // auto-serialized by a gate (costume, shared-impl, a :requires-serial
+  // hook) shows a greyed @serial chip annotated with WHY — "ran as though
+  // this was also true", visually distinct from authored tags. An authored
+  // @serial (:tag reason) already shows its real tag chip.
+  const schedule = k(scenario, ":schedule");
+  if (schedule && k(schedule, ":serial?") === true) {
+    const reason = k(schedule, ":reason");
+    if (reason !== ":tag") {
+      const reasonText = Array.isArray(reason)
+        ? String(reason[0]).slice(1) + " " + reason[1]
+        : String(reason).slice(1);
+      const derived = el("span", "tags derived-schedule");
+      derived.appendChild(el("span", "tag derived", "@serial"));
+      derived.appendChild(el("span", "derived-note", "via " + reasonText));
+      summary.appendChild(derived);
+    }
+  }
+  summary.appendChild(el("span", "duration", fmtMs(k(scenario, ":duration-ms"))));
+  details.appendChild(summary);
+
+  // Scenario description prose (sl-v85e): first block of the expanded body,
+  // above any error detail and the transcript. Absent key renders nothing —
+  // pre-v85e islands and hand-built envelopes are unchanged.
+  const scenarioDesc = k(pickle, ":pickle/description");
+  if (scenarioDesc) {
+    details.appendChild(el("p", "scenario-description", scenarioDesc));
+  }
+
+  // Scenario-level hook failure (sl-esq): the :error lives on the scenario,
+  // not on any step — render its attributed detail block above the steps.
+  const scenarioError = k(scenario, ":error");
+  if (scenarioError) {
+    const detail = el("div", "error-detail scenario-error");
+    detail.appendChild(
+      el("div", "error-type", (k(scenarioError, ":type") || "").slice(1) || "error"),
+    );
+    let message = "";
+    if (k(scenarioError, ":hook")) message += "hook '" + k(scenarioError, ":hook") + "' -- ";
+    message += k(scenarioError, ":message") || "";
+    const reg = k(k(scenarioError, ":registration"), ":path");
+    if (reg) message += "\nregistered at: " + reg;
+    const tagSource = k(scenarioError, ":tag-source");
+    if (tagSource && k(tagSource, ":file")) {
+      message += "\ntagged at: " + k(tagSource, ":file") + ":" + k(tagSource, ":line");
+    }
+    detail.appendChild(el("pre", null, message));
+    details.appendChild(detail);
+  }
+
+  const steps = k(scenario, ":steps") || [];
+  const counts = macroCounts(steps);
+  const list = el("ol", "steps");
+  for (const step of steps) list.appendChild(renderStep(step, counts));
+  // Hook lines (sl-esq) mirror execution order: before-phase above the
+  // steps, after-phase below. Hook-less scenarios render exactly as before.
+  const hookRecords = k(scenario, ":hooks") || [];
+  for (const h of hookRecords.filter((r) => k(r, ":phase") === ":before")) {
+    details.appendChild(renderHookLine(h));
+  }
+  details.appendChild(list);
+  for (const h of hookRecords.filter((r) => k(r, ":phase") === ":after")) {
+    details.appendChild(renderHookLine(h));
+  }
+  return details;
+}
+
+function renderFeatures(runCtx, scenarios) {
+  const main = el("main");
+  main.id = "features";
+  const allowPending = k(runCtx, ":allow-pending?") === true;
+  const projectRoot = k(runCtx, ":project-root");
+  const groups = new Map(); // source-file -> {name, scenarios} in plan order
+  for (const scenario of scenarios) {
+    const pickle = kIn(scenario, [":plan", ":plan/pickle"]);
+    const file = k(pickle, ":pickle/source-file") || "(unknown)";
+    if (!groups.has(file)) {
+      groups.set(file, {
+        name: k(pickle, ":pickle/feature-name") || "(unnamed feature)",
+        scenarios: [],
+      });
+    }
+    groups.get(file).scenarios.push(scenario);
+  }
+  for (const [file, group] of groups) {
+    const section = el("section", "feature");
+    const heading = el("h2", "feature-name", "Feature: " + group.name);
+    section.appendChild(heading);
+    section.appendChild(el("span", "feature-path", relativePath(projectRoot, file)));
+    // Feature description prose (sl-v85e) — from the group's first pickle;
+    // textContent via el() keeps arbitrary feature-file prose inert.
+    const featureDesc = kIn(group.scenarios[0], [
+      ":plan",
+      ":plan/pickle",
+      ":pickle/feature-description",
+    ]);
+    if (featureDesc) {
+      section.appendChild(el("p", "feature-description", featureDesc));
+    }
+    let hasRed = false;
+    for (const scenario of group.scenarios) {
+      if (isRed(scenario, allowPending)) hasRed = true;
+      section.appendChild(renderScenario(scenario, allowPending));
+    }
+    if (hasRed) section.classList.add("has-red");
+    main.appendChild(section);
+  }
+  return main;
+}
+
+function renderDiagnostics(diagnostics) {
+  const issues = k(diagnostics, ":svo-issues") || [];
+  if (!issues.length) return null;
+  const section = el("section", "diagnostics");
+  section.appendChild(el("h2", null, "Diagnostics (" + issues.length + ")"));
+  const list = el("ul");
+  for (const issue of issues) {
+    list.appendChild(el("li", null, k(issue, ":message") || k(issue, ":type") || "(diagnostic)"));
+  }
+  section.appendChild(list);
+  return section;
+}
+
+function render() {
+  const island = document.getElementById("run-data");
+  const data = parseEdn(island.textContent);
+  const runCtx = k(data, ":run-ctx") || new Map();
+  const scenarios = k(data, ":scenarios") || [];
+  const summary = k(data, ":summary");
+
+  const app = document.getElementById("app");
+  app.appendChild(renderHeader(runCtx, summary, scenarios));
+  app.appendChild(renderFeatures(runCtx, scenarios));
+  const diagnostics = renderDiagnostics(k(data, ":diagnostics"));
+  if (diagnostics) app.appendChild(diagnostics);
+  app.appendChild(
+    el(
+      "footer",
+      "run-footer",
+      "Generated by ShiftLefter" +
+        (k(runCtx, ":version") ? " v" + k(runCtx, ":version") : "") +
+        (k(runCtx, ":run-id") ? " · run " + k(runCtx, ":run-id") : ""),
+    ),
+  );
+}
+
+document.addEventListener("DOMContentLoaded", render);
+</script>
+</body>
+</html>

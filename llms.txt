@@ -1,0 +1,31 @@
+# ShiftLefter
+
+> A typed behavioral vocabulary over Gherkin, built in Clojure. Define your
+> app's actors, actions, and intents once; every scenario is validated against
+> that vocabulary at bind time, before anything runs. Drives real browsers
+> (pluggable WebDriver/Playwright backend) and SMS. CI-ready: JUnit XML, HTML,
+> and EDN output, tag filtering, parallel scenario execution.
+
+This site is a pointer. The repository owns the content.
+
+## Start here
+
+- Repository: https://github.com/shift-lefter/shiftlefter
+- Releases: https://github.com/shift-lefter/shiftlefter/releases
+- Install (Java 11+ only):
+  curl -fsSL https://raw.githubusercontent.com/SHIFT-LEFTER/shiftlefter/main/release/install.sh | bash
+- After installing, run `sl orient` in any project — it reports the project's
+  mode, what would fail, and what to read next. `sl agent-doc --list` names the
+  packaged doctrine topics.
+
+## Docs
+
+- Agent guide: https://github.com/shift-lefter/shiftlefter/blob/main/docs/AGENT.md
+- Fit check ("would it work for my project?"): https://github.com/shift-lefter/shiftlefter/blob/main/docs/FIT.md
+- Docs index: https://github.com/shift-lefter/shiftlefter/blob/main/docs/README.md
+- Changelog: https://github.com/shift-lefter/shiftlefter/blob/main/CHANGELOG.md
+
+## Sample artifact
+
+- A real HTML run report (self-contained, includes a machine-readable EDN data
+  island): https://shiftlefter.com/report/
