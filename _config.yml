@@ -1,0 +1,62 @@
+# ==========================================================================
+# FROZEN CITATION CONTRACT (sl-5dhn; charter §1.5 — the flags must timestamp)
+# --------------------------------------------------------------------------
+# The permalink scheme is the ONE unmigratable thing on this site. Once the
+# first real post publishes (sl-vvxu), /blog/YYYY/MM/slug/ URLs are frozen
+# forever — generators and themes may change, URLs may not. Until that first
+# publication event this line is a one-line flip (Chair's veto window on the
+# /blog prefix is open until then).
+# Amendment trail: ratified scheme was /YYYY/MM/slug/ (blog-platform.md,
+# written when the blog was assumed a subdomain site); Shape C (one site at
+# the apex) + the namespace rule below prefix it with /blog.
+# ==========================================================================
+permalink: /blog/:year/:month/:title/
+
+# Pinned so a late-evening local post can never land in the wrong permanent
+# /YYYY/MM/ month via a UTC build (GH Pages builds in UTC).
+timezone: America/Chicago
+
+title: ShiftLefter
+author: Gabriel Wilkins
+url: https://shiftlefter.com
+
+# Namespace rule (Shape C, ratified 2026-07-31): /blog/* is the Jekyll blog
+# surface; every other root path is free static content — Jekyll passes files
+# without front matter through untouched, so anything parked at a non-blog
+# path serves byte-identical.
+plugins:
+  - jekyll-feed
+feed:
+  path: blog/feed.xml
+
+# GH Pages force-enables several convenience plugins; these settings switch
+# off the ones that would break the passthrough guarantee by converting
+# front-matter-less .md files into pages (verified locally against the same
+# github-pages gem code the server runs).
+theme: null
+optional_front_matter:
+  enabled: false
+titles_from_headings:
+  enabled: false
+relative_links:
+  enabled: false
+
+markdown: kramdown
+kramdown:
+  # Chapter anchors are explicit frozen {#id} attributes only — spoke targets
+  # are never auto-derived from titles (grooming ruling 2026-07-31). With
+  # auto_ids off, a heading has an anchor exactly when one was deliberately
+  # frozen onto it.
+  auto_ids: false
+
+defaults:
+  - scope:
+      path: ""
+      type: posts
+    values:
+      layout: post
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - vendor
