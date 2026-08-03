@@ -20,6 +20,10 @@ title: ShiftLefter
 author: Gabriel Wilkins
 url: https://shiftlefter.com
 
+# Explicit because jekyll-github-metadata otherwise infers the repo from the
+# `origin` remote — which is the GitLab working remote here, not GitHub.
+repository: SHIFT-LEFTER/shiftlefter.com
+
 # Namespace rule (Shape C, ratified 2026-07-31): /blog/* is the Jekyll blog
 # surface; every other root path is free static content — Jekyll passes files
 # without front matter through untouched, so anything parked at a non-blog
