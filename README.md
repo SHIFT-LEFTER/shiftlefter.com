@@ -33,8 +33,12 @@ see `report/README-REGEN.md` for how it is regenerated.
    Auto-generated IDs are off; an anchor exists exactly when one was
    deliberately frozen onto a heading, because published anchors are
    permanent deep-link targets.
-3. Preview locally (below), open a PR, merge it. **The merge commit is the
-   publication timestamp.**
+3. Preview locally (below), push the branch to the `github` remote, open a
+   PR there, merge it. **The merge commit is the publication timestamp.**
+
+Remote topology: `origin` (gl.3var.com) is the working remote — all branches
+live there and nothing deploys from it. The `github` remote deploys `main`
+via GH Pages and receives branches only when a publish PR is being opened.
 
 The post URL becomes `shiftlefter.com/blog/YYYY/MM/slug/` — this permalink
 scheme is the frozen citation contract (see the header of `_config.yml`);
