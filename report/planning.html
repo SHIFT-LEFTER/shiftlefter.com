@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>shiftlefter-demo — run report</title>
+<style>
+/* ShiftLefter HTML run report (sl-muq9).
+ *
+ * Tasteful-utilitarian v1; a future branding pass swaps this file wholesale
+ * (the renderer emits semantic classes only — no inline styles).
+ * All color/spacing decisions live in the custom properties below, so a
+ * restyle is a variable swap, not a selector rewrite. Class vocabulary:
+ *   .run-header .run-status .run-meta .run-selection .run-counts .controls
+ *   .feature .feature-name .feature-path
+ *   .scenario .scenario-name .tags .tag .duration
+ *   .steps .step .step-status .step-text .macro-marker .error-detail
+ *   .diagnostics .run-footer
+ * Status modifiers: .st-passed .st-failed .st-error .st-pending .st-skipped
+ * State: body.failures-only, .scenario.red, .feature.has-red
+ */
+
+:root {
+  --bg: #ffffff;
+  --fg: #1a1d21;
+  --fg-muted: #6b7280;
+  --surface: #f6f7f9;
+  --border: #e2e5e9;
+  --passed: #1a7f37;
+  --failed: #c93c37;
+  --error: #a13ac9;
+  --pending: #b58a1e;
+  --skipped: #6b7280;
+  --chip-bg: #eef1f4;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #16181c;
+    --fg: #e6e8eb;
+    --fg-muted: #9aa2ad;
+    --surface: #1f2228;
+    --border: #33373e;
+    --passed: #4bc26b;
+    --failed: #ef6a64;
+    --error: #c579e0;
+    --pending: #d9ae4a;
+    --skipped: #9aa2ad;
+    --chip-bg: #2a2e35;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0 auto;
+  max-width: 64rem;
+  padding: 1.5rem 1.25rem 3rem;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--sans);
+  line-height: 1.45;
+}
+
+.noscript-note {
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+}
+
+/* ---- run header ---------------------------------------------------- */
+
+.run-header h1 {
+  font-size: 1.35rem;
+  margin: 0 0 0.25rem;
+}
+
+.run-status {
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 0.1rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  vertical-align: middle;
+  color: var(--bg);
+}
+
+.run-status.st-passed {
+  background: var(--passed);
+}
+
+.run-status.st-failed {
+  background: var(--failed);
+}
+
+.run-meta,
+.run-selection {
+  margin: 0.15rem 0;
+  color: var(--fg-muted);
+  font-size: 0.85rem;
+}
+
+.run-selection {
+  font-weight: 600;
+}
+
+.run-counts {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0;
+  margin: 0.75rem 0;
+}
+
+.run-counts .count {
+  padding: 0.15rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.count.st-passed {
+  color: var(--passed);
+}
+
+.count.st-failed,
+.count.st-error {
+  color: var(--failed);
+}
+
+.count.st-pending {
+  color: var(--pending);
+}
+
+.count.st-skipped {
+  color: var(--skipped);
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.75rem 0 1.25rem;
+  font-size: 0.85rem;
+}
+
+.controls button {
+  padding: 0.25rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--fg);
+  font: inherit;
+  cursor: pointer;
+}
+
+.controls button:hover {
+  border-color: var(--fg-muted);
+}
+
+/* ---- features & scenarios ------------------------------------------ */
+
+.feature {
+  margin: 1.5rem 0;
+}
+
+.feature-name {
+  font-size: 1.05rem;
+  margin: 0 0 0.1rem;
+}
+
+.feature-path {
+  color: var(--fg-muted);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+}
+
+/* Gherkin description prose (sl-v85e): pre-line honors the authored
+   line breaks and indentation without allowing markup. */
+.feature-description,
+.scenario-description {
+  color: var(--fg-muted);
+  white-space: pre-line;
+  font-size: 0.85rem;
+  margin: 0.35rem 0 0.5rem;
+}
+
+.scenario-description {
+  margin: 0.5rem 0.75rem 0.25rem;
+}
+
+.scenario {
+  margin: 0.5rem 0;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+}
+
+.scenario > summary {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.45rem 0.75rem;
+  cursor: pointer;
+  list-style-position: inside;
+}
+
+.scenario .status-word {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  min-width: 4.2em;
+}
+
+.status-word.st-passed {
+  color: var(--passed);
+}
+
+.status-word.st-failed {
+  color: var(--failed);
+}
+
+.status-word.st-error {
+  color: var(--error);
+}
+
+.status-word.st-pending {
+  color: var(--pending);
+}
+
+.status-word.st-skipped {
+  color: var(--skipped);
+}
+
+.scenario-name {
+  flex: 1;
+}
+
+.tags {
+  display: inline-flex;
+  gap: 0.3rem;
+}
+
+.tag {
+  padding: 0 0.45rem;
+  border-radius: 999px;
+  background: var(--chip-bg);
+  color: var(--fg-muted);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+}
+
+/* Derived-scheduling annotation (sl-esq): a gate serialized this scenario.
+   Greyed + dashed = "ran as though this was also true" — never pretending
+   the tag was authored. */
+.tag.derived {
+  background: transparent;
+  border: 1px dashed var(--fg-muted);
+  opacity: 0.65;
+}
+
+.derived-note {
+  color: var(--fg-muted);
+  font-size: 0.72rem;
+  font-style: italic;
+}
+
+/* Lifecycle hook lines (sl-esq): rendered around the steps list, mirroring
+   execution order — before-phase above, after-phase below. */
+.hook-line {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.15rem 0.75rem;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--fg-muted);
+}
+
+.hook-line .hook-status {
+  font-size: 0.68rem;
+  font-weight: 600;
+}
+
+.hook-line.st-failed,
+.hook-line.st-failed .hook-status,
+.hook-line .hook-error {
+  color: var(--red, #c0392b);
+}
+
+.hook-line .contributed {
+  font-style: italic;
+}
+
+.hook-line .duration {
+  margin-left: auto;
+}
+
+/* ---- attachments (sl-l9nj) ------------------------------------------- */
+
+.attachment {
+  padding: 0.15rem 0.75rem;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--fg-muted);
+}
+
+.attachment-line {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.attachment-line .attachment-kind {
+  font-size: 0.68rem;
+  font-weight: 600;
+}
+
+.attachment-line .attachment-note {
+  font-style: italic;
+}
+
+.attachment-line .duration {
+  margin-left: auto;
+}
+
+.attachment-failed,
+.attachment-failed .attachment-kind {
+  color: var(--red, #c0392b);
+}
+
+.attachment-image {
+  display: block;
+  max-width: 100%;
+  max-height: 480px;
+  margin: 0.35rem 0 0.5rem;
+  border: 1px solid var(--border, #ddd);
+  border-radius: 4px;
+}
+
+.attachment-excerpt {
+  margin: 0.2rem 0 0.4rem;
+}
+
+.attachment-excerpt pre {
+  max-height: 16rem;
+  overflow: auto;
+  font-size: 0.72rem;
+  margin: 0.25rem 0 0;
+  padding: 0.4rem 0.6rem;
+  background: var(--bg-alt, rgba(127, 127, 127, 0.08));
+  border-radius: 4px;
+}
+
+.duration {
+  color: var(--fg-muted);
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- step transcript ------------------------------------------------ */
+
+.steps {
+  list-style: none;
+  margin: 0;
+  padding: 0.4rem 0.75rem 0.6rem;
+  border-top: 1px solid var(--border);
+  font-family: var(--mono);
+  font-size: 0.8rem;
+}
+
+.step {
+  display: flex;
+  flex-wrap: wrap; /* error-detail breaks onto its own full-width row */
+  gap: 0.5rem;
+  align-items: baseline;
+  padding: 0.1rem 0;
+}
+
+.step .step-status {
+  min-width: 4.2em;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.step.st-passed .step-status {
+  color: var(--passed);
+}
+
+.step.st-failed .step-status {
+  color: var(--failed);
+}
+
+.step.st-error .step-status {
+  color: var(--error);
+}
+
+.step.st-pending .step-status {
+  color: var(--pending);
+}
+
+.step.st-skipped .step-status,
+.step.st-skipped .step-text {
+  color: var(--skipped);
+}
+
+.step-text {
+  flex: 1;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.macro-marker {
+  color: var(--fg-muted);
+}
+
+.error-detail {
+  flex-basis: 100%;
+  margin: 0.35rem 0 0.35rem 4.7em;
+  padding: 0.5rem 0.65rem;
+  border-left: 3px solid var(--failed);
+  background: var(--bg);
+  border-radius: 0 4px 4px 0;
+}
+
+.error-detail .error-type {
+  font-weight: 700;
+  font-size: 0.75rem;
+  margin-bottom: 0.2rem;
+}
+
+.error-detail pre {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 0.78rem;
+}
+
+/* ---- diagnostics & footer ------------------------------------------- */
+
+.diagnostics {
+  margin: 2rem 0 0;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--pending);
+  border-radius: 6px;
+}
+
+.diagnostics h2 {
+  font-size: 0.95rem;
+  margin: 0 0 0.4rem;
+}
+
+.diagnostics ul {
+  margin: 0;
+  padding-left: 1.2rem;
+  font-size: 0.85rem;
+}
+
+/* ---- planning diagnostics (sl-6hsd) --------------------------------- */
+
+.planning-failed-note {
+  margin: 1.25rem 0 0;
+  padding: 0.6rem 0.9rem;
+  border-left: 3px solid var(--error);
+  background: var(--surface);
+  font-size: 0.9rem;
+}
+
+.diagnostics h3 {
+  font-size: 0.85rem;
+  margin: 0.8rem 0 0.3rem;
+  color: var(--fg-muted);
+}
+
+.diag-item {
+  margin: 0.25rem 0;
+}
+
+.diag-step-text {
+  font-family: var(--mono);
+}
+
+.diag-loc,
+.diag-alt {
+  color: var(--fg-muted);
+  font-size: 0.8rem;
+}
+
+.diag-alt {
+  font-family: var(--mono);
+  margin-left: 0.75rem;
+}
+
+/* The teaching line (sl-s04n family) — the console renders it cyan; here
+   it gets the pending accent and a quiet indent under its step. */
+.diag-hint {
+  margin: 0.15rem 0 0 0.75rem;
+  padding-left: 0.6rem;
+  border-left: 2px solid var(--pending);
+  color: var(--fg);
+  font-size: 0.82rem;
+}
+
+.run-footer {
+  margin-top: 2.5rem;
+  color: var(--fg-muted);
+  font-size: 0.75rem;
+}
+
+/* ---- failures-only state -------------------------------------------- */
+
+body.failures-only .scenario:not(.red) {
+  display: none;
+}
+
+body.failures-only .feature:not(.has-red) {
+  display: none;
+}
+</style>
+</head>
+<body>
+<noscript><p class="noscript-note">This report renders with JavaScript. The complete run data is embedded in this file as readable EDN &mdash; view source and find <code>script type=&quot;application/edn&quot;</code>.</p></noscript>
+<div id="app"></div>
+<script type="application/edn" id="run-data">
+{:run-ctx {:run-id "da8b1103-f686-4f98-a204-30f9a4904544", :version "0.5.4", :mode :vanilla, :started-at "2026-08-05T22:00:03", :project-root "/private/tmp/shiftlefter-demo", :project-name "shiftlefter-demo", :allow-pending? false}, :scenarios [], :diagnostics {:undefined [{:status :undefined, :step {:step/id #uuid "e6a807a9-713c-4bc2-b706-b4f05c9b997b", :step/text "corpus step that no stepdef defines", :step/template-text nil, :step/keyword "Given", :step/location {:line 5, :column 5}, :step/origin :scenario, :step/arguments []}, :binding nil, :alternatives [], :source-file "/private/tmp/shiftlefter-demo/target/corpus/p62449/default-42/broken/broken.feature", :severity :error} {:status :undefined, :step {:step/id #uuid "b2ffba6c-1107-4a18-8981-d22e93fe7c6f", :step/text "the gateway degrades, the client retries.", :step/template-text nil, :step/keyword "When", :step/location {:line 8, :column 5}, :step/origin :scenario, :step/arguments []}, :binding nil, :alternatives [], :hint {:type :grammar/prose-as-step, :suggestion "This line reads like description prose. Descriptions end at the first Given/When/Then/And/But (or *) — move prose above the first step or rephrase so it does not open with a step keyword."}, :source-file "/private/tmp/shiftlefter-demo/target/corpus/p62449/default-42/broken/broken.feature", :severity :error}], :ambiguous [], :invalid-arity [], :svo-issues [], :counts {:undefined-count 2, :ambiguous-count 0, :invalid-arity-count 0, :svo-issue-count 0, :total-issues 2}}, :summary {:run-id "da8b1103-f686-4f98-a204-30f9a4904544", :exit-code 2, :status :planning-failed, :counts {:undefined-count 2, :ambiguous-count 0, :invalid-arity-count 0, :svo-issue-count 0, :total-issues 2}}}
+</script>
+<script>
+// ShiftLefter HTML run report renderer (sl-muq9).
+//
+// The report is a VIEWER: the sole source of truth is the EDN data island
+// (the script element with type application/edn, id run-data) — run-ctx,
+// scenario envelopes, diagnostics, summary. This file parses that island and
+// builds the DOM from it. Deliberately liftable into the served multi-run
+// viewer (sl-zztu): nothing here assumes file:// or a single run beyond
+// render().
+//
+// SAFETY: all island data is untrusted (scenario names, step text, error
+// messages come from user feature files and arbitrary exceptions). Every
+// data value reaches the page via textContent — never via HTML parsing,
+// never via attribute interpolation. (No literal angle-bracket tag text in
+// these comments either: this file is inlined into the document, and tests
+// count tag occurrences.)
+//
+// The ONE sanctioned exception (sl-l9nj): an attachment ref whose media
+// type is image/* and whose path passes safeRelPath (relative, no scheme,
+// no backslash, no dot-dot segment) gets an img element whose src is set
+// by PROPERTY ASSIGNMENT on a created node — still never HTML parsing.
+// Every path failing that gate renders as plain text.
+
+"use strict";
+
+// ---------------------------------------------------------------------------
+// EDN parser — the subset reporter envelopes can contain (invariant 3):
+// nil, booleans, numbers, strings, keywords, symbols, vectors/lists, maps,
+// sets, #uuid (and generic tagged literals, tag dropped). Keywords parse to
+// their literal string form (":status"); maps to Map; sets to arrays.
+// ---------------------------------------------------------------------------
+
+function parseEdn(text) {
+  let pos = 0;
+
+  function err(msg) {
+    throw new Error("EDN parse error at " + pos + ": " + msg);
+  }
+
+  function skipWs() {
+    while (pos < text.length) {
+      const c = text[pos];
+      if (c === " " || c === "\t" || c === "\n" || c === "\r" || c === ",") {
+        pos++;
+      } else if (c === ";") {
+        while (pos < text.length && text[pos] !== "\n") pos++;
+      } else {
+        return;
+      }
+    }
+  }
+
+  function readString() {
+    pos++; // opening quote
+    let out = "";
+    while (pos < text.length) {
+      const c = text[pos];
+      if (c === '"') {
+        pos++;
+        return out;
+      }
+      if (c === "\\") {
+        const e = text[pos + 1];
+        if (e === "u") {
+          out += String.fromCharCode(parseInt(text.substr(pos + 2, 4), 16));
+          pos += 6;
+        } else {
+          const map = { n: "\n", t: "\t", r: "\r", f: "\f", b: "\b" };
+          out += map[e] !== undefined ? map[e] : e;
+          pos += 2;
+        }
+      } else {
+        out += c;
+        pos++;
+      }
+    }
+    err("unterminated string");
+  }
+
+  const TOKEN_END = /[\s,()\[\]{}"]/;
+
+  function readToken() {
+    const start = pos;
+    while (pos < text.length && !TOKEN_END.test(text[pos])) pos++;
+    return text.slice(start, pos);
+  }
+
+  function readChar() {
+    pos++; // backslash
+    const tok = readToken();
+    const named = { newline: "\n", space: " ", tab: "\t", return: "\r" };
+    return named[tok] !== undefined ? named[tok] : tok.charAt(0);
+  }
+
+  function readColl(close) {
+    pos++; // opening delimiter
+    const items = [];
+    for (;;) {
+      skipWs();
+      if (pos >= text.length) err("unterminated collection");
+      if (text[pos] === close) {
+        pos++;
+        return items;
+      }
+      items.push(readValue());
+    }
+  }
+
+  function readMap() {
+    const items = readColl("}");
+    if (items.length % 2 !== 0) err("map with odd entry count");
+    const m = new Map();
+    for (let i = 0; i < items.length; i += 2) m.set(items[i], items[i + 1]);
+    return m;
+  }
+
+  function readDispatch() {
+    pos++; // '#'
+    if (text[pos] === "{") return readColl("}"); // set -> array
+    if (text[pos] === "_") {
+      pos++;
+      readValue(); // discard
+      return readValue();
+    }
+    readToken(); // tag symbol (uuid, inst, ...) — value stands in for it
+    skipWs();
+    return readValue();
+  }
+
+  function readValue() {
+    skipWs();
+    if (pos >= text.length) err("unexpected end of input");
+    const c = text[pos];
+    if (c === '"') return readString();
+    if (c === "{") return readMap();
+    if (c === "[") return readColl("]");
+    if (c === "(") return readColl(")");
+    if (c === "#") return readDispatch();
+    if (c === "\\") return readChar();
+    const tok = readToken();
+    if (tok === "") err("unexpected character " + c);
+    if (tok === "nil") return null;
+    if (tok === "true") return true;
+    if (tok === "false") return false;
+    if (/^[+-]?(\d+\.?\d*([eE][+-]?\d+)?|\.\d+)[MN]?$/.test(tok)) {
+      return parseFloat(tok);
+    }
+    return tok; // keyword (":status") or symbol, as its literal text
+  }
+
+  const v = readValue();
+  skipWs();
+  return v;
+}
+
+// ---------------------------------------------------------------------------
+// Data access helpers
+// ---------------------------------------------------------------------------
+
+function k(m, key) {
+  return m instanceof Map ? m.get(key) : undefined;
+}
+
+function kIn(m, keys) {
+  let v = m;
+  for (const key of keys) {
+    v = k(v, key);
+    if (v === undefined || v === null) return v;
+  }
+  return v;
+}
+
+function fmtMs(ms) {
+  return ((ms || 0) / 1000).toFixed(3) + "s";
+}
+
+function relativePath(projectRoot, path) {
+  if (projectRoot && path && path.startsWith(projectRoot)) {
+    return path.slice(projectRoot.length).replace(/^[/\\]+/, "");
+  }
+  return path || "";
+}
+
+// ---------------------------------------------------------------------------
+// Status classification
+// ---------------------------------------------------------------------------
+
+function isSynthetic(step) {
+  return kIn(step, [":step", ":step/synthetic?"]) === true;
+}
+
+function isExpandedChild(step) {
+  return kIn(step, [":step", ":step/macro", ":role"]) === ":expanded";
+}
+
+function firstStepOfStatus(scenario, status) {
+  return (k(scenario, ":steps") || []).find((s) => k(s, ":status") === status && !isSynthetic(s));
+}
+
+// A failed scenario whose failing step threw (carries :exception-class) is
+// rendered as an ERROR — the same failure/error split the JUnit reporter
+// makes (sl-40to D-rules).
+function scenarioStatusClass(scenario) {
+  const status = k(scenario, ":status");
+  if (status === ":failed") {
+    const fs = firstStepOfStatus(scenario, ":failed");
+    if (fs && k(k(fs, ":error"), ":exception-class")) return "st-error";
+    return "st-failed";
+  }
+  return "st-" + (status || ":unknown").slice(1);
+}
+
+// "Red" mirrors exit-code semantics: failed always; :error (a lifecycle
+// hook threw, sl-esq) always; pending only when the run was strict
+// (allow-pending? false). Red scenarios render default-open.
+function isRed(scenario, allowPending) {
+  const status = k(scenario, ":status");
+  if (status === ":failed") return true;
+  if (status === ":error") return true;
+  if (status === ":pending" && !allowPending) return true;
+  return false;
+}
+
+const STATUS_WORDS = {
+  "st-passed": "PASSED",
+  "st-failed": "FAILED",
+  "st-error": "ERROR",
+  "st-pending": "PENDING",
+  "st-skipped": "SKIPPED",
+};
+
+// ---------------------------------------------------------------------------
+// Macro transcript rules — authored-primary rendering, ported from the JUnit
+// reporter's D6 rules: the synthetic wrapper (:role :call) is the authored
+// line; expanded children carry a "+ [key N/M]" marker.
+// ---------------------------------------------------------------------------
+
+function macroCounts(steps) {
+  const counts = {};
+  for (const s of steps) {
+    const macro = kIn(s, [":step", ":step/macro"]);
+    if (macro && k(macro, ":role") === ":call") {
+      const key = k(macro, ":key") + "|" + kIn(macro, [":call-site", ":line"]);
+      counts[key] = k(macro, ":step-count");
+    }
+  }
+  return counts;
+}
+
+function childMarker(step, counts) {
+  const macro = kIn(step, [":step", ":step/macro"]);
+  const n = (k(macro, ":index") || 0) + 1;
+  const key = k(macro, ":key") + "|" + kIn(macro, [":call-site", ":line"]);
+  const m = counts[key];
+  return "+ [" + k(macro, ":key") + " " + n + "/" + (m || "?") + "] ";
+}
+
+function macroAttribution(step, counts) {
+  if (!isExpandedChild(step)) return "";
+  const macro = kIn(step, [":step", ":step/macro"]);
+  const n = (k(macro, ":index") || 0) + 1;
+  const key = k(macro, ":key") + "|" + kIn(macro, [":call-site", ":line"]);
+  const m = counts[key];
+  return (
+    "\n[via macro '" +
+    k(macro, ":key") +
+    "' called at feature line " +
+    kIn(macro, [":call-site", ":line"]) +
+    ", step " +
+    n +
+    "/" +
+    (m || "?") +
+    ": " +
+    kIn(step, [":step", ":step/text"]) +
+    "]"
+  );
+}
+
+// ---------------------------------------------------------------------------
+// DOM construction (textContent only — data is never parsed as HTML)
+// ---------------------------------------------------------------------------
+
+function el(tag, className, textContent) {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (textContent !== undefined) node.textContent = textContent;
+  return node;
+}
+
+function renderHeader(runCtx, summary, scenarios) {
+  const header = el("header", "run-header");
+  const failed = summary ? k(summary, ":exit-code") !== 0 : null;
+  // sl-6hsd: exit 2 before execution — nothing ran; the badge must not
+  // pretend scenarios failed.
+  const planningFailed = summary && k(summary, ":status") === ":planning-failed";
+
+  const h1 = el("h1", null, k(runCtx, ":project-name") || "ShiftLefter run");
+  if (failed !== null) {
+    const badge = el(
+      "span",
+      "run-status " + (planningFailed ? "st-error" : failed ? "st-failed" : "st-passed"),
+      planningFailed ? "PLANNING FAILED" : failed ? "FAILED" : "PASSED",
+    );
+    h1.appendChild(badge);
+  }
+  header.appendChild(h1);
+
+  const totalMs = scenarios.reduce((t, s) => t + (k(s, ":duration-ms") || 0), 0);
+  const meta = [
+    k(runCtx, ":started-at"),
+    fmtMs(totalMs),
+    k(runCtx, ":version") ? "v" + k(runCtx, ":version") : null,
+    k(runCtx, ":mode") ? k(runCtx, ":mode").slice(1) + " mode" : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+  header.appendChild(el("p", "run-meta", meta));
+
+  const selection = k(runCtx, ":selection");
+  if (selection) {
+    const selected = k(selection, ":selected");
+    const filteredOut = k(selection, ":filtered-out");
+    const filter = k(selection, ":filter");
+    const parts = [];
+    for (const which of [":include", ":exclude"]) {
+      const tags = k(filter, which) || [];
+      if (tags.length) {
+        parts.push(which.slice(1) + " " + tags.join(", "));
+      }
+    }
+    header.appendChild(
+      el(
+        "p",
+        "run-selection",
+        "Ran " +
+          selected +
+          " of " +
+          (selected + filteredOut) +
+          " scenarios (" +
+          filteredOut +
+          " filtered out by tags)" +
+          (parts.length ? " — filter: " + parts.join("; ") : ""),
+      ),
+    );
+  }
+
+  // Planning-failed reports carry issue counts, not scenario statuses —
+  // a zeroed status row would be noise (sl-6hsd).
+  if (!planningFailed) {
+    const counts = summary ? k(summary, ":counts") : null;
+    const countsList = el("ul", "run-counts");
+    countsList.appendChild(el("li", "count", scenarios.length + " scenario(s)"));
+    for (const status of [":passed", ":failed", ":pending", ":skipped"]) {
+      const n = counts ? k(counts, status) || 0 : 0;
+      countsList.appendChild(el("li", "count st-" + status.slice(1), n + " " + status.slice(1)));
+    }
+    // :error (hook threw, sl-esq) — only when present, so hook-less reports
+    // keep the historical four-count row.
+    const errorCount = counts ? k(counts, ":error") || 0 : 0;
+    if (errorCount > 0) {
+      countsList.appendChild(el("li", "count st-error", errorCount + " error"));
+    }
+    header.appendChild(countsList);
+  }
+
+  // Scenario controls have nothing to operate on when planning failed.
+  if (!planningFailed) {
+    const controls = el("div", "controls");
+    const expand = el("button", null, "Expand all");
+    expand.addEventListener("click", () => setAllOpen(true));
+    const collapse = el("button", null, "Collapse all");
+    collapse.addEventListener("click", () => setAllOpen(false));
+    const label = el("label");
+    const checkbox = el("input");
+    checkbox.type = "checkbox";
+    checkbox.addEventListener("change", () =>
+      document.body.classList.toggle("failures-only", checkbox.checked),
+    );
+    label.appendChild(checkbox);
+    label.appendChild(document.createTextNode(" Failures only"));
+    controls.appendChild(expand);
+    controls.appendChild(collapse);
+    controls.appendChild(label);
+    header.appendChild(controls);
+  }
+
+  return header;
+}
+
+function setAllOpen(open) {
+  for (const d of document.querySelectorAll("details.scenario")) {
+    d.open = open;
+  }
+}
+
+function renderStep(step, counts) {
+  const status = k(step, ":status");
+  const error = k(step, ":error");
+  const statusClass =
+    status === ":failed" && error && k(error, ":exception-class")
+      ? "st-error"
+      : "st-" + (status || ":unknown").slice(1);
+  const li = el("li", "step " + statusClass);
+  li.appendChild(el("span", "step-status", STATUS_WORDS[statusClass] || ""));
+
+  const text = el("span", "step-text");
+  if (isExpandedChild(step)) {
+    text.appendChild(el("span", "macro-marker", childMarker(step, counts)));
+  }
+  text.appendChild(
+    document.createTextNode(
+      kIn(step, [":step", ":step/keyword"]) + " " + kIn(step, [":step", ":step/text"]),
+    ),
+  );
+  li.appendChild(text);
+  li.appendChild(el("span", "duration", fmtMs(k(step, ":duration-ms"))));
+
+  if (error) {
+    const detail = el("div", "error-detail");
+    detail.appendChild(
+      el(
+        "div",
+        "error-type",
+        k(error, ":exception-class") || (k(error, ":type") || "").slice(1) || "failure",
+      ),
+    );
+    let message = k(error, ":message") || "";
+    // Dual attribution (D6): a failing expanded child names BOTH the
+    // authored macro call and the child step.
+    message += macroAttribution(step, counts);
+    if (k(error, ":value")) message += "\nvalue: " + k(error, ":value");
+    detail.appendChild(el("pre", null, message));
+    li.appendChild(detail);
+  }
+  // Step-level attachment refs (sl-l9nj; producer arrives with sl-3q9r).
+  for (const ref of k(step, ":attachments") || []) {
+    li.appendChild(renderAttachment(ref));
+  }
+  return li;
+}
+
+// ---------------------------------------------------------------------------
+// Attachments (sl-l9nj): pure-data refs from the envelope. Paths are
+// group-root-relative when portable — and this report sits AT the group
+// root, so a safe relative path resolves as a sibling. Anything else
+// (absolute paths, hostile strings) renders as text, never as a URL.
+// ---------------------------------------------------------------------------
+
+function safeRelPath(p) {
+  return (
+    typeof p === "string" &&
+    p.length > 0 &&
+    !p.startsWith("/") &&
+    !p.includes("\\") &&
+    !/^[A-Za-z][A-Za-z0-9+.-]*:/.test(p) &&
+    !p.split("/").includes("..")
+  );
+}
+
+function fmtBytes(n) {
+  if (typeof n !== "number") return "";
+  if (n >= 1048576) return (n / 1048576).toFixed(1) + " MB";
+  if (n >= 1024) return (n / 1024).toFixed(1) + " KB";
+  return n + " B";
+}
+
+function attachmentSource(ref) {
+  const source = k(ref, ":attachment/source");
+  if (Array.isArray(source)) return "via hook " + source[1];
+  if (source === ":capture-policy") return "via capture policy";
+  return "";
+}
+
+function renderAttachment(ref) {
+  const kind = String(k(ref, ":attachment/kind") || ":attachment").slice(1);
+  const path = k(ref, ":attachment/path") || "";
+  const mediaType = k(ref, ":attachment/media-type") || "";
+  const excerpt = k(ref, ":attachment/excerpt");
+  const error = k(ref, ":attachment/error");
+  const portable = safeRelPath(path);
+
+  const wrap = el("div", "attachment" + (error ? " attachment-failed" : ""));
+  const line = el("div", "attachment-line");
+  line.appendChild(el("span", "attachment-kind", error ? "FAILED" : kind));
+  line.appendChild(
+    el("span", "attachment-text", (error ? kind + ": " + error + " -- " : "") + path),
+  );
+  if (!portable) {
+    line.appendChild(el("span", "attachment-note", "(non-portable path)"));
+  }
+  const source = attachmentSource(ref);
+  if (source) line.appendChild(el("span", "attachment-note", source));
+  const bytes = fmtBytes(k(ref, ":attachment/bytes"));
+  if (bytes) line.appendChild(el("span", "duration", bytes));
+  wrap.appendChild(line);
+
+  // Inline image: healthy image/* ref with a safe sibling-relative path.
+  // Mailed alone (or read at the stable-path copy, which sits outside the
+  // run dir) the img degrades to its alt text — the line above still
+  // names the evidence.
+  if (!error && portable && mediaType.startsWith("image/")) {
+    const img = el("img", "attachment-image");
+    img.alt = kind + " " + path;
+    img.loading = "lazy";
+    img.src = path; // property assignment on a created node — see SAFETY
+    wrap.appendChild(img);
+  }
+
+  // Text excerpt (D3): the mailed-alone triage courtesy, bounded upstream.
+  if (excerpt) {
+    const d = el("details", "attachment-excerpt");
+    d.appendChild(el("summary", null, "excerpt"));
+    d.appendChild(el("pre", null, excerpt));
+    wrap.appendChild(d);
+  }
+  return wrap;
+}
+
+// One row per lifecycle hook that ran (sl-esq): name, phase, status,
+// duration, and the ctx keys a Before contributed.
+function renderHookLine(record) {
+  const status = k(record, ":status"); // ":ok" | ":failed"
+  const line = el("div", "hook-line" + (status === ":failed" ? " st-failed" : ""));
+  line.appendChild(el("span", "hook-status", status === ":failed" ? "FAILED" : "OK"));
+  line.appendChild(
+    el(
+      "span",
+      "hook-text",
+      "hook " + k(record, ":name") + " [" + String(k(record, ":phase")).slice(1) + "]",
+    ),
+  );
+  const contributed = k(record, ":contributed") || [];
+  if (contributed.length) {
+    line.appendChild(el("span", "contributed", "-> " + contributed.join(", ")));
+  }
+  const err = k(record, ":error");
+  if (err && k(err, ":message")) {
+    line.appendChild(el("span", "hook-error", k(err, ":message")));
+  }
+  line.appendChild(el("span", "duration", fmtMs(k(record, ":duration-ms"))));
+  return line;
+}
+
+function renderScenario(scenario, allowPending) {
+  const statusClass = scenarioStatusClass(scenario);
+  const red = isRed(scenario, allowPending);
+  const details = el("details", "scenario " + statusClass + (red ? " red" : ""));
+  details.open = red; // failures + errors default-open (strict pending too)
+
+  const pickle = kIn(scenario, [":plan", ":plan/pickle"]);
+  const summary = el("summary");
+  summary.appendChild(el("span", "status-word " + statusClass, STATUS_WORDS[statusClass] || ""));
+  summary.appendChild(el("span", "scenario-name", k(pickle, ":pickle/name") || "(unnamed)"));
+  const tags = k(pickle, ":pickle/tags") || [];
+  if (tags.length) {
+    const tagSpan = el("span", "tags");
+    for (const tag of tags) {
+      tagSpan.appendChild(el("span", "tag", k(tag, ":name")));
+    }
+    summary.appendChild(tagSpan);
+  }
+  // Derived-scheduling annotation (sl-esq round-5 unification): a scenario
+  // auto-serialized by a gate (costume, shared-impl, a :requires-serial
+  // hook) shows a greyed @serial chip annotated with WHY — "ran as though
+  // this was also true", visually distinct from authored tags. An authored
+  // @serial (:tag reason) already shows its real tag chip.
+  const schedule = k(scenario, ":schedule");
+  if (schedule && k(schedule, ":serial?") === true) {
+    const reason = k(schedule, ":reason");
+    if (reason !== ":tag") {
+      const reasonText = Array.isArray(reason)
+        ? String(reason[0]).slice(1) + " " + reason[1]
+        : String(reason).slice(1);
+      const derived = el("span", "tags derived-schedule");
+      derived.appendChild(el("span", "tag derived", "@serial"));
+      derived.appendChild(el("span", "derived-note", "via " + reasonText));
+      summary.appendChild(derived);
+    }
+  }
+  summary.appendChild(el("span", "duration", fmtMs(k(scenario, ":duration-ms"))));
+  details.appendChild(summary);
+
+  // Scenario description prose (sl-v85e): first block of the expanded body,
+  // above any error detail and the transcript. Absent key renders nothing —
+  // pre-v85e islands and hand-built envelopes are unchanged.
+  const scenarioDesc = k(pickle, ":pickle/description");
+  if (scenarioDesc) {
+    details.appendChild(el("p", "scenario-description", scenarioDesc));
+  }
+
+  // Scenario-level hook failure (sl-esq): the :error lives on the scenario,
+  // not on any step — render its attributed detail block above the steps.
+  const scenarioError = k(scenario, ":error");
+  if (scenarioError) {
+    const detail = el("div", "error-detail scenario-error");
+    detail.appendChild(
+      el("div", "error-type", (k(scenarioError, ":type") || "").slice(1) || "error"),
+    );
+    let message = "";
+    if (k(scenarioError, ":hook")) message += "hook '" + k(scenarioError, ":hook") + "' -- ";
+    message += k(scenarioError, ":message") || "";
+    const reg = k(k(scenarioError, ":registration"), ":path");
+    if (reg) message += "\nregistered at: " + reg;
+    const tagSource = k(scenarioError, ":tag-source");
+    if (tagSource && k(tagSource, ":file")) {
+      message += "\ntagged at: " + k(tagSource, ":file") + ":" + k(tagSource, ":line");
+    }
+    detail.appendChild(el("pre", null, message));
+    details.appendChild(detail);
+  }
+
+  const steps = k(scenario, ":steps") || [];
+  const counts = macroCounts(steps);
+  const list = el("ol", "steps");
+  for (const step of steps) list.appendChild(renderStep(step, counts));
+  // Hook lines (sl-esq) mirror execution order: before-phase above the
+  // steps, after-phase below. Hook-less scenarios render exactly as before.
+  const hookRecords = k(scenario, ":hooks") || [];
+  for (const h of hookRecords.filter((r) => k(r, ":phase") === ":before")) {
+    details.appendChild(renderHookLine(h));
+  }
+  details.appendChild(list);
+  for (const h of hookRecords.filter((r) => k(r, ":phase") === ":after")) {
+    details.appendChild(renderHookLine(h));
+  }
+  // Scenario-level attachments (sl-l9nj): After-hook claims, below the
+  // transcript they evidence. Claim-less scenarios render exactly as before.
+  const attachments = k(scenario, ":attachments") || [];
+  if (attachments.length) {
+    const block = el("div", "attachments");
+    for (const ref of attachments) block.appendChild(renderAttachment(ref));
+    details.appendChild(block);
+  }
+  return details;
+}
+
+function renderFeatures(runCtx, scenarios) {
+  const main = el("main");
+  main.id = "features";
+  const allowPending = k(runCtx, ":allow-pending?") === true;
+  const projectRoot = k(runCtx, ":project-root");
+  const groups = new Map(); // source-file -> {name, scenarios} in plan order
+  for (const scenario of scenarios) {
+    const pickle = kIn(scenario, [":plan", ":plan/pickle"]);
+    const file = k(pickle, ":pickle/source-file") || "(unknown)";
+    if (!groups.has(file)) {
+      groups.set(file, {
+        name: k(pickle, ":pickle/feature-name") || "(unnamed feature)",
+        scenarios: [],
+      });
+    }
+    groups.get(file).scenarios.push(scenario);
+  }
+  for (const [file, group] of groups) {
+    const section = el("section", "feature");
+    const heading = el("h2", "feature-name", "Feature: " + group.name);
+    section.appendChild(heading);
+    section.appendChild(el("span", "feature-path", relativePath(projectRoot, file)));
+    // Feature description prose (sl-v85e) — from the group's first pickle;
+    // textContent via el() keeps arbitrary feature-file prose inert.
+    const featureDesc = kIn(group.scenarios[0], [
+      ":plan",
+      ":plan/pickle",
+      ":pickle/feature-description",
+    ]);
+    if (featureDesc) {
+      section.appendChild(el("p", "feature-description", featureDesc));
+    }
+    let hasRed = false;
+    for (const scenario of group.scenarios) {
+      if (isRed(scenario, allowPending)) hasRed = true;
+      section.appendChild(renderScenario(scenario, allowPending));
+    }
+    if (hasRed) section.classList.add("has-red");
+    main.appendChild(section);
+  }
+  return main;
+}
+
+// Planning diagnostics (sl-6hsd) — full parity with the console sections:
+// undefined steps carry their grammar hint (sl-s04n) and interface
+// suggestion (sl-563); ambiguous steps list their candidate stepdefs;
+// invalid arity shows expected/got. Bound-step shapes, textContent only.
+
+function stepLocation(runCtx, boundStep) {
+  const file = relativePath(k(runCtx, ":project-root"), k(boundStep, ":source-file"));
+  const line = kIn(boundStep, [":step", ":step/location", ":line"]);
+  if (!file && line == null) return "";
+  return " (" + [file || "?", line].filter((x) => x != null && x !== "").join(":") + ")";
+}
+
+function renderUndefinedItem(runCtx, boundStep) {
+  const li = el("li", "diag-item");
+  const head = el("div", "diag-step");
+  head.appendChild(
+    el("span", "diag-step-text", kIn(boundStep, [":step", ":step/text"]) || "(step)"),
+  );
+  head.appendChild(el("span", "diag-loc", stepLocation(runCtx, boundStep)));
+  li.appendChild(head);
+  const hint = kIn(boundStep, [":hint", ":suggestion"]);
+  if (hint) li.appendChild(el("div", "diag-hint", "hint: " + hint));
+  const filterHint = kIn(boundStep, [":filter-info", ":suggestion"]);
+  if (filterHint) li.appendChild(el("div", "diag-hint", "hint: " + filterHint));
+  return li;
+}
+
+function renderAmbiguousItem(runCtx, boundStep) {
+  const li = el("li", "diag-item");
+  const head = el("div", "diag-step");
+  head.appendChild(
+    el("span", "diag-step-text", kIn(boundStep, [":step", ":step/text"]) || "(step)"),
+  );
+  head.appendChild(el("span", "diag-loc", stepLocation(runCtx, boundStep)));
+  li.appendChild(head);
+  const alts = k(boundStep, ":alternatives") || [];
+  for (const alt of alts) {
+    li.appendChild(el("div", "diag-alt", "matches: " + (k(alt, ":pattern-src") || "(stepdef)")));
+  }
+  return li;
+}
+
+function renderArityItem(runCtx, boundStep) {
+  const li = el("li", "diag-item");
+  const head = el("div", "diag-step");
+  head.appendChild(
+    el("span", "diag-step-text", kIn(boundStep, [":step", ":step/text"]) || "(step)"),
+  );
+  const expected = kIn(boundStep, [":binding", ":expected"]);
+  const actual = kIn(boundStep, [":binding", ":actual"]);
+  head.appendChild(el("span", "diag-loc", " (expected " + expected + ", got " + actual + ")"));
+  li.appendChild(head);
+  return li;
+}
+
+function diagSection(section, title, cls, items, renderItem) {
+  if (!items.length) return;
+  section.appendChild(el("h3", null, title));
+  const list = el("ul", "diag-list " + cls);
+  for (const item of items) list.appendChild(renderItem(item));
+  section.appendChild(list);
+}
+
+function renderDiagnostics(runCtx, diagnostics) {
+  if (!diagnostics) return null;
+  const undef = k(diagnostics, ":undefined") || [];
+  const ambiguous = k(diagnostics, ":ambiguous") || [];
+  const arity = k(diagnostics, ":invalid-arity") || [];
+  const svoIssues = k(diagnostics, ":svo-issues") || [];
+  const errors = k(diagnostics, ":errors") || [];
+  const total = undef.length + ambiguous.length + arity.length + svoIssues.length + errors.length;
+  if (!total) return null;
+  const section = el("section", "diagnostics");
+  section.appendChild(el("h2", null, "Diagnostics (" + total + ")"));
+  diagSection(section, "Undefined steps", "diag-undefined", undef, (bs) =>
+    renderUndefinedItem(runCtx, bs),
+  );
+  diagSection(section, "Ambiguous steps", "diag-ambiguous", ambiguous, (bs) =>
+    renderAmbiguousItem(runCtx, bs),
+  );
+  diagSection(section, "Invalid arity", "diag-arity", arity, (bs) => renderArityItem(runCtx, bs));
+  diagSection(section, "Issues", "diag-svo", svoIssues, (issue) =>
+    el("li", "diag-item", k(issue, ":message") || k(issue, ":type") || "(diagnostic)"),
+  );
+  diagSection(section, "Errors", "diag-errors", errors, (err) =>
+    el("li", "diag-item", k(err, ":message") || k(err, ":type") || "(error)"),
+  );
+  return section;
+}
+
+function render() {
+  const island = document.getElementById("run-data");
+  const data = parseEdn(island.textContent);
+  const runCtx = k(data, ":run-ctx") || new Map();
+  const scenarios = k(data, ":scenarios") || [];
+  const summary = k(data, ":summary");
+
+  const app = document.getElementById("app");
+  app.appendChild(renderHeader(runCtx, summary, scenarios));
+  if (k(summary, ":status") === ":planning-failed") {
+    app.appendChild(
+      el(
+        "p",
+        "planning-failed-note",
+        "Planning failed — no scenarios ran. The diagnostics below say why.",
+      ),
+    );
+  } else {
+    app.appendChild(renderFeatures(runCtx, scenarios));
+  }
+  const diagnostics = renderDiagnostics(runCtx, k(data, ":diagnostics"));
+  if (diagnostics) app.appendChild(diagnostics);
+  app.appendChild(
+    el(
+      "footer",
+      "run-footer",
+      "Generated by ShiftLefter" +
+        (k(runCtx, ":version") ? " v" + k(runCtx, ":version") : "") +
+        (k(runCtx, ":run-id") ? " · run " + k(runCtx, ":run-id") : ""),
+    ),
+  );
+}
+
+document.addEventListener("DOMContentLoaded", render);
+</script>
+</body>
+</html>

@@ -12,7 +12,7 @@ This site is a pointer. The repository owns the content.
 
 - Repository: https://github.com/shift-lefter/shiftlefter
 - Releases: https://github.com/shift-lefter/shiftlefter/releases
-- Install (Java 11+ only):
+- Install (Java 21+ only):
   curl -fsSL https://raw.githubusercontent.com/SHIFT-LEFTER/shiftlefter/main/release/install.sh | bash
 - After installing, run `sl orient` in any project — it reports the project's
   mode, what would fail, and what to read next. `sl agent-doc --list` names the

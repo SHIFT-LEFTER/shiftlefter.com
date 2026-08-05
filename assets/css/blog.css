@@ -1,0 +1,75 @@
+/* Blog surface for shiftlefter.com (sl-5dhn).
+ *
+ * CONTRACT: the custom property NAMES below are load-bearing — the theme
+ * pass (sl-8yfe) restyles by changing their VALUES, and the map one-pager
+ * SVG (sl-zwjz) inherits them by NAME so it themes itself inline. Rename
+ * nothing without checking both beads.
+ */
+
+:root {
+  --sl-bg: #ffffff;
+  --sl-fg: #1a1a1a;
+  --sl-muted: #666666;
+  --sl-accent: #0b5fff;
+  --sl-rule: #dddddd;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --sl-bg: #121212;
+    --sl-fg: #e6e6e6;
+    --sl-muted: #999999;
+    --sl-accent: #6ea8ff;
+    --sl-rule: #333333;
+  }
+}
+
+body {
+  margin: 0 auto;
+  max-width: 42rem;
+  padding: 1.5rem 1rem 3rem;
+  background: var(--sl-bg);
+  color: var(--sl-fg);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.6;
+}
+
+a { color: var(--sl-accent); }
+
+.site-header nav {
+  display: flex;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--sl-rule);
+  margin-bottom: 2rem;
+}
+
+.site-header a { text-decoration: none; }
+
+.post-meta { color: var(--sl-muted); }
+
+.post-list { list-style: none; padding: 0; }
+
+.post-list li { margin-bottom: 0.75rem; }
+
+.post-list time { color: var(--sl-muted); margin-right: 0.75rem; }
+
+.site-footer {
+  margin-top: 3rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--sl-rule);
+  color: var(--sl-muted);
+}
+
+code, pre {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+pre {
+  overflow-x: auto;
+  padding: 0.75rem;
+  border: 1px solid var(--sl-rule);
+}
+
+img { max-width: 100%; }
