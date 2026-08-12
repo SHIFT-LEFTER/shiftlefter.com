@@ -3,22 +3,25 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% if page.title %}{{ page.title }} · {{ site.title }}{% else %}{{ site.title }}{% endif %}</title>
-  <link rel="stylesheet" href="/assets/css/writing.css">
+  <meta name="color-scheme" content="light dark">
+  <title>{% if page.title %}{{ page.title }} · {{ site.title }}{% else %}ShiftLefter — Quality as a dimension, not a phase{% endif %}</title>
+  {%- if page.url == "/" %}
+  <meta name="description"
+        content="ShiftLefter is a typed behavioral vocabulary over Gherkin — define your app's actors and actions once, validate every scenario before it runs, and drive real browsers and SMS from plain feature files. CI-ready: JUnit XML, HTML reports, tag filtering, parallel runs.">
+  <meta property="og:title" content="ShiftLefter — Quality as a dimension, not a phase">
+  <meta property="og:description"
+        content="A typed behavioral vocabulary over Gherkin. We don't heal your tests — we name what changed.">
+  <meta property="og:image" content="https://shiftlefter.com/report-screenshot.png">
+  <meta property="og:url" content="https://shiftlefter.com/">
+  <meta property="og:type" content="website">
+  {%- endif %}
+  <link rel="icon" type="image/png" href="/shiftlefter-noname.png">
+  <link rel="stylesheet" href="/assets/css/theme.css">
   {% feed_meta %}
 </head>
 <body>
-  <header class="site-header">
-    <nav>
-      <a href="/">{{ site.title }}</a>
-      <a href="/writing/">Writing</a>
-    </nav>
-  </header>
-  <main>
-    {{ content }}
-  </main>
-  <footer class="site-footer">
-    <p><a href="/writing/feed.xml">RSS</a></p>
-  </footer>
+  {% include nav.html variant=page.nav %}
+  {{ content }}
+  <script data-goatcounter="https://shiftlefter.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>

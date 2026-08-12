@@ -1,0 +1,1 @@
+<svg class="{{ include.class }}" viewBox="0 0 130 60" aria-hidden="true"><polygon class="m-up" points="25,4 46,26 34,26 34,56 16,56 16,26 4,26"></polygon><polygon class="m-left" points="46,30 72,5 72,26 94,5 94,18 126,18 126,42 94,42 94,55 72,34 72,55"></polygon></svg>
