@@ -2,15 +2,17 @@
 # FROZEN CITATION CONTRACT (sl-5dhn; charter §1.5 — the flags must timestamp)
 # --------------------------------------------------------------------------
 # The permalink scheme is the ONE unmigratable thing on this site. Once the
-# first real post publishes (sl-vvxu), /blog/YYYY/MM/slug/ URLs are frozen
+# first real post publishes, /writing/YYYY/MM/slug/ URLs are frozen
 # forever — generators and themes may change, URLs may not. Until that first
-# publication event this line is a one-line flip (Chair's veto window on the
-# /blog prefix is open until then).
+# publication event this line is a one-line flip.
 # Amendment trail: ratified scheme was /YYYY/MM/slug/ (blog-platform.md,
 # written when the blog was assumed a subdomain site); Shape C (one site at
-# the apex) + the namespace rule below prefix it with /blog.
+# the apex) + the namespace rule below prefixed it with /blog; Chair exercised
+# the pre-publication veto window 2026-08-12 (sl-0ewe): 'writing' over 'blog'
+# — accommodates screeds, essays, posts; nothing was live under /blog/, so
+# no redirects.
 # ==========================================================================
-permalink: /blog/:year/:month/:title/
+permalink: /writing/:year/:month/:title/
 
 # Pinned so a late-evening local post can never land in the wrong permanent
 # /YYYY/MM/ month via a UTC build (GH Pages builds in UTC).
@@ -24,14 +26,14 @@ url: https://shiftlefter.com
 # `origin` remote — which is the GitLab working remote here, not GitHub.
 repository: SHIFT-LEFTER/shiftlefter.com
 
-# Namespace rule (Shape C, ratified 2026-07-31): /blog/* is the Jekyll blog
-# surface; every other root path is free static content — Jekyll passes files
-# without front matter through untouched, so anything parked at a non-blog
-# path serves byte-identical.
+# Namespace rule (Shape C, ratified 2026-07-31; slug renamed sl-0ewe):
+# /writing/* is the Jekyll posts surface; every other root path is free
+# static content — Jekyll passes files without front matter through
+# untouched, so anything parked outside /writing/ serves byte-identical.
 plugins:
   - jekyll-feed
 feed:
-  path: blog/feed.xml
+  path: writing/feed.xml
 
 # GH Pages force-enables several convenience plugins; these settings switch
 # off the ones that would break the passthrough guarantee by converting
