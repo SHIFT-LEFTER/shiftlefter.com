@@ -1,8 +1,7 @@
 ---
 title: "Your System Is Not Your Application"
+standfirst: "Your application is the part you test. Your system is everything a user crosses on the way to their goal - and much of it ships unchecked."
 ---
-
-*Your application is the part you test. Your system is everything a user crosses on the way to their goal - and much of it ships unchecked.*
 
 I've been talking to support chatbots lately. Last week it was a delivery company's. My package had gone from "delivery attempted" to "there's a problem," so I asked the bot what was going on. It confirmed my zip code - for privacy - looked into it, told me it could see the problem, and said it would file a ticket; I'd hear back soon. I was actually impressed. This was a good one.
 
@@ -20,7 +19,7 @@ This isn't an AI problem. AI just industrialized it. It's a boundary problem, an
 
 A user arrives with a goal. It might be concrete - reset a password, file an expense - or as thin as "a friend said this was cool; is it?" The thin goals are the fragile ones: a determined user will push through a broken journey; a curious one is gone at the first wrong turn. Either way, the path crosses your marketing site, your docs, your onboarding flow, your pricing page, your error messages, your support inbox, your bug tracker. Every one of those things, you built. Every one of them, you control. Most of them will never see a requirement, a use case, or a test.
 
-The user does not grade these separately. To someone trying to get something done, **a bug, a missing feature, and a help page listing hours nobody staffs are all the same kind of failure: the system didn't get them there.** The sizes differ; the category doesn't. (Christopher Alexander made this point about design in general sixty years ago - quality is mostly the absence of specific, pointable failures of fit. Users don't itemize whose fault each failure was.)
+The user does not grade these separately. To someone trying to get something done, **a bug, a missing feature, and a help page listing hours nobody staffs are all the same kind of failure: the system didn't get them there.** The sizes differ; the category doesn't.<span class="note">Christopher Alexander made this point about design in general sixty years ago - quality is mostly the absence of specific, pointable failures of fit. Users don't itemize whose fault each failure was.</span>
 
 [Conway's Law](http://www.melconway.com/Home/Committees_Paper.html) - the 1968 observation that organizations produce designs copying their own communication structures - gets paraphrased as "you ship your org chart." You do. And the user walks across every seam in it: from marketing's landing page, through the docs team's tutorial, into engineering's product, out to support's inbox. Each group may run a tight ship. The journey crosses all four, and the journey is the product. It isn't a big-company disease, either: a five-person startup ships its org chart too - the seams just run between the hats one engineer wears before lunch.
 
@@ -50,7 +49,7 @@ Every organization already believes things like these:
 - The support address is correct, and the posted hours are actually staffed.
 - A person can get from the landing page to help in two clicks.
 
-Nobody disagrees with a single one of them. And in most organizations, not one is written down - which means not one is checked - which means each is quietly false some percentage of the time, discovered only by users, at the worst possible moment, with no ticket filed. (The unwritten requirement does enjoy one advantage: it has never once been violated.)
+Nobody disagrees with a single one of them. And in most organizations, not one is written down - which means not one is checked - which means each is quietly false some percentage of the time, discovered only by users, at the worst possible moment, with no ticket filed.<span class="note">The unwritten requirement does enjoy one advantage: it has never once been violated.</span>
 
 It is negligence, strictly speaking - but nobody's. Someone checked the hours page when it launched; then other plates needed spinning, and they moved on. Attention is an event; a requirement is a mechanism. Between the times somebody happens to look, nothing is holding these things true.
 
@@ -82,11 +81,11 @@ And if your users include agents - for a growing class of products they already 
 
 ## Drawing the boundary is part of the work
 
-A **system**, in full: the set of things someone controls in order to help a class of users change their world toward some goal. **Context** is everything else - everything that makes demands on your system without submitting to your control. The **boundary** between them is where control ends. (The vocabulary is older than software - Alexander's *Notes on the Synthesis of Form*, the 1964 book that eventually gave us design patterns, calls them form and context and defines them the same way.)
+A **system**, in full: the set of things someone controls in order to help a class of users change their world toward some goal. **Context** is everything else - everything that makes demands on your system without submitting to your control. The **boundary** between them is where control ends.<span class="note">The vocabulary is older than software - Alexander's *Notes on the Synthesis of Form*, the 1964 book that eventually gave us design patterns, calls them form and context and defines them the same way.</span>
 
 Which brings back the thought I asked you to hold. Drawing the boundary is part discovery and part decision. Discovery, because some of it isn't up to you: you cannot control the browser, the app store's review queue, the user's patience. You find those edges by hitting them. Decision, because inside the edges there's a real choice with real trade-offs: you *could* staff support around the clock - you choose "listed hours are correct" instead. Extending the boundary buys control and costs ownership; every surface you claim needs its requirements kept true.
 
-**You discover what you *can* control. You decide what you *will*.** The failure mode is doing neither - leaving the boundary undrawn: a fuzzy region where nobody has checked what's controllable and nobody has committed to what's owned. An undrawn boundary doesn't stay blank; it defaults. The default is nearly always the same: system equals application, because the application is the part engineering happens to control. **That is not a drawn boundary. That's a defaulted one.** (Requirements tradition kept a slot for the decision - Cockburn's use-case template opens by asking which system, exactly, is under design.)
+**You discover what you *can* control. You decide what you *will*.** The failure mode is doing neither - leaving the boundary undrawn: a fuzzy region where nobody has checked what's controllable and nobody has committed to what's owned. An undrawn boundary doesn't stay blank; it defaults. The default is nearly always the same: system equals application, because the application is the part engineering happens to control. **That is not a drawn boundary. That's a defaulted one.**<span class="note">Requirements tradition kept a slot for the decision - Cockburn's use-case template opens by asking which system, exactly, is under design.</span>
 
 So draw it on purpose - find the edges, choose the line. Here is the smallest possible way to start.
 
