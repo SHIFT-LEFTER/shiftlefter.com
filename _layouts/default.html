@@ -4,21 +4,21 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% if page.title %}{{ page.title }} · {{ site.title }}{% else %}{{ site.title }}{% endif %}</title>
-  <link rel="stylesheet" href="/assets/css/blog.css">
+  <link rel="stylesheet" href="/assets/css/writing.css">
   {% feed_meta %}
 </head>
 <body>
   <header class="site-header">
     <nav>
       <a href="/">{{ site.title }}</a>
-      <a href="/blog/">Blog</a>
+      <a href="/writing/">Writing</a>
     </nav>
   </header>
   <main>
     {{ content }}
   </main>
   <footer class="site-footer">
-    <p><a href="/blog/feed.xml">RSS</a></p>
+    <p><a href="/writing/feed.xml">RSS</a></p>
   </footer>
 </body>
 </html>
