@@ -1,8 +1,7 @@
 ---
 title: "The Pony Test"
+standfirst: "Hand a blinded agent nothing but your marketing pitch, ask it to derive your product, and grade what it imagines. A field note from the first run I've done."
 ---
-
-*Hand a blinded agent nothing but your marketing pitch, ask it to derive your product, and grade what it imagines. A field note from the first run I've done.*
 
 Users ask product teams for ponies - the adorable, expensive thing they don't understand and are never getting. The Pony Test doesn't ask whether users want a pony. It asks whether you told them they were getting one.
 

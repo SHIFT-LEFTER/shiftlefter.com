@@ -2,12 +2,24 @@
 layout: default
 title: Writing
 ---
-<h1>Writing</h1>
-<ul class="post-list">
-  {% for post in site.posts %}
-  <li>
-    <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y-%m-%d" }}</time>
-    <a href="{{ post.url }}">{{ post.title }}</a>
-  </li>
-  {% endfor %}
-</ul>
+<main class="writing">
+  <header class="writing-header">
+    <p class="kicker">ShiftLefter</p>
+    <h1>Writing</h1>
+    <p class="writing-sub">Essays on quality as a dimension, not a phase.</p>
+  </header>
+  <ol class="essay-list" reversed>
+    {%- for post in site.posts %}
+    <li class="essay-item">
+      <time datetime="{{ post.date | date: '%Y-%m-%d' }}">{{ post.date | date: "%B %-d, %Y" }}</time>
+      <h2><a href="{{ post.url }}">{{ post.title }}</a></h2>
+      {%- if post.standfirst %}
+      <p class="dek">{{ post.standfirst | smartify }}</p>
+      {%- endif %}
+    </li>
+    {%- endfor %}
+  </ol>
+  <footer class="writing-footer">
+    <a href="/writing/feed.xml">RSS</a>
+  </footer>
+</main>

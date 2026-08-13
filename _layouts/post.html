@@ -1,13 +1,18 @@
 ---
 layout: default
 ---
-<article>
-  <header class="post-header">
+<article class="essay">
+  <header class="essay-header">
+    <p class="kicker">Writing · Essay</p>
     <h1>{{ page.title }}</h1>
-    <p class="post-meta">
-      <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%B %-d, %Y" }}</time>
-      · {{ page.author | default: site.author }}
-    </p>
+    <p class="byline"><time datetime="{{ page.date | date: '%Y-%m-%d' }}">{{ page.date | date: "%B %-d, %Y" }}</time> · {{ page.author | default: site.author }}</p>
+    {%- if page.standfirst %}
+    <p class="standfirst">{{ page.standfirst | smartify }}</p>
+    {%- endif %}
   </header>
   {{ content }}
+  <footer class="essay-footer">
+    <a href="/writing/">More writing</a>
+    <a href="/writing/feed.xml">RSS</a>
+  </footer>
 </article>

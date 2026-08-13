@@ -1,723 +1,99 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>ShiftLefter – Quality as a dimension, not a phase</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description"
-        content="ShiftLefter is a typed behavioral vocabulary over Gherkin — define your app's actors and actions once, validate every scenario before it runs, and drive real browsers and SMS from plain feature files. CI-ready: JUnit XML, HTML reports, tag filtering, parallel runs.">
-  <meta property="og:title" content="ShiftLefter — Quality as a dimension, not a phase">
-  <meta property="og:description"
-        content="A typed behavioral vocabulary over Gherkin. We don't heal your tests — we name what changed.">
-  <meta property="og:image" content="https://shiftlefter.com/report-screenshot.png">
-  <meta property="og:url" content="https://shiftlefter.com/">
-  <meta property="og:type" content="website">
-  <link rel="icon" type="image/png" href="shiftlefter-noname.png">
-  <style>
-    :root {
-      --bg: #f7f7fb;
-      --surface: #ffffff;
-      --surface-soft: rgba(255, 255, 255, 0.8);
-      --hero-surface: rgba(255, 255, 255, 0.9);
-      --border-subtle: #e5e7eb;
-      --border-card: rgba(148, 163, 184, 0.35);
-      --text-main: #111827;
-      --text-muted: #4b5563;
-      --text-faint: #6b7280;
-      --accent-gold: #e5b500;
-      --accent-blue: #2563eb;
-      --accent-blue-soft: #e0ebff;
-      --code-bg: #0f172a;
-      --code-text: #e2e8f0;
-      --code-err: #fca5a5;
-      --code-hint: #86efac;
-      --radius-lg: 18px;
-      --shadow-soft: 0 18px 40px rgba(15, 23, 42, 0.12);
-      --page-gradient: radial-gradient(circle at top left, #fef3c7 0, #eff6ff 35%, var(--bg) 70%);
-    }
-
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #0b1120;
-        --surface: #101828;
-        --surface-soft: rgba(17, 25, 43, 0.8);
-        --hero-surface: rgba(17, 25, 43, 0.9);
-        --border-subtle: #253046;
-        --border-card: rgba(100, 116, 139, 0.4);
-        --text-main: #e5e9f2;
-        --text-muted: #9aa6ba;
-        --text-faint: #7d8798;
-        --accent-blue: #7aa5ff;
-        --accent-blue-soft: rgba(37, 99, 235, 0.18);
-        --code-bg: #0a0f1c;
-        --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.45);
-        --page-gradient: radial-gradient(circle at top left, #1f2412 0, #101a2e 35%, var(--bg) 70%);
-      }
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: var(--text-main);
-      background: var(--page-gradient);
-      background-attachment: fixed;
-      line-height: 1.6;
-    }
-
-    a {
-      color: var(--accent-blue);
-      text-decoration: none;
-    }
-
-    a:hover {
-      text-decoration: underline;
-    }
-
-    .page {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 16px 20px 40px;
-    }
-
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 0 8px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-weight: 700;
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
-      font-size: 0.95rem;
-    }
-
-    .brand img {
-      width: 32px;
-      height: 32px;
-      object-fit: contain;
-    }
-
-    nav {
-      display: flex;
-      gap: 18px;
-      font-size: 0.9rem;
-      flex-wrap: wrap;
-    }
-
-    nav a {
-      color: var(--text-muted);
-      font-weight: 500;
-    }
-
-    main {
-      margin-top: 32px;
-    }
-
-    .hero {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
-      gap: 40px;
-      align-items: center;
-      background: var(--hero-surface);
-      border-radius: 24px;
-      padding: 28px 28px 30px;
-      box-shadow: var(--shadow-soft);
-      border: 1px solid var(--border-card);
-    }
-
-    .hero-logo {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .hero-logo img {
-      max-width: 320px;
-      width: 100%;
-      height: auto;
-    }
-
-    .hero-copy h1 {
-      font-size: clamp(2.2rem, 3vw + 1rem, 3rem);
-      margin: 0 0 8px;
-      letter-spacing: -0.03em;
-    }
-
-    .tagline {
-      margin: 0 0 16px;
-      font-size: 1rem;
-      font-weight: 500;
-      color: var(--text-muted);
-    }
-
-    .tagline em {
-      font-style: italic;
-    }
-
-    .hero-copy p {
-      margin: 0 0 10px;
-      color: var(--text-main);
-      font-size: 0.98rem;
-    }
-
-    .hero-line {
-      margin: 14px 0 6px;
-      font-size: 1.15rem;
-      font-weight: 600;
-      letter-spacing: -0.01em;
-    }
-
-    .hero-gloss {
-      margin: 0 0 12px;
-      font-size: 0.92rem;
-      color: var(--text-muted);
-    }
-
-    .hero-status {
-      margin-top: 8px;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 4px 10px;
-      border-radius: 999px;
-      background: #ecfdf3;
-      color: #166534;
-      font-size: 0.8rem;
-      font-weight: 500;
-    }
-
-    @media (prefers-color-scheme: dark) {
-      .hero-status {
-        background: rgba(34, 197, 94, 0.12);
-        color: #6ee7a0;
-      }
-    }
-
-    .hero-status a {
-      color: inherit;
-      text-decoration: underline;
-    }
-
-    .hero-status-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      background: #22c55e;
-      box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.3);
-    }
-
-    .proof {
-      margin-top: 28px;
-      display: grid;
-      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-      gap: 20px;
-      align-items: stretch;
-    }
-
-    .proof-install,
-    .proof-report {
-      background: var(--surface-soft);
-      border: 1px solid var(--border-card);
-      border-radius: var(--radius-lg);
-      padding: 16px 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .proof h3 {
-      margin: 0;
-      font-size: 0.85rem;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--text-muted);
-      font-weight: 600;
-    }
-
-    .proof-install p,
-    .proof-report p {
-      margin: 0;
-      font-size: 0.92rem;
-      color: var(--text-muted);
-    }
-
-    pre {
-      margin: 0;
-      background: var(--code-bg);
-      color: var(--code-text);
-      border-radius: 12px;
-      padding: 12px 14px;
-      font-size: 0.82rem;
-      line-height: 1.55;
-      overflow-x: auto;
-    }
-
-    code {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    }
-
-    p code, li code {
-      background: var(--accent-blue-soft);
-      border-radius: 5px;
-      padding: 1px 5px;
-      font-size: 0.86em;
-    }
-
-    pre code {
-      background: none;
-      border-radius: 0;
-      padding: 0;
-      font-size: inherit;
-    }
-
-    .code-err { color: var(--code-err); }
-    .code-hint { color: var(--code-hint); }
-    .code-comment { color: #94a3b8; }
-
-    .proof-report a.report-shot {
-      display: block;
-      border-radius: 12px;
-      overflow: hidden;
-      border: 1px solid var(--border-card);
-      line-height: 0;
-    }
-
-    .proof-report img {
-      width: 100%;
-      height: auto;
-      display: block;
-    }
-
-    .plain-terms {
-      margin: 26px 4px 0;
-      font-size: 0.98rem;
-      color: var(--text-muted);
-    }
-
-    .plain-terms strong {
-      color: var(--text-main);
-    }
-
-    .features {
-      margin-top: 36px;
-      padding: 0 4px;
-    }
-
-    .features h2,
-    .split h2,
-    .agents h2 {
-      font-size: 1.1rem;
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
-      font-weight: 600;
-      color: var(--text-muted);
-      margin: 0 0 18px;
-    }
-
-    .features-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .features-list li {
-      position: relative;
-      font-size: 0.98rem;
-      background: var(--surface-soft);
-      border-radius: 14px;
-      padding: 10px 14px 11px 22px;
-      border: 1px solid var(--border-card);
-    }
-
-    .features-list li::before {
-      content: "";
-      position: absolute;
-      left: 10px;
-      top: 14px;
-      width: 5px;
-      height: 5px;
-      border-radius: 999px;
-      background: var(--accent-gold);
-    }
-
-    .features-list strong {
-      font-weight: 600;
-    }
-
-    .features-list pre {
-      margin-top: 10px;
-    }
-
-    .split {
-      margin-top: 36px;
-      padding: 0 4px;
-    }
-
-    .split-cols {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-
-    .split-col {
-      background: var(--surface-soft);
-      border: 1px solid var(--border-card);
-      border-radius: var(--radius-lg);
-      padding: 16px 18px;
-    }
-
-    .split-col h3 {
-      margin: 0 0 10px;
-      font-size: 0.95rem;
-    }
-
-    .split-col ul {
-      margin: 0;
-      padding-left: 18px;
-      font-size: 0.92rem;
-      color: var(--text-muted);
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .split-col li strong {
-      color: var(--text-main);
-      font-weight: 600;
-    }
-
-    .split-note {
-      margin: 14px 4px 0;
-      font-size: 0.92rem;
-      color: var(--text-muted);
-    }
-
-    .agents {
-      margin-top: 36px;
-      padding: 16px 18px;
-      background: var(--surface-soft);
-      border: 1px solid var(--border-card);
-      border-radius: var(--radius-lg);
-    }
-
-    .agents p {
-      margin: 0 0 10px;
-      font-size: 0.95rem;
-    }
-
-    .agents pre {
-      margin-bottom: 10px;
-    }
-
-    .agents p:last-child {
-      margin-bottom: 0;
-    }
-
-    .cta {
-      margin-top: 32px;
-      padding: 18px 20px;
-      border-radius: var(--radius-lg);
-      background: var(--accent-blue-soft);
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-      border: 1px solid rgba(37, 99, 235, 0.35);
-    }
-
-    .cta p {
-      margin: 0;
-      font-size: 0.98rem;
-      color: var(--text-main);
-    }
-
-    .cta-links {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .btn-primary,
-    .btn-secondary {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 7px 14px;
-      border-radius: 999px;
-      font-size: 0.9rem;
-      font-weight: 500;
-      border: 1px solid transparent;
-      text-decoration: none;
-      white-space: nowrap;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--accent-blue), #1d4ed8);
-      color: white;
-      border-color: rgba(15, 23, 42, 0.15);
-      box-shadow: 0 10px 25px rgba(37, 99, 235, 0.35);
-    }
-
-    .btn-primary:hover {
-      filter: brightness(1.03);
-      text-decoration: none;
-    }
-
-    .btn-secondary {
-      background: var(--surface);
-      color: var(--text-muted);
-      border-color: var(--border-subtle);
-    }
-
-    .btn-secondary:hover {
-      background: var(--accent-blue-soft);
-      text-decoration: none;
-    }
-
-    footer {
-      margin-top: 26px;
-      padding-top: 12px;
-      border-top: 1px solid var(--border-card);
-      font-size: 0.8rem;
-      color: var(--text-faint);
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    footer span {
-      opacity: 0.9;
-    }
-
-    @media (max-width: 720px) {
-      .page {
-        padding: 14px 14px 32px;
-      }
-
-      header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-      }
-
-      nav {
-        gap: 14px;
-        font-size: 0.85rem;
-      }
-
-      .hero {
-        grid-template-columns: minmax(0, 1fr);
-        padding: 20px 16px 22px;
-      }
-
-      .hero-logo img {
-        max-width: 180px;
-      }
-
-      .hero-copy p {
-        font-size: 0.95rem;
-      }
-
-      .proof,
-      .split-cols {
-        grid-template-columns: minmax(0, 1fr);
-      }
-
-      .cta {
-        align-items: flex-start;
-      }
-
-      .cta-links {
-        width: 100%;
-      }
-    }
-  </style>
-</head>
-<body>
-  <div class="page">
-    <header>
-      <div class="brand">
-        <img src="shiftlefter-noname.png" alt="ShiftLefter logo">
-        <span>ShiftLefter</span>
-      </div>
-      <nav>
-        <a href="/writing/">Writing</a>
-        <a href="https://github.com/shift-lefter/shiftlefter" target="_blank" rel="noopener">GitHub</a>
-        <a href="#agents">For AI agents</a>
-        <a href="https://www.linkedin.com/in/Gabriel-Wilkins" target="_blank" rel="noopener">LinkedIn</a>
-        <a href="mailto:gabriel@shiftlefter.com">Email</a>
-      </nav>
-    </header>
-
-    <main>
-      <section class="hero">
-        <div class="hero-logo">
-          <img src="shiftlefter-noname.png" alt="ShiftLefter arrow logo">
-        </div>
-        <div class="hero-copy">
-          <h1>ShiftLefter</h1>
-          <p class="tagline">Quality as a <em>dimension</em>, not a phase.</p>
-          <p>A <strong>typed vocabulary for your app's behavior</strong> — your actors, your actions,
-            your intents, defined once and shared by every human and every AI agent that touches your
-            tests. Scenarios are validated against it <strong>before anything runs</strong>.</p>
-          <p class="hero-line">We don't heal your tests — we name what changed.</p>
-          <p class="hero-gloss">Failures arrive in your vocabulary — which actor, which intent, which
-            step — not as a selector timeout.</p>
-          <div class="hero-status">
-            <span class="hero-status-dot"></span>
-            <span>Open source, actively developed — <a href="https://github.com/shift-lefter/shiftlefter/releases" target="_blank" rel="noopener">releases</a></span>
-          </div>
-        </div>
-      </section>
-
-      <section class="proof">
-        <div class="proof-install">
-          <h3>Install</h3>
-          <p>Java 21+ is the only requirement. No Clojure toolchain.</p>
-          <pre><code>curl -fsSL https://raw.githubusercontent.com/SHIFT-LEFTER/shiftlefter/main/release/install.sh | bash
+---
+layout: default
+nav: home
+---
+<main class="home">
+  <header class="hero">
+    {% include logo.svg class="hero-mark" %}
+    <h1>ShiftLefter</h1>
+    <p class="tagline">Quality as a <em>dimension</em>, not a phase.</p>
+    <p class="lede">A <strong>typed vocabulary for your app’s behavior</strong> — your actors, your actions, your intents, defined once and shared by every human and every AI agent that touches your tests. Scenarios are validated against it <strong>before anything runs</strong>.</p>
+    <p class="credo">We don’t heal your tests — we name what changed.</p>
+    <p>Failures arrive in your vocabulary — which actor, which intent, which step — not as a selector timeout.</p>
+    <p class="release-line">Open source, actively developed — <a href="https://github.com/shift-lefter/shiftlefter/releases" target="_blank" rel="noopener">releases</a></p>
+  </header>
+
+  <div class="twin-cards">
+    <section class="card">
+      <h3>Install</h3>
+      <p>Java 21+ is the only requirement. No Clojure toolchain.</p>
+      <pre><code>curl -fsSL https://raw.githubusercontent.com/SHIFT-LEFTER/shiftlefter/main/release/install.sh | bash
 export PATH="$PWD/sl:$PATH"
 sl --version</code></pre>
-        </div>
-        <div class="proof-report">
-          <h3>A real run report</h3>
-          <p>Every <code>sl run</code> can write a self-contained HTML report — one file, no server,
-            failures expanded. <a href="/report/">This one is real</a>, failures and all.</p>
-          <a class="report-shot" href="/report/">
-            <img src="report-screenshot.png" alt="ShiftLefter HTML run report — scenario results with expanded failure transcripts">
-          </a>
-        </div>
-      </section>
+    </section>
+    <section class="card">
+      <h3>A real run report</h3>
+      <p>Every <code>sl run</code> can write a self-contained HTML report — one file, no server, failures expanded. <a href="/report/">This one is real</a>, failures and all.</p>
+      <a href="/report/"><img src="/report-screenshot.png" alt="ShiftLefter HTML run report — scenario results with expanded failure transcripts"></a>
+    </section>
+  </div>
 
-      <p class="plain-terms">In plain terms: <strong>a Cucumber-compatible Gherkin test runner</strong> —
-        Clojure core, real browsers and SMS, JUnit XML and HTML reports for CI — <strong>with a type
-        system for what your tests are allowed to say</strong>.</p>
+  <p class="plain-terms">In plain terms: <strong>a Cucumber-compatible Gherkin test runner</strong> — Clojure core, real browsers and SMS, JUnit XML and HTML reports for CI — <strong>with a type system for what your tests are allowed to say</strong>.</p>
 
-      <section class="features">
-        <h2>What ShiftLefter does</h2>
-        <ul class="features-list">
-          <li><strong>A vocabulary you own, enforced before anything runs.</strong> Your glossary declares
-            who can act and what they can do. Every scenario is checked against it at bind time, so a
-            typo'd actor dies with a suggestion — before a browser ever opens, not four minutes into a run.
-            This is real output:
-            <pre><code>SVO validation issues:
-  <span class="code-err">ERROR:</span> Unknown subject :user/alicce in step
+  <section class="does">
+    <h2>What ShiftLefter does</h2>
+    <ul class="features">
+      <li>
+        <p><strong>A vocabulary you own, enforced before anything runs.</strong> Your glossary declares who can act. Every scenario is checked against it at bind time, so a typo’d actor dies with a suggestion — before a browser ever opens, not four minutes into a run. This is real output:</p>
+        <pre><code>SVO validation issues:
+  <span class="c-err">ERROR:</span> Unknown subject :user/alicce in step
          ":user/alicce fills {:id "password"} with 'SuperSecretPassword!'"
          at features/two-users.feature:6
          Known subjects: :user/alice, :user/bob
-         <span class="code-hint">Did you mean: :user/alice?</span>
+         <span class="c-hint">Did you mean: :user/alice?</span>
 
-1 binding issue(s) found. Cannot execute.  <span class="code-comment"># exit 2 — no browser was harmed</span></code></pre></li>
+1 binding issue(s) found. Cannot execute.  <span class="c-com"># exit 2 — no browser was harmed</span></code></pre>
+      </li>
+      <li><p><strong>Macro expansion, not steps-calling-steps.</strong> Define “the user logs in” as a Gherkin step sequence, and ShiftLefter expands it at compile time — the runner sees every step with full provenance. When the login flow changes, update one macro definition, not 47 scenarios. Non-developers can read and edit the macro file. The workflow reuse teams reach for Screenplay to get — without the shadow-SUT complexity.</p></li>
+      <li><p><strong>Many actors, more than one interface.</strong> Each actor gets its own isolated session — <code>:user/alice</code> and <code>:user/bob</code> log in side by side without sharing state. Web runs on a pluggable WebDriver/Playwright backend; SMS is a first-class second interface, so a 2FA flow can span web and text in a single scenario.</p></li>
+      <li><p><strong>A well-behaved CI citizen.</strong> <code>--junit-xml</code> writes results your CI ingests natively (verified against a real GitLab <code>artifacts:reports:junit</code> ingest). <code>--tags @smoke</code> runs the subset your MR pipeline needs. <code>--max-parallel</code> runs scenarios concurrently with byte-identical report output, and <code>@serial</code> marks the ones that must run alone. Results print live, per scenario, as they finish.</p></li>
+      <li><p><strong>An agent front door.</strong> <code>sl orient</code> tells a coding agent — or you — what mode a project is in, what would fail, and what to read next. <code>sl agent-doc</code> serves the doctrine from inside the jar, and the step-vocabulary reference is generated from the registered steps, so it cannot drift from the code. Tests live in durable project artifacts — glossary, intents, config — not one-shot generated scripts.</p></li>
+    </ul>
+  </section>
 
-          <li><strong>Macro expansion, not steps-calling-steps.</strong> Define "the user logs in" as a
-            Gherkin step sequence, and ShiftLefter expands it at compile time — the runner sees every step
-            with full provenance. When the login flow changes, update one macro definition, not 47
-            scenarios. Non-developers can read and edit the macro file. The workflow reuse teams reach for
-            Screenplay to get — without the shadow-SUT complexity.</li>
-
-          <li><strong>Many actors, more than one interface.</strong> Each actor gets its own isolated
-            session — <code>:user/alice</code> and <code>:user/bob</code> log in side by side without
-            sharing state. Web runs on a pluggable WebDriver/Playwright backend; SMS is a first-class
-            second interface, so a 2FA flow can span web and text in a single scenario.</li>
-
-          <li><strong>A well-behaved CI citizen.</strong> <code>--junit-xml</code> writes results your CI
-            ingests natively (verified against a real GitLab <code>artifacts:reports:junit</code> ingest).
-            <code>--tags @smoke</code> runs the subset your MR pipeline needs. <code>--max-parallel</code>
-            runs scenarios concurrently with byte-identical report output, and <code>@serial</code> marks
-            the ones that must run alone. Results print live, per scenario, as they finish.</li>
-
-          <li><strong>An agent front door.</strong> <code>sl orient</code> tells a coding agent — or you —
-            what mode a project is in, what would fail, and what to read next. <code>sl agent-doc</code>
-            serves the doctrine from inside the jar, and the step-vocabulary reference is generated from
-            the registered steps, so it cannot drift from the code. Tests live in durable project
-            artifacts — glossary, intents, config — not one-shot generated scripts.</li>
+  <section class="honestly">
+    <h2>Where it is, honestly</h2>
+    <div class="cols">
+      <div>
+        <h3>Solid today</h3>
+        <ul>
+          <li><strong>Multi-actor browser driving</strong> — independent sessions with real isolation.</li>
+          <li><strong>The typed vocabulary discipline</strong> — validated at bind time, with suggestions.</li>
+          <li><strong>The <code>sl</code> CLI</strong> — run, format, dry-run, diagnose; JUnit XML, HTML, and EDN output; tag filtering; parallel scenarios.</li>
+          <li><strong>Gherkin parsing &amp; lossless formatting</strong> — 46/46 official Cucumber test files, usable as a CI formatting gate.</li>
+          <li><strong>Scenario lifecycle hooks</strong> — named in the feature file (<code>@hook=</code>), registered next to your config. Befores fail fast before a browser ever opens; afters run while it’s still alive; every hook that ran is in the report.</li>
+          <li><strong>A scenario data plane</strong> — regex named captures with <code>{name}</code> interpolation, so a value captured in one step is usable in the next.</li>
         </ul>
-      </section>
+      </div>
+      <div>
+        <h3>Building toward</h3>
+        <ul>
+          <li><strong>The traceability graph</strong> — requirements ↔ use cases ↔ features ↔ the runs that prove them.</li>
+          <li><strong>Semantic diffing of live pages</strong> — ships today as a dev/REPL preview (SIEVE), heading for the CLI.</li>
+          <li><strong>Not just <em>what</em> changed — how, and what it puts at risk.</strong></li>
+          <li><strong>First-class fixtures</strong> and brownfield suite migration.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="baton">The baton pass: agents write good end-to-end tests against this surface <em>now</em>; the same vocabulary is the foundation they’ll use to map tests to requirements, use cases, and provenance. Adopt it for the left column; the right column is why the discipline compounds.</p>
+  </section>
 
-      <section class="split">
-        <h2>Where it is, honestly</h2>
-        <div class="split-cols">
-          <div class="split-col">
-            <h3>Solid today</h3>
-            <ul>
-              <li><strong>Multi-actor browser driving</strong> — independent sessions with real isolation.</li>
-              <li><strong>The typed vocabulary discipline</strong> — validated at bind time, with suggestions.</li>
-              <li><strong>The <code>sl</code> CLI</strong> — run, format, dry-run, diagnose; JUnit XML, HTML,
-                and EDN output; tag filtering; parallel scenarios.</li>
-              <li><strong>Gherkin parsing &amp; lossless formatting</strong> — 46/46 official Cucumber
-                test files, usable as a CI formatting gate.</li>
-              <li><strong>Scenario lifecycle hooks</strong> — named in the feature file
-                (<code>@hook=</code>), registered next to your config. Befores fail fast before a
-                browser ever opens; afters run while it's still alive; every hook that ran is in
-                the report.</li>
-              <li><strong>A scenario data plane</strong> — regex named captures with
-                <code>{name}</code> interpolation, so a value captured in one step is usable in
-                the next.</li>
-            </ul>
-          </div>
-          <div class="split-col">
-            <h3>Building toward</h3>
-            <ul>
-              <li><strong>The traceability graph</strong> — requirements ↔ use cases ↔ features ↔ the runs
-                that prove them.</li>
-              <li><strong>Semantic diffing of live pages</strong> — ships today as a dev/REPL preview
-                (SIEVE), heading for the CLI.</li>
-              <li><strong>Not just <em>what</em> changed — how, and what it puts at risk.</strong></li>
-              <li><strong>First-class fixtures</strong> and brownfield suite migration.</li>
-            </ul>
-          </div>
-        </div>
-        <p class="split-note">The baton pass: agents write good end-to-end tests against this surface
-          <em>now</em>; the same vocabulary is the foundation they'll use to map tests to requirements,
-          use cases, and provenance. Adopt it for the left column; the right column is why the discipline
-          compounds.</p>
-      </section>
-
-      <section class="agents" id="agents">
-        <h2>For AI agents</h2>
-        <p>If you're an agent (or you brought one): install, then ask the tool itself.</p>
-        <pre><code>curl -fsSL https://raw.githubusercontent.com/SHIFT-LEFTER/shiftlefter/main/release/install.sh | bash
-./sl/sl orient        <span class="code-comment"># where am I, what would fail, what to read next</span>
+  <section class="agents" id="agents">
+    <h2>For AI agents</h2>
+    <p>If you’re an agent (or you brought one): install, then ask the tool itself.</p>
+    <pre><code>curl -fsSL https://raw.githubusercontent.com/SHIFT-LEFTER/shiftlefter/main/release/install.sh | bash
+./sl/sl orient        <span class="c-com"># where am I, what would fail, what to read next</span>
 ./sl/sl agent-doc --list</code></pre>
-        <p>The full agent surface is documented in
-          <a href="https://github.com/shift-lefter/shiftlefter/blob/main/docs/AGENT.md" target="_blank" rel="noopener">docs/AGENT.md</a>;
-          the installer prints a breadcrumb stanza to paste into your <code>AGENTS.md</code>. A plain-text
-          pointer lives at <a href="/llms.txt">/llms.txt</a>.</p>
-      </section>
+    <p>The full agent surface is documented in <a href="https://github.com/shift-lefter/shiftlefter/blob/main/docs/AGENT.md" target="_blank" rel="noopener">docs/AGENT.md</a>; the installer prints a breadcrumb stanza to paste into your <code>AGENTS.md</code>. A plain-text pointer lives at <a href="/llms.txt">/llms.txt</a>.</p>
+  </section>
 
-      <section class="cta">
-        <p>See the code, or say hello.</p>
-        <div class="cta-links">
-          <a class="btn-primary" href="https://github.com/shift-lefter/shiftlefter" target="_blank" rel="noopener">
-            View ShiftLefter on GitHub
-          </a>
-          <a class="btn-secondary" href="https://www.linkedin.com/in/Gabriel-Wilkins" target="_blank" rel="noopener">
-            Connect on LinkedIn
-          </a>
-          <a class="btn-secondary" href="mailto:gabriel@shiftlefter.com">
-            Email gabriel@shiftlefter.com
-          </a>
-        </div>
-      </section>
-    </main>
-
-    <footer>
-      <span>© 2026 ShiftLefter.</span>
-      <span>Built by Gabriel Wilkins.</span>
-    </footer>
-  </div>
-</body>
-</html>
+  <footer class="site-footer">
+    <p class="footer-hello">See the code, or say hello.</p>
+    <p class="footer-links">
+      <a href="https://github.com/shift-lefter/shiftlefter" target="_blank" rel="noopener">View ShiftLefter on GitHub</a>
+      <a href="https://www.linkedin.com/in/Gabriel-Wilkins" target="_blank" rel="noopener">Connect on LinkedIn</a>
+      <a href="mailto:gabriel@shiftlefter.com">Email gabriel@shiftlefter.com</a>
+    </p>
+    <p class="colophon">© 2026 ShiftLefter. Built by Gabriel Wilkins.</p>
+  </footer>
+</main>
