@@ -18,7 +18,20 @@ This site is a pointer. The repository owns the content.
   mode, what would fail, and what to read next. `sl agent-doc --list` names the
   packaged doctrine topics.
 
-## Docs
+## Docs on this site (synced from the repository, stamped with the commit they came from)
+
+- Index: https://shiftlefter.com/docs/
+- Guides: https://shiftlefter.com/docs/reports/ · https://shiftlefter.com/docs/costumes/ ·
+  https://shiftlefter.com/docs/hooks/ · https://shiftlefter.com/docs/extending-vocabulary/ ·
+  https://shiftlefter.com/docs/ci/
+- Architecture reports (how it is built, checked against the source):
+  https://shiftlefter.com/docs/architecture/invocation-map/ ·
+  https://shiftlefter.com/docs/architecture/module-map/ ·
+  https://shiftlefter.com/docs/architecture/control-loop/ ·
+  https://shiftlefter.com/docs/architecture/data-shapes/ ·
+  https://shiftlefter.com/docs/architecture/repl-lifetimes/
+
+## Docs in the repository
 
 - Agent guide: https://github.com/shift-lefter/shiftlefter/blob/main/docs/AGENT.md
 - Fit check ("would it work for my project?"): https://github.com/shift-lefter/shiftlefter/blob/main/docs/FIT.md

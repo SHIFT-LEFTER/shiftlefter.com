@@ -2,6 +2,7 @@
   <a class="brand" href="/">{% include logo.svg class="mark" %}ShiftLefter</a>
   {%- if include.variant == "home" %}
   <span class="nav-links">
+    <a href="/docs/">Docs</a>
     <a href="/writing/">Writing</a>
     <a href="https://github.com/shift-lefter/shiftlefter" target="_blank" rel="noopener">GitHub</a>
     <a href="#agents">For AI agents</a>
@@ -9,6 +10,9 @@
     <a href="mailto:gabriel@shiftlefter.com">Email</a>
   </span>
   {%- else %}
-  <a href="/writing/">Writing</a>
+  <span class="nav-links">
+    <a href="/docs/">Docs</a>
+    <a href="/writing/">Writing</a>
+  </span>
   {%- endif %}
 </nav>
