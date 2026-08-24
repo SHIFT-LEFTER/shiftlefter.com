@@ -38,6 +38,19 @@ This site is a pointer. The repository owns the content.
 - Docs index: https://github.com/shift-lefter/shiftlefter/blob/main/docs/README.md
 - Changelog: https://github.com/shift-lefter/shiftlefter/blob/main/CHANGELOG.md
 
+## Writing
+
+Essays by the author, on this site. Index: https://shiftlefter.com/writing/ ·
+feed: https://shiftlefter.com/writing/feed.xml
+
+- "Your System Is Not Your Application" — your application is the part you
+  test; your system is everything a user crosses on the way to their goal,
+  and much of it ships unchecked:
+  https://shiftlefter.com/writing/2026/08/your-system-is-not-your-application/
+- "The Pony Test" — hand a blinded agent nothing but your marketing pitch,
+  ask it to derive your product, and grade what it imagines:
+  https://shiftlefter.com/writing/2026/08/the-pony-test/
+
 ## Sample artifact
 
 - A real HTML run report (self-contained, includes a machine-readable EDN data

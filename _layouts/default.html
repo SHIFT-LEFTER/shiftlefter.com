@@ -4,6 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
+  <script>
+    /* Theme override (sl-cvow): the system preference is the default; a
+     * visitor's toggle choice persists in localStorage and is applied here,
+     * before first paint, so a forced theme never flashes the other one. */
+    try { var t = localStorage.getItem("theme"); if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t); } catch (e) {}
+  </script>
   <title>{% if page.title %}{{ page.title }} · {{ site.title }}{% else %}ShiftLefter — Quality as a dimension, not a phase{% endif %}</title>
   {%- if page.url == "/" %}
   <meta name="description"
@@ -22,6 +28,23 @@
 <body>
   {% include nav.html variant=page.nav %}
   {{ content }}
+  <script>
+    /* Theme toggle (sl-cvow): flips between an explicit light and dark
+     * override, starting from whatever is currently in effect (override or
+     * system), and persists the choice. Clearing the override = clear
+     * localStorage "theme"; the head snippet then falls back to the system. */
+    (function () {
+      var b = document.querySelector(".theme-toggle"); if (!b) return;
+      b.addEventListener("click", function () {
+        var root = document.documentElement;
+        var current = root.getAttribute("data-theme") ||
+          (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+        var next = current === "dark" ? "light" : "dark";
+        root.setAttribute("data-theme", next);
+        try { localStorage.setItem("theme", next); } catch (e) {}
+      });
+    })();
+  </script>
   <script data-goatcounter="https://shiftlefter.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>
