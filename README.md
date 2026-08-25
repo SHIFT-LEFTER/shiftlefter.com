@@ -9,6 +9,21 @@ The site is a pointer; the [shiftlefter repository](https://github.com/shift-lef
 owns the product content. `/report/` hosts a sample HTML run report —
 see `report/README-REGEN.md` for how it is regenerated.
 
+## JavaScript on this site
+
+Exactly two scripts, both in `_layouts/default.html`, both optional to the
+reading experience:
+
+- **GoatCounter** — the one analytics tag (sl-8yfe).
+- **The theme toggle** (sl-cvow) — a few inline lines: the system
+  light/dark preference is the default, the sun/moon button in the nav
+  stores an override in `localStorage`, and a head snippet applies it
+  before first paint. No framework, no bundle, no third-party host.
+
+Everything else — including the mermaid diagrams under `/docs/`, which are
+baked to SVG at sync time — is static. Adding a third script is a decision,
+not a drift; update this list when it happens.
+
 ## The namespace rule
 
 - **`/writing/*` is the Jekyll posts surface** — posts, the writing index, feed.

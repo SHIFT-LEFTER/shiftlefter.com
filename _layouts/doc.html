@@ -1,0 +1,18 @@
+---
+layout: default
+---
+<article class="essay doc">
+  <header class="essay-header">
+    <p class="kicker"><a href="/docs/">Docs</a> · {{ page.kind }}</p>
+    <h1>{{ page.title }}</h1>
+    {%- if page.subtitle %}
+    <p class="standfirst">{{ page.subtitle | smartify }}</p>
+    {%- endif %}
+    <p class="byline">Synced from <a href="{{ page.source_url }}">{{ page.source }}</a> at <code>{{ page.synced_from }}</code></p>
+  </header>
+  {{ content }}
+  <footer class="essay-footer">
+    <a href="/docs/">All docs</a>
+    <a href="{{ page.source_url }}">Source on GitHub</a>
+  </footer>
+</article>

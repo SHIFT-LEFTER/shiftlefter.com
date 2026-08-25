@@ -5,12 +5,24 @@
   --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
   --sans:-apple-system,"Helvetica Neue",Helvetica,Arial,sans-serif;
 }
+/* Three-state theme (sl-cvow): the system preference is the default; the
+ * nav toggle stores an override as data-theme on <html> (applied before
+ * first paint by the head snippet in _layouts/default.html). The dark
+ * token block appears twice on purpose — once behind the media query,
+ * guarded so an explicit light override wins, and once for the explicit
+ * dark override — so the toggle beats the system in both directions. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --paper:#191712; --ink:#e9e3d3; --soft:#a29a85; --accent:#e07d40; --logo-up:#e3b23c; --logo-left:#5c7d58;
     --rule-h:#e9e3d3; --rule:#37332a; --code-bg:#23201a; --code-ink:#d5cdb8; --card:#1f1c16;
   }
 }
+:root[data-theme="dark"] {
+  --paper:#191712; --ink:#e9e3d3; --soft:#a29a85; --accent:#e07d40; --logo-up:#e3b23c; --logo-left:#5c7d58;
+  --rule-h:#e9e3d3; --rule:#37332a; --code-bg:#23201a; --code-ink:#d5cdb8; --card:#1f1c16;
+}
+:root[data-theme="light"] { color-scheme:light; }
+:root[data-theme="dark"] { color-scheme:dark; }
 /* CONTRACT (sl-5dhn, carried through sl-8yfe): the --sl-* custom property
  * NAMES below are load-bearing — the map one-pager SVG (sl-zwjz) inherits
  * them by NAME so it themes itself inline. They alias the Argument-theme
@@ -35,6 +47,18 @@ a:hover { color:var(--ink); }
 .m-left { fill:var(--logo-left); }
 .site-nav > a:not(.brand) { margin-left:auto; }
 .nav-links { margin-left:auto; display:flex; gap:1.4rem; flex-wrap:wrap; }
+/* Theme toggle (sl-cvow): top-right, nav-adjacent icon button — the
+ * pattern readers already know from GitHub, MDN, and every docs site. */
+.theme-toggle { appearance:none; background:none; border:1px solid var(--rule); border-radius:999px; color:var(--ink); width:2rem; height:2rem; padding:0; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; font-size:1rem; line-height:1; }
+.theme-toggle:hover { border-color:var(--accent); color:var(--accent); }
+.theme-toggle .sun, .theme-toggle .moon { display:none; }
+.theme-toggle .moon { display:inline; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .theme-toggle .moon { display:none; }
+  :root:not([data-theme="light"]) .theme-toggle .sun { display:inline; }
+}
+:root[data-theme="dark"] .theme-toggle .moon { display:none; }
+:root[data-theme="dark"] .theme-toggle .sun { display:inline; }
 
 .kicker { font-family:var(--sans); font-size:.72rem; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--accent); margin:0 0 1rem; }
 h1 { font-family:var(--sans); font-size:2.6rem; line-height:1.06; font-weight:800; letter-spacing:-.02em; margin:0 0 .8rem; }
@@ -54,6 +78,38 @@ h2::before { content:""; width:0; height:0; border-block:.3em solid transparent;
   .note { float:right; clear:right; width:17rem; margin:.2rem -21.5rem .8rem 0; padding:.35rem 0 0; font-size:.8rem; border-bottom:none; border-top:1px solid var(--rule-h); }
 }
 .essay-footer { margin-top:3rem; padding-top:1.1rem; border-top:2px solid var(--rule-h); display:flex; gap:1.6rem; font-family:var(--sans); font-size:.78rem; font-weight:600; letter-spacing:.06em; text-transform:uppercase; }
+
+/* Docs section (sl-xzom): synced markdown — tables, deeper headings, and
+ * mermaid diagrams baked as light/dark SVG pairs at sync time (no client
+ * mermaid.js). The pair is switched by the same three-state theme rule the
+ * toggle uses: system preference unless data-theme overrides it. */
+.doc h3 { font-family:var(--sans); font-size:1rem; font-weight:800; margin:1.8rem 0 .6rem; }
+.doc h4 { font-family:var(--sans); font-size:.9rem; font-weight:700; margin:1.4rem 0 .5rem; }
+.doc ol { margin:0 0 .95rem; padding-left:1.4rem; }
+.doc blockquote { margin:0 0 .95rem; padding:.2rem 0 .2rem 1rem; border-left:3px solid var(--accent); color:var(--soft); }
+.doc hr { border:0; border-top:1px solid var(--rule); margin:2rem 0; }
+.doc table { border-collapse:collapse; width:100%; font-size:.86rem; margin:0 0 1.2rem; display:block; overflow-x:auto; }
+.doc th, .doc td { border-bottom:1px solid var(--rule); padding:.4rem .6rem; text-align:left; vertical-align:top; }
+.doc th { font-family:var(--sans); font-size:.72rem; letter-spacing:.06em; text-transform:uppercase; border-bottom:2px solid var(--rule-h); }
+.doc .byline a { color:inherit; }
+.doc .kicker a { color:inherit; text-decoration:none; }
+.docs-index ul { list-style:none; padding:0; margin:0 0 1.5rem; }
+.docs-index li { margin:0 0 .9rem; }
+.docs-index li > a { font-family:var(--sans); font-weight:700; }
+.docs-index li span { display:block; color:var(--soft); font-size:.92rem; }
+@media (min-width:76rem) {
+  .essay.doc { max-width:58rem; padding-right:1.5rem; }
+}
+.diagram { margin:1.4rem 0; }
+.diagram img { max-width:100%; height:auto; margin:0 auto; }
+.diagram img.diagram-light { display:block; }
+.diagram img.diagram-dark { display:none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .diagram img.diagram-light { display:none; }
+  :root:not([data-theme="light"]) .diagram img.diagram-dark { display:block; }
+}
+:root[data-theme="dark"] .diagram img.diagram-light { display:none; }
+:root[data-theme="dark"] .diagram img.diagram-dark { display:block; }
 
 pre { background:var(--code-bg); color:var(--code-ink); border-top:2px solid var(--rule-h); border-bottom:1px solid var(--rule); padding:.9rem 1.1rem; overflow-x:auto; font-size:.79rem; line-height:1.5; font-family:var(--mono); }
 code { font-family:var(--mono); font-size:.84em; background:var(--code-bg); padding:.08em .3em; }
