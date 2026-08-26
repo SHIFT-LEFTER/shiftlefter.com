@@ -5,7 +5,7 @@ kind: Guide
 permalink: /docs/reports/
 source: docs/REPORTS.md
 source_url: https://github.com/shift-lefter/shiftlefter/blob/main/docs/REPORTS.md
-synced_from: b9e77546
+synced_from: 99cba96a
 ---
 {% raw %}
 

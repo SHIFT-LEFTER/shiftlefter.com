@@ -5,7 +5,7 @@ kind: Guide
 permalink: /docs/ci/
 source: docs/CI.md
 source_url: https://github.com/shift-lefter/shiftlefter/blob/main/docs/CI.md
-synced_from: b9e77546
+synced_from: 99cba96a
 ---
 {% raw %}
 
@@ -23,9 +23,12 @@ system that can run a shell command.
 ## The one rule: gate on the exit code, route on the record
 
 A planning failure — undefined steps, parse errors, config errors, no features
-found, an **empty selection** — exits **2** and writes **no JUnit file at
-all**. A job that keys only on the report's presence (or swallows the exit
-code with `|| true`) will read that missing report as green. So:
+found, an **empty selection** — exits **2** and, in a single-group run, writes
+**no JUnit file at all**. In a multi-group run (`setup.clj`, N>1) the other
+groups still run and the file IS written, covering only the groups that ran —
+it can be entirely green beside exit 2. A job that keys only on the report's
+presence or greenness (or swallows the exit code with `|| true`) will read
+that missing — or partial, all-green — report as success. So:
 
 - Let `sl run`'s exit code fail the job. Don't append `|| true`, and don't
   `allow_failure` the test job. Any nonzero exit is a failed gate.
@@ -36,20 +39,32 @@ code with `|| true`) will read that missing report as green. So:
   test plan on 2, look at your infrastructure on 4. The gate stays binary;
   the routing is where the distinctions pay.
 
-The report never contradicts the exit code: the XML contains at least one
-`<failure>`/`<error>` exactly when the run exits nonzero. `sl run`'s codes:
+In a single-group run the report never contradicts the exit code: the XML
+contains at least one `<failure>`/`<error>` exactly when the run exits
+nonzero. In a multi-group run that equivalence holds only for the groups that
+ran — a later group's planning failure exits 2 beside a file that may be all
+green (see [ERRATA E009](https://github.com/shift-lefter/shiftlefter/blob/main/ERRATA.md#e009-junit-xml-has-no-official-spec--we-target-the-consumer-subset)
+D3). `sl run`'s codes:
 
 | Code | Meaning |
 |------|---------|
 | 0 | Existential pass: ≥1 scenario selected, all ran to a tolerated outcome, none failed or errored (pending tolerated only under `:allow-pending?`) |
 | 1 | One or more scenarios failed (valid tests, app wrong), or pending steps when not allowed |
-| 2 | Planning failure (undefined steps, parse errors, config errors, no features found, bad flags, empty selection) — **no JUnit file is written** |
+| 2 | Planning failure (undefined steps, parse errors, config errors, no features found, bad flags, empty selection) — **single-group: no JUnit file; multi-group: the file covers only the groups that ran** — gate on the exit code |
 | 3 | Runner crash (unexpected exception) |
 | 4 | Run degraded: an infrastructure failure (hook throw, capability provisioning, capture, harness) — the run proves nothing about the app |
 
 Canonical table for all commands: [README → Return Codes](https://github.com/shift-lefter/shiftlefter/blob/main/README.md#return-codes).
-Background on the no-file decision and the JUnit format itself:
+Background on the no-file/partial-file semantics and the JUnit format itself:
 [ERRATA E009](https://github.com/shift-lefter/shiftlefter/blob/main/ERRATA.md#e009-junit-xml-has-no-official-spec--we-target-the-consumer-subset).
+
+One forward-looking note for gate authors: today an infrastructure failure
+that surfaces inside a step — a connection refused mid-run, say — is
+indistinguishable from the app being wrong and reports as an ordinary
+scenario failure (exit 1); only the harness's own `:error` family reaches 4.
+A future release may classify such step-level infrastructure failures into
+the degraded verdict — one more reason to gate on nonzero, not on a specific
+value.
 
 The HTML report behaves differently on exit 2 (since 0.5.4): late planning
 failures — undefined or ambiguous steps, arity mismatches, a hooks error —
@@ -213,7 +228,7 @@ The installer drops a runnable `sl` + jar into `./sl/`:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/SHIFT-LEFTER/shiftlefter/main/release/install.sh \
-  | bash -s -- --version 0.5.4 --no-breadcrumb
+  | bash -s -- --version 0.5.5 --no-breadcrumb
 ```
 
 - **Pin `--version`** to the release your team is on, so CI doesn't silently
@@ -239,12 +254,12 @@ image: eclipse-temurin:21-jre
 stages: [test]
 
 cache:
-  key: "sl-0.5.4"
+  key: "sl-0.5.5"
   paths: [sl/]
 
 .install-sl: &install-sl
   - apt-get update -qq && apt-get install -y -qq --no-install-recommends curl unzip
-  - '[ -x sl/sl ] || curl -fsSL https://raw.githubusercontent.com/SHIFT-LEFTER/shiftlefter/main/release/install.sh | bash -s -- --version 0.5.4 --no-breadcrumb'
+  - '[ -x sl/sl ] || curl -fsSL https://raw.githubusercontent.com/SHIFT-LEFTER/shiftlefter/main/release/install.sh | bash -s -- --version 0.5.5 --no-breadcrumb'
 
 smoke:
   stage: test
@@ -316,7 +331,7 @@ jobs:
       - name: Install sl
         run: |
           curl -fsSL https://raw.githubusercontent.com/SHIFT-LEFTER/shiftlefter/main/release/install.sh \
-            | bash -s -- --version 0.5.4 --no-breadcrumb
+            | bash -s -- --version 0.5.5 --no-breadcrumb
       - name: Run features
         # PRs run the @smoke subset; main runs everything.
         run: |

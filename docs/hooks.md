@@ -6,7 +6,7 @@ kind: Guide
 permalink: /docs/hooks/
 source: docs/hooks.md
 source_url: https://github.com/shift-lefter/shiftlefter/blob/main/docs/hooks.md
-synced_from: b9e77546
+synced_from: 99cba96a
 ---
 {% raw %}
 
