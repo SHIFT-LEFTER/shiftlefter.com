@@ -6,7 +6,7 @@ kind: Architecture
 permalink: /docs/architecture/repl-lifetimes/
 source: docs/architecture/repl-lifetimes.md
 source_url: https://github.com/shift-lefter/shiftlefter/blob/main/docs/architecture/repl-lifetimes.md
-synced_from: b575d948
+synced_from: b17cb676
 ---
 {% raw %}
 

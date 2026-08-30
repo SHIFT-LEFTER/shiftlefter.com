@@ -6,7 +6,7 @@ kind: Architecture
 permalink: /docs/architecture/module-map/
 source: docs/architecture/module-map.md
 source_url: https://github.com/shift-lefter/shiftlefter/blob/main/docs/architecture/module-map.md
-synced_from: b575d948
+synced_from: b17cb676
 ---
 {% raw %}
 

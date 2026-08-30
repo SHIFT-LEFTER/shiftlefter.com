@@ -6,7 +6,7 @@ kind: Architecture
 permalink: /docs/architecture/invocation-map/
 source: docs/architecture/invocation-map.md
 source_url: https://github.com/shift-lefter/shiftlefter/blob/main/docs/architecture/invocation-map.md
-synced_from: b575d948
+synced_from: b17cb676
 ---
 {% raw %}
 
@@ -29,8 +29,7 @@ walks the runner pipeline's stages and speaks the verdict contract; the
 **query family** (`orient`, `glossary`, `explain`) rides
 `build-projection` (`project_projection.clj:571`) — the run's own
 config/glossary/intent/stepdef loaders behind one resolver, so a listing
-can never disagree with the run it predicts — and since resolution
-queries v2, `glossary`/`explain` additionally re-enter
+can never disagree with the run it predicts — and `glossary`/`explain` additionally re-enter
 discover→parse→compile through `projection/usage_index.clj` to bind the corpus
 for usage facts (same binder, never a parallel path); the **utility
 family** (`fmt`, `doctor`, `costume`, `daemon`, `agent-doc`,
@@ -48,7 +47,7 @@ family** (`fmt`, `doctor`, `costume`, `daemon`, `agent-doc`,
 Two facts the diagram earns its place by showing: **the planning verbs
 stop at compile** (dry-run's exit 0 is a plan verdict — the selection
 binds — not a run verdict), and **the query surfaces hang off the same
-resolver the run uses**, with the v2 usage loop drawn as a re-entry into
+resolver the run uses**, with the usage loop drawn as a re-entry into
 the run's own discovery/parse/bind stages rather than a second reader.
 
 

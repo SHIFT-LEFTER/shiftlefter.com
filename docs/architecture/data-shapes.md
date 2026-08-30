@@ -6,7 +6,7 @@ kind: Architecture
 permalink: /docs/architecture/data-shapes/
 source: docs/architecture/data-shapes.md
 source_url: https://github.com/shift-lefter/shiftlefter/blob/main/docs/architecture/data-shapes.md
-synced_from: b575d948
+synced_from: b17cb676
 ---
 {% raw %}
 
@@ -109,7 +109,8 @@ contract is docstring/doc, see § Stability tiers).
   (project_context.clj:201) MUST match `bin/sl`'s `find_instance_root`
   exactly — the shell wrapper and daemon agree on
   `.shiftlefter/daemon.edn` by parallel implementation, not shared code.
-- Discovery is closed to `<candidate>/sl/shiftlefter.edn` (layout C);
+- Discovery is closed to `<candidate>/sl/shiftlefter.edn` (the `sl/`
+  directory layout);
   root-level configs are no longer discovered; `-c FILE` is the escape
   hatch.
 
@@ -163,7 +164,8 @@ contract is docstring/doc, see § Stability tiers).
   (usage_index.clj:57),
   which re-enters discover→parse→compile with the
   run's own binder; its flat tuples (:152-172) are the node/edge
-  vocabulary the graph era consumes (prepaid graph work, :20-22).
+  vocabulary later graph tooling consumes — deliberate groundwork
+  (:20-22).
 
 
 {: id="6-glossary"}
@@ -175,7 +177,7 @@ contract is docstring/doc, see § Stability tiers).
 
 - Runtime key set is a superset of the spec: `:subjects :verbs` (spec'd)
   plus loader-added `:provenance :sources :instance-index`. `:verbs` mount
-  keys are the types the FILES declare ( — `:type` required and
+  keys are the types the FILES declare (`:type` required and
   authoritative; config `:glossaries :verbs` is a plain path list), and
   `:sources :verbs` maps each declared type to the file that mounted it.
 - **Merge is wholesale-per-key** (glossary.clj:48-60): a project entry
@@ -340,7 +342,7 @@ contract is docstring/doc, see § Stability tiers).
 |---|---|---|---|---|
 | event envelope | `events/make-event` events.clj:242; `:seq` stamped in `publish!` :125 | `::event-envelope` events.clj:65 (`:req-un` type/ts/run-id/payload; `:opt-un` seq; `:opt` `:scenario/id`) | observe plane: graph emission, telemetry, future workers | locked alongside the summary (docs/AGENT.md:196-201); delivery is offer!-based drop-and-count (buffer 1024, `dropped-events` :212); total order guaranteed only WITHIN a scenario (events.clj:14-20) |
 
-- Event types at HEAD: `:test-run/started` `:test-run/finished`
+- Event types at this stamp: `:test-run/started` `:test-run/finished`
   `:scenario/finished` `:step/svo` (payload
   `{:subject :verb :object :interface :interface-type :step-text
   :location}`, step_loop.clj:147-153).
@@ -393,7 +395,9 @@ All captures REAL, from `examples/04-sms-2fa` at the 2026-08-19
 extraction, one scenario ("Alice resets her password using a code sent
 to her phone", 8 steps, two interfaces, zero custom steps), run live with
 ChromeDriver + the example's fixture
-server. Substrate stamps the claim:
+server. Substrate stamps the claim — the
+`:git-sha` names the development tree the trace ran on, quoted as
+captured:
 `{:config-source :discovered, :git-sha "39468a25", :git-dirty? false}`.
 
 **Station 1-2 (config in).** The project config declares two interfaces
@@ -408,8 +412,7 @@ and three `:svo` levels — and deliberately omits `:unknown-object`:
 ```
 
 **Station 3-4 (context → projection).** `sl orient --edn` emits the
-projection verbatim. `:mode :shifted` (the `:svo` key is present —
-). The conditional default is visible: intents are
+projection verbatim. `:mode :shifted` (the `:svo` key is present). The conditional default is visible: intents are
 configured, so the effective levels gained `:unknown-object :warn`:
 
 ```clojure

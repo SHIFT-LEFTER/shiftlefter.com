@@ -6,7 +6,7 @@ kind: Architecture
 permalink: /docs/architecture/control-loop/
 source: docs/architecture/control-loop.md
 source_url: https://github.com/shift-lefter/shiftlefter/blob/main/docs/architecture/control-loop.md
-synced_from: b575d948
+synced_from: b17cb676
 ---
 {% raw %}
 
@@ -153,7 +153,7 @@ stamp.
 | capability cleanup fails | untouched — `:cleanup-failures` diagnostics, "never the exit code" | — | cleanup.clj:80-101, core.clj:1171-1187 |
 | `:start` throws / bad shape / registry mismatch ✓ | group skipped, no `:stop`, siblings run | 2 (group-local) | core.clj:1533-1595 |
 | `:stop` throws ✓ | reported + dirty-teardown marker; next run announces, then clears — exit already earned | unchanged | core.clj:1365-1389, 1625-1629 |
-| empty selection (A's territory) | pre-execution | 2 | core.clj:797-822 |
+| empty selection (the invocation map's territory) | pre-execution | 2 | core.clj:797-822 |
 | anything escaping the group body | — | 3 | core.clj:1707-1717, 1992-2010 |
 
 
