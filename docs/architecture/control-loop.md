@@ -6,24 +6,24 @@ kind: Architecture
 permalink: /docs/architecture/control-loop/
 source: docs/architecture/control-loop.md
 source_url: https://github.com/shift-lefter/shiftlefter/blob/main/docs/architecture/control-loop.md
-synced_from: b9e77546
+synced_from: b575d948
 ---
 {% raw %}
 
-Artifact B of the architecture series (sibling of the module map, artifact
-D) — the last of the five. Extracted and live-verified against **HEAD
-`64a449eb`** (2026-08-19; `runner/core.clj` pins re-verified 2026-08-23,
-sl-d3cz — the step_loop/cleanup pins held): the firing order below is transcribed from the
+Extracted and live-verified against the code of the v0.5.5 release line
+(2026-08-19; `runner/core.clj` pins re-verified 2026-08-23): the firing
+order below is transcribed from the
 source order of `runner/core.clj`, `exec/cleanup.clj`, and
 `exec/step_loop.clj`, the ctx contract is reconciled verbatim against a
-live probe dump (banked on sl-ygtj), and every failure row marked ✓ was
-driven for real this session — exit codes from actual runs, not from the
+live probe dump, and every failure row marked ✓ was
+driven for real at the stamp — exit codes from actual runs, not from the
 table they're supposed to match. The [invocation map](/docs/architecture/invocation-map/)
 owns everything before execute; this map starts where the plan phase's
 guarantee ends — "everything knowable without touching the world" is now
 known — and shows what happens when the world starts. The doctrine line
 this page makes mechanical: never guess before the run, never lie after
-it. The first half is the plan phase (A's territory); the second half is
+it. The first half is the plan phase (the invocation map's territory); the
+second half is
 this page — every arrow below carries its honest exit, and nothing on
 this path can make a result look healthier than it was.
 
@@ -134,9 +134,9 @@ them, and runtime dispatch is arity-only.
 {: id="every-failures-honest-exit"}
 ## Every failure's honest exit
 
-Exit meanings are the [invocation map](/docs/architecture/invocation-map/)'s verdict table
-(sl-7c7i); this table is who contributes what. ✓ = driven live this
-session (evidence banked on sl-ygtj).
+Exit meanings are the [invocation map](/docs/architecture/invocation-map/)'s verdict table;
+this table is who contributes what. ✓ = driven live at the 2026-08-19
+stamp.
 
 | Failure | Scenario status | Exit | Pin |
 |---|---|---|---|
@@ -203,7 +203,7 @@ via `shiftlefter.step` accessors, not by fishing.
 but zero SVO steps, so the stashes populate and no adapter factory ever
 runs — no browser; one global Before contributing
 `{:probeToken "…" :custom/before-key 42}`; a `bindings/capture!` step;
-then the dump step — full rig on sl-ygtj):
+then the dump step):
 
 ```clojure
 {:probe/stage :before, :payload-keys [:artifacts-dir :ctx :scenario :seed],
@@ -223,7 +223,7 @@ root *and* in `:sl/bindings`; its namespaced `:custom/before-key` stays
 root-only; the step-captured `:orderId` joins the data plane. There is no
 ctx spec, by design — the ledger's stability tiers rule ctx
 "reserved-namespace": the key families are the contract, the map stays
-open (0.6 fences writes; `ARCHITECTURE.md` § bindings).
+open (0.6 fences writes).
 
 
 {: id="the-substrates"}
@@ -259,7 +259,7 @@ wrapper placement, not runtime checks: oracles retry, mutations never,
 negation doesn't wait (`step.clj:41-55`, `browser.clj:97-100`). User
 prose: [extending-vocabulary § Timing](/docs/extending-vocabulary/).
 
-**Capture — two sites, one ruled matrix (sl-3q9r/sehc).** Per-step site
+**Capture — two sites, one ruled matrix.** Per-step site
 (`step_loop.clj:267-272`): `:every-step` follows the acting subject, all
 kinds; `:on-failure` fires **on `:failed` only** — provisioning failures
 have no settled instant to witness, Before failures never reach the loop,
@@ -300,75 +300,32 @@ Negative space, stated: there is no `:scenario/started`, no
 a separate synchronous plane (`core.clj:231-235`).
 
 
-{: id="findings"}
-## Findings
-
-**F1 — "in a `finally`" is semantics, not syntax.**
-`docs/lifecycle.md` draws `:stop ← in a finally`; the implementation is
-capture-and-rethrow (`core.clj:1625-1628`) so a `:stop` throw can enrich
-the group result — a real `finally` cannot. The guarantee (":stop runs
-even when scenarios failed") holds by construction and was driven live.
-Disposition: stated here; the user-page wording rides sl-t68j's lifecycle
-v2 (its scope, ruled 08-19).
-
-**F2 — the live probe corrected the code-read on hook metadata.** The
-code-read prediction was "hook ctx carries no metadata"; the dump shows
-an After receiving the last step's `:step/*` stamp when that step
-returned the ctx object it was handed. The precise contract (stamped only
-at step invocation, replaced wholesale, incidental elsewhere) is now in
-§ ctx contract, and a one-sentence caveat lands in
-`docs/extending-vocabulary.md` with this pass (ruled at plan verdict).
-Disposition: exactly what the live-reconcile bar exists to catch —
-`:step/arguments []`-not-nil was a second same-class catch.
-
-**F3 — `:start` throw ⇒ no `:stop`, mechanically.** `:stop` is a key on
-the start-result (`setup.clj:158-159`, destructured `core.clj:1598`); a
-throwing `:start` produced no start-result, so there is nothing to run —
-pinned here, driven live. The user-docs clause stating this plainly is
-sl-t68j M2's scope; `lifecycle.md:92` currently only implies it.
-Disposition: cross-boundary noted, nothing taken from the rider.
-
-
-{: id="method"}
-## Method
-
-- Firing order: transcribed from source order of `run-group!`
-  (`runner/core.clj:1469+`), `execute-scenario-with-cleanup`
-  (`exec/cleanup.clj:152+`), and `classify-and-execute-step` /
-  `invoke-step` (`exec/step_loop.clj`); every table row carries its pin.
-- Ctx contract: live probe project (no-SVO trick — `:timing` +
-  `:interfaces` configured, zero SVO steps, so stashes populate with no
-  browser), one global Before + `capture!` step + dump step, run via
-  `bin/sl-dev run`; dump banked verbatim on sl-ygtj and reconciled
-  against § ctx contract word for word.
-- Failure matrix: each ✓ row is `run > out 2>&1; echo $?` against scratch
-  projects (step outcomes; named `@hook=` failure hooks; a two-group
-  `setup.clj` with a throwing `:start`; a `:stop`-throwing group run
-  twice to watch the dirty-teardown marker cycle; provisioning driven
-  real via `:adapter-opts {:path-driver /nonexistent}` — note the
-  resolver precedence is adapter-opts > user config.edn > PATH, which a
-  first mis-keyed attempt proved by launching a real Chrome). Evidence on
-  sl-ygtj.
-- Re-stamp: re-run the probe + matrix and update the HEAD sha after any
-  change to the three loop namespaces, provisioning, capture, or hooks.
-
-
 {: id="siblings"}
 ## Siblings
 
-- D — [module map](/docs/architecture/module-map/) (require-graph truth). The layering
+- [module map](/docs/architecture/module-map/) (require-graph truth). The layering
   law this loop obeys — stepengine never reaches up into runner — is its
   territory.
-- A — [the invocation map](/docs/architecture/invocation-map/): everything before
+- [the invocation map](/docs/architecture/invocation-map/): everything before
   execute; the verdict table this page's exit column speaks.
-- C — [the data-shape ledger](/docs/architecture/data-shapes/): these keys at rest —
+- [the data-shape ledger](/docs/architecture/data-shapes/): these keys at rest —
   producer/spec/consumers/stability per station; its § spine is this
   page's control-flow dual (station 10 is § ctx contract's shape half).
-- E — [REPL custody & lifetimes](/docs/architecture/repl-lifetimes/): the state axis —
+- [REPL custody & lifetimes](/docs/architecture/repl-lifetimes/): the state axis —
   who reaps what this loop provisions, and the REPL's deviations from
   this exact path (hand-built ctx, no run stash, free mode never
   provisions).
 - [extending-vocabulary](/docs/extending-vocabulary/): the user-facing
   dual — what this machinery promises a custom step author; this page
   pins what that page teaches.
+
+
+{: id="how-this-map-stays-true"}
+## How this map stays true
+
+This page is a mechanical projection of a live-maintained internal map:
+re-verified against the code by probe runs at each re-stamp, regenerated —
+never hand-edited — by the derivation pipeline, and drift-guarded by the
+test suite (a hand edit here fails a test). File:line pins are re-verified
+at each re-stamp.
 {% endraw %}

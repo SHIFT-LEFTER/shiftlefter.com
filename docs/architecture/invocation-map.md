@@ -6,17 +6,15 @@ kind: Architecture
 permalink: /docs/architecture/invocation-map/
 source: docs/architecture/invocation-map.md
 source_url: https://github.com/shift-lefter/shiftlefter/blob/main/docs/architecture/invocation-map.md
-synced_from: b9e77546
+synced_from: b575d948
 ---
 {% raw %}
 
-Artifact A of the architecture series (sibling of the module map, artifact
-D). Extracted and live-verified against **HEAD `0b77c34e`** (2026-08-18);
-line pins re-verified and the `init` lane added 2026-08-23 (sl-d3cz);
-every exit code below was transcribed from an actual run (jar rebuilt at
-the 08-18 HEAD; it reports version 0.5.4 — the bump is a release-day step).
-Verb completeness comes from the dispatch table itself, not from memory —
-see § Method.
+Extracted and live-verified against the code of the v0.5.5 release line
+(2026-08-18); line pins re-verified and the `init` lane added 2026-08-23.
+Every exit code below was transcribed from an actual run. Verb
+completeness comes from the dispatch table itself, not from
+memory.
 
 
 {: id="the-shape-in-one-paragraph"}
@@ -59,11 +57,11 @@ the run's own discovery/parse/bind stages rather than a second reader.
 
 Every branch of the dispatch `cond` (`core.clj:917-1030`), one row each.
 "Enters at" is the branch's command fn; codes marked ✓ were produced by a
-live run (see § Method for the battery).
+live run.
 
 | Verb | Enters at | Stops at | Emits | Exit codes (live-verified ✓) |
 |---|---|---|---|---|
-| `run` | `run-cmd` core.clj:132 → `execute!` runner/core.clj:1891 | full pipeline → verdict | console report; `--edn` summary; `--junit-xml`; `--html`; captures | 0 pass ✓ · 1 fail ✓ · 2 planning/bad path ✓ · 3 crash · 4 degraded (7c7i table) |
+| `run` | `run-cmd` core.clj:132 → `execute!` runner/core.clj:1891 | full pipeline → verdict | console report; `--edn` summary; `--junit-xml`; `--html`; captures | 0 pass ✓ · 1 fail ✓ · 2 planning/bad path ✓ · 3 crash · 4 degraded (the verdict table below) |
 | `run --dry-run` | same | after compile-suite + capture-plan lint (runner/core.clj:2063) | bound-plan line (stderr), hook preview; `--edn` plan summary | 0 binds ✓ · 2 binding/discovery errors ✓ |
 | `fmt` (`--check/--write/--canonical`) | `fmt-cmd` core.clj:433 | parser round-trip only — no pickles, no binding | per-file OK/NOT-OK lines; formatted text | 0 clean ✓ · 1 check-failure ✓ · 2 usage. NOTE: fmt's 1 is "file not canonical", not the verdict table's "scenario failed" — fmt is not a run surface |
 | `gherkin fuzz` | `fuzz-cmd` core.clj:539 | parser property loop (no project context use) | trial summary; failure artifacts under `--save` | 0 all pass ✓ · 1 failures. Framework-dev tool |
@@ -78,7 +76,7 @@ live run (see § Method for the battery).
 | `costume list` | core.clj:751 | wardrobe read | costume table + liveness | 0 ✓ |
 | `costume destroy` | core.clj:772 | wardrobe delete (refuses while live unless `--force`) | removal confirmation | 0 · 1 refused/failed · 2 usage (code-read) |
 | `doctor` | `doctor.clj:629` | probe registry (machine pre-flight; no feature corpus) | probe table; `--list`; `--edn` | 0 all ok · 1 issues found ✓ |
-| `init` | `init/init-cmd` init.clj:161 (branch core.clj:1010) | scaffold write: `sl/` config + glossary + starter feature + AGENTS.md stanza (marker-guarded); bails touch-nothing if `sl/shiftlefter.edn` exists | one line per artifact; breadcrumb commands | 0 scaffolded AND 0 bailed (code-read; deliberately absent from `--help` until system-wide distribution, sl-f1ir) |
+| `init` | `init/init-cmd` init.clj (branch core.clj) | scaffold write: `sl/` config + glossary + starter feature; AGENTS.md only on `--write-agents` (marker-guarded; the default prints the offer); bails touch-nothing if `sl/shiftlefter.edn` exists, except the explicit `--write-agents` ask still lands | one line per artifact; AGENTS.md offer or outcome | 0 scaffolded AND 0 bailed (code-read; deliberately absent from `--help` until system-wide distribution) |
 | `daemon serve` | `daemon-cmd` core.clj:810 | long-lived JVM serving `dispatch` over the wire (auto-spawned by `bin/sl`) | socket + port file | blocks; lifecycle codes on the client side |
 | `daemon status` | core.clj:810 | registry read | daemon record (port/pid/jar) | 0 ✓ |
 | `daemon stop` | core.clj:810 | signal + reap | stopped confirmation | 0 ✓ |
@@ -89,8 +87,8 @@ live run (see § Method for the battery).
 | *(unknown command)* | core.clj:1019 | immediate | hint on stderr, stdout clean | 2 ✓ |
 
 
-{: id="exit-codes-the-verdict-contract-sl-7c7i"}
-## Exit codes: the verdict contract (sl-7c7i)
+{: id="exit-codes-the-verdict-contract"}
+## Exit codes: the verdict contract
 
 The run family's column is one table, owned by `runner/verdict.clj` and
 guard-tested against the docs (`exit-contract-guard-test`):
@@ -108,63 +106,27 @@ Precedence: 3 anywhere; 2 pre-execution exclusive; execution worst-wins
 lane above); none of them can produce 3/4 short of a crash.
 
 
-{: id="findings"}
-## Findings
-
-**F1 — the bead's verb list undercounted by six.** The dispatch table
-carries `gherkin fuzz`, `gherkin ddmin`, `verify`, `agent-doc`, `repl`,
-and `daemon status`/`stop` beyond the verbs the bead named. All are lanes
-above. Disposition: the dispatch `cond` is the completeness authority;
-this map's § Method regenerates the inventory mechanically.
-
-**F2 — there is no `sl costume connect`, by design.** The bead text named
-a `connect` CLI verb; the code has `init`/`relaunch`/`list`/`destroy`
-only. Ruled at plan fisk (Chair-ratified 08-18): a one-shot CLI process
-cannot hold a WebDriver session, so *attach* exists only in the surfaces
-that persist — the REPL's `connect-costume!` and the runner's wear
-provisioning. Disposition: bead-text error, documented here as the design
-fact.
-
-**F3 — setup/hooks load earlier than the folk sketch says.** The naive
-spine (and the bead's own stage list) places setup/hook loading after
-binding; the code loads them immediately after intents
-(`runner/core.clj:1999-2003`), *before* discovery, so hook applicability
-and setup groups exist when compile-suite attaches them. The bead's stage
-list also inserted "projection" into the run spine — the projection is
-the query surfaces' substrate, not a run stage. Disposition: diagram
-drawn from the code; sketch corrected here.
-
-
-{: id="method"}
-## Method
-
-- Verb inventory: `grep -n '(= (first arguments)' src/shiftlefter/core.clj`
-  plus the flag/error branches of the same `cond` — every hit is a lane row.
-- Exit codes: each ✓ is `"$@" > out 2>&1; echo $?` from the 08-18 battery —
-  planning verbs against `examples/01-validate-and-format` and
-  `examples/03-custom-steps` via the freshly built jar (`bin/sl`),
-  Shifted-mode query verbs against `examples/04-sms-2fa`, the failing-run
-  lane against a scratch project with one deliberately failing scenario,
-  `verify` from a non-repo directory. Costume mutation verbs are
-  code-read (they launch a real browser); `daemon serve` was exercised
-  implicitly — the battery itself ran warm through the auto-spawned daemon.
-- Cross-checks: exit column vs `runner/verdict.clj` (quoted above) and
-  `test/shiftlefter/exit_contract_guard_test.clj`.
-- Re-stamp: rerun the battery and update the HEAD sha in the header after
-  any dispatch or stage change.
-
-
 {: id="siblings"}
 ## Siblings
 
-- D — [module map](/docs/architecture/module-map/) (require-graph truth)
-- E — [REPL custody & lifetimes](/docs/architecture/repl-lifetimes/): where the `repl`
+- [module map](/docs/architecture/module-map/) (require-graph truth)
+- [REPL custody & lifetimes](/docs/architecture/repl-lifetimes/): where the `repl`
   lane's `:repl` sentinel hands off — the one surface where things
   outlive the invocation.
-- C — [the data-shape ledger](/docs/architecture/data-shapes/): the values these verbs
+- [the data-shape ledger](/docs/architecture/data-shapes/): the values these verbs
   carry — every boundary-crossing shape with producer/spec/consumers/
   stability; its chain diagram is this map's data-flow dual.
-- B — [the control loop](/docs/architecture/control-loop/): where `execute-and-report-stage`
+- [the control loop](/docs/architecture/control-loop/): where `execute-and-report-stage`
   hands off — inside one scenario's execution, the ctx contract, and every
   failure path's honest exit.
+
+
+{: id="how-this-map-stays-true"}
+## How this map stays true
+
+This page is a mechanical projection of a live-maintained internal map:
+re-verified against the code by probe runs at each re-stamp, regenerated —
+never hand-edited — by the derivation pipeline, and drift-guarded by the
+test suite (a hand edit here fails a test). File:line pins are re-verified
+at each re-stamp.
 {% endraw %}
