@@ -20,7 +20,7 @@ permalink: /docs/
   </ul>
 
   <h2>Architecture</h2>
-  <p>Five reports, each checked against the source at the commit it names rather than drawn from memory. They date themselves; read the stamp.</p>
+  <p>Five reports, each checked against the code itself rather than drawn from memory. They date themselves; read the stamp.</p>
   <ul>
     <li><a href="/docs/architecture/invocation-map/">The Invocation Map</a><span>Every <code>sl</code> verb through the shared spine — one dispatch, cold and warm alike.</span></li>
     <li><a href="/docs/architecture/module-map/">Module Map</a><span>The namespace dependency graph as extracted from the require forms, with the laws it is checked against.</span></li>
