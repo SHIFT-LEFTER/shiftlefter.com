@@ -16,7 +16,7 @@
  *   .scenario .scenario-name .tags .tag .duration
  *   .steps .step .step-status .step-text .macro-marker .error-detail
  *   .diagnostics .run-footer
- * Status modifiers: .st-passed .st-failed .st-error .st-pending .st-skipped
+ * Status modifiers: .st-passed .st-failed .st-error .st-unobserved .st-pending .st-skipped
  * State: body.failures-only, .scenario.red, .feature.has-red
  */
 
@@ -118,6 +118,14 @@ body {
   font-weight: 600;
 }
 
+/* sl-78u4 (Warden W10): the one-line :halted record under the run meta. */
+.run-halted {
+  margin: 0.15rem 0;
+  color: var(--error);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
 .run-counts {
   list-style: none;
   display: flex;
@@ -141,7 +149,8 @@ body {
 }
 
 .count.st-failed,
-.count.st-error {
+.count.st-error,
+.count.st-unobserved {
   color: var(--failed);
 }
 
@@ -237,7 +246,8 @@ body {
   color: var(--failed);
 }
 
-.status-word.st-error {
+.status-word.st-error,
+.status-word.st-unobserved {
   color: var(--error);
 }
 
@@ -571,7 +581,7 @@ body.failures-only .feature:not(.has-red) {
 <noscript><p class="noscript-note">This report renders with JavaScript. The complete run data is embedded in this file as readable EDN &mdash; view source and find <code>script type=&quot;application/edn&quot;</code>.</p></noscript>
 <div id="app"></div>
 <script type="application/edn" id="run-data">
-{:run-ctx {:run-id "f5707e9a-7aa3-4853-b9ed-2647e9fc0df3", :seed 6479876580151103787, :version "0.5.5", :mode :vanilla, :started-at "2026-08-26T19:14:12", :project-root "/private/tmp/shiftlefter-demo", :project-name "shiftlefter-demo", :allow-pending? false}, :scenarios [], :diagnostics {:undefined [{:status :undefined, :step {:step/id #uuid "441ae5ad-b851-4e62-bce1-aa76f5b984b7", :step/text "corpus step that no stepdef defines", :step/template-text nil, :step/keyword "Given", :step/location {:line 5, :column 5}, :step/origin :scenario, :step/arguments []}, :binding nil, :alternatives [], :source-file "/private/tmp/shiftlefter-demo/target/corpus/p98565/default-42/broken/broken.feature", :severity :error} {:status :undefined, :step {:step/id #uuid "c39cfc71-7e72-41e5-b8a3-2bf2b12ae9e6", :step/text "the gateway degrades, the client retries.", :step/template-text nil, :step/keyword "When", :step/location {:line 8, :column 5}, :step/origin :scenario, :step/arguments []}, :binding nil, :alternatives [], :hint {:type :grammar/prose-as-step, :suggestion "This line reads like description prose. Descriptions end at the first Given/When/Then/And/But (or *) — move prose above the first step or rephrase so it does not open with a step keyword."}, :source-file "/private/tmp/shiftlefter-demo/target/corpus/p98565/default-42/broken/broken.feature", :severity :error}], :ambiguous [], :invalid-arity [], :ambiguous-instance [], :svo-issues [], :counts {:undefined-count 2, :ambiguous-count 0, :invalid-arity-count 0, :ambiguous-instance-count 0, :svo-issue-count 0, :total-issues 2}}, :summary {:run-id "f5707e9a-7aa3-4853-b9ed-2647e9fc0df3", :exit-code 2, :status :planning-failed, :counts {:undefined-count 2, :ambiguous-count 0, :invalid-arity-count 0, :ambiguous-instance-count 0, :svo-issue-count 0, :total-issues 2}}}
+{:run-ctx {:run-id "f3fba53b-a3c7-4b89-a2d9-1ee272832df8", :seed 1363317390311410711, :version "0.5.6", :mode :vanilla, :started-at "2026-09-08T20:31:53", :project-root "/private/tmp/shiftlefter-demo", :project-name "shiftlefter-demo", :allow-pending? false}, :scenarios [], :diagnostics {:undefined [{:status :undefined, :step {:step/id #uuid "7373602b-6d28-47a2-a5a6-acbac0a36cb5", :step/text "corpus step that no stepdef defines", :step/template-text nil, :step/keyword "Given", :step/location {:line 5, :column 5}, :step/origin :scenario, :step/arguments []}, :binding nil, :alternatives [], :source-file "/private/tmp/shiftlefter-demo/target/corpus/p87970/default-42/broken/broken.feature", :severity :error} {:status :undefined, :step {:step/id #uuid "4d17bce9-aaff-4d6a-a8de-b7241e604b3a", :step/text "the gateway degrades, the client retries.", :step/template-text nil, :step/keyword "When", :step/location {:line 8, :column 5}, :step/origin :scenario, :step/arguments []}, :binding nil, :alternatives [], :hint {:type :grammar/prose-as-step, :suggestion "This line reads like description prose. Descriptions end at the first Given/When/Then/And/But (or *) — move prose above the first step or rephrase so it does not open with a step keyword."}, :source-file "/private/tmp/shiftlefter-demo/target/corpus/p87970/default-42/broken/broken.feature", :severity :error}], :ambiguous [], :invalid-arity [], :ambiguous-instance [], :svo-issues [], :counts {:undefined-count 2, :ambiguous-count 0, :invalid-arity-count 0, :ambiguous-instance-count 0, :svo-issue-count 0, :total-issues 2}}, :summary {:run-id "f3fba53b-a3c7-4b89-a2d9-1ee272832df8", :exit-code 2, :status :planning-failed, :counts {:undefined-count 2, :ambiguous-count 0, :invalid-arity-count 0, :ambiguous-instance-count 0, :svo-issue-count 0, :total-issues 2}}}
 </script>
 <script>
 // ShiftLefter HTML run report renderer (sl-muq9).
@@ -782,6 +792,12 @@ function scenarioStatusClass(scenario) {
     if (fs && k(k(fs, ":error"), ":exception-class")) return "st-error";
     return "st-failed";
   }
+  // An :error scenario whose attribution carries :error/class :observation
+  // (sl-kowi) is UNOBSERVED — the witness went dark — distinct from ERROR
+  // (the harness family) and from FAILED (a verdict).
+  if (status === ":error" && k(k(scenario, ":error"), ":error/class") === ":observation") {
+    return "st-unobserved";
+  }
   return "st-" + (status || ":unknown").slice(1);
 }
 
@@ -800,6 +816,7 @@ const STATUS_WORDS = {
   "st-passed": "PASSED",
   "st-failed": "FAILED",
   "st-error": "ERROR",
+  "st-unobserved": "UNOBSERVED",
   "st-pending": "PENDING",
   "st-skipped": "SKIPPED",
 };
@@ -896,6 +913,7 @@ function renderHeader(runCtx, summary, scenarios) {
     .filter(Boolean)
     .join(" · ");
   header.appendChild(el("p", "run-meta", meta));
+  appendHaltedLine(header, summary);
 
   const selection = k(runCtx, ":selection");
   if (selection) {
@@ -941,6 +959,12 @@ function renderHeader(runCtx, summary, scenarios) {
     if (errorCount > 0) {
       countsList.appendChild(el("li", "count st-error", errorCount + " error"));
     }
+    // :unobserved (sl-kowi) — the observation-class bucket, disjoint from
+    // :error; same only-when-present rule.
+    const unobservedCount = counts ? k(counts, ":unobserved") || 0 : 0;
+    if (unobservedCount > 0) {
+      countsList.appendChild(el("li", "count st-unobserved", unobservedCount + " unobserved"));
+    }
     header.appendChild(countsList);
   }
 
@@ -966,6 +990,28 @@ function renderHeader(runCtx, summary, scenarios) {
   }
 
   return header;
+}
+
+// sl-78u4 (Warden W10): the :halted record as ONE header line — the
+// console string verbatim — so halted-skipped scenarios stop reading as
+// plain SKIPPED with no reason. Absent unless the halt policy fired. Used by
+// the run header and the invocation TOC alike.
+function appendHaltedLine(header, summary) {
+  const halted = summary ? k(summary, ":halted") : null;
+  if (!halted) return;
+  const name = k(halted, ":scenario");
+  const group = k(halted, ":group/label");
+  header.appendChild(
+    el(
+      "p",
+      "run-halted",
+      "halted after scenario " +
+        k(halted, ":after-scenario") +
+        (name ? " (" + name + ")" : "") +
+        ": observation failure" +
+        (group ? " — in group " + group + "; later groups skipped" : ""),
+    ),
+  );
 }
 
 function setAllOpen(open) {
@@ -1361,6 +1407,8 @@ const TOC_STATUS = {
   ":planning-failed": ["PLANNING FAILED", "st-error"],
   ":degraded": ["DEGRADED", "st-error"],
   ":crashed": ["CRASHED", "st-error"],
+  // sl-78u4: a setup group the :run-scope halt never started.
+  ":skipped": ["SKIPPED", "st-skipped"],
 };
 
 function tocCountsLine(counts) {
@@ -1389,6 +1437,7 @@ function renderTocPage(runCtx, summary, toc) {
     .filter(Boolean)
     .join(" · ");
   header.appendChild(el("p", "run-meta", meta));
+  appendHaltedLine(header, summary);
   app.appendChild(header);
 
   const table = el("table", "toc-table");
@@ -1406,7 +1455,12 @@ function renderTocPage(runCtx, summary, toc) {
     const [word, cls] = TOC_STATUS[k(g, ":status")] || [String(k(g, ":status") || ""), "st-error"];
     const statusCell = el("td");
     statusCell.appendChild(el("span", "run-status " + cls, word));
-    statusCell.appendChild(el("span", "toc-exit", " exit " + k(g, ":exit-code")));
+    // A group the :run-scope halt skipped never started: no exit code to
+    // print (sl-78u4).
+    const exitCode = k(g, ":exit-code");
+    if (exitCode !== null && exitCode !== undefined) {
+      statusCell.appendChild(el("span", "toc-exit", " exit " + exitCode));
+    }
     row.appendChild(statusCell);
     row.appendChild(el("td", "toc-counts", tocCountsLine(k(g, ":counts"))));
     const pageCell = el("td", "toc-page");

@@ -24,12 +24,14 @@ This site is a pointer. The repository owns the content.
 - Guides: https://shiftlefter.com/docs/reports/ · https://shiftlefter.com/docs/costumes/ ·
   https://shiftlefter.com/docs/hooks/ · https://shiftlefter.com/docs/extending-vocabulary/ ·
   https://shiftlefter.com/docs/ci/
-- Architecture reports (how it is built, checked against the source):
+- Architecture reports (how it is built, checked against the source);
+  index: https://shiftlefter.com/docs/architecture/
   https://shiftlefter.com/docs/architecture/invocation-map/ ·
   https://shiftlefter.com/docs/architecture/module-map/ ·
   https://shiftlefter.com/docs/architecture/control-loop/ ·
   https://shiftlefter.com/docs/architecture/data-shapes/ ·
-  https://shiftlefter.com/docs/architecture/repl-lifetimes/
+  https://shiftlefter.com/docs/architecture/repl-lifetimes/ ·
+  https://shiftlefter.com/docs/architecture/exit-codes/
 
 ## Docs in the repository
 
