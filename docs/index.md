@@ -20,13 +20,15 @@ permalink: /docs/
   </ul>
 
   <h2>Architecture</h2>
-  <p>Five reports, each checked against the code itself rather than drawn from memory. They date themselves; read the stamp.</p>
+  <p>Six reports and an index page, each checked against the code itself rather than drawn from memory. They date themselves; read the stamp.</p>
   <ul>
+    <li><a href="/docs/architecture/">The Architecture Pages</a><span>The front door: six documents, one method — each page checked against the code it describes, on a recorded date, by a stated procedure.</span></li>
     <li><a href="/docs/architecture/invocation-map/">The Invocation Map</a><span>Every <code>sl</code> verb through the shared spine — one dispatch, cold and warm alike.</span></li>
     <li><a href="/docs/architecture/module-map/">Module Map</a><span>The namespace dependency graph as extracted from the require forms, with the laws it is checked against.</span></li>
     <li><a href="/docs/architecture/control-loop/">The Control Loop</a><span>Inside one scenario's execution: provisioning, hooks, the step loop, capture, cleanup, verdict.</span></li>
     <li><a href="/docs/architecture/data-shapes/">The Data-Shape Ledger</a><span>Every boundary-crossing shape with its producer, spec, consumers, and stability promise.</span></li>
     <li><a href="/docs/architecture/repl-lifetimes/">REPL Custody &amp; Lifetimes</a><span>Who owns what in the REPL and the daemon, and how long each thing lives.</span></li>
+    <li><a href="/docs/architecture/exit-codes/">Exit Codes</a><span>The ladder: five codes, the axis that orders them, and the error-class contract that keeps a green honest.</span></li>
   </ul>
 
   <p class="note">Not here on purpose: the generated API reference and the agent-facing doctrine topics — those live in the repository and travel with each release.</p>

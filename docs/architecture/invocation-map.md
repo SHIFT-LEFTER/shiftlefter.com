@@ -6,7 +6,7 @@ kind: Architecture
 permalink: /docs/architecture/invocation-map/
 source: docs/architecture/invocation-map.md
 source_url: https://github.com/shift-lefter/shiftlefter/blob/main/docs/architecture/invocation-map.md
-synced_from: b17cb676
+synced_from: a426a777
 ---
 {% raw %}
 
@@ -54,9 +54,12 @@ the run's own discovery/parse/bind stages rather than a second reader.
 {: id="lanes"}
 ## Lanes
 
-Every branch of the dispatch `cond` (`core.clj:917-1030`), one row each.
-"Enters at" is the branch's command fn; codes marked ✓ were produced by a
-live run.
+Every branch of the dispatch `cond` (`core.clj:918-1033`; **18 branches**
+at the 2026-09-03 re-stamp — the `run --dry-run` + `--html`/`--junit-xml`
+refusal arm retired for 0.5.6; freshness-guarded by the test suite), one row
+each — sub-verb rows (`run --dry-run`, `costume …`, `daemon …`) expand a
+branch. "Enters at" is the branch's command fn; codes marked ✓ were
+produced by a live run.
 
 | Verb | Enters at | Stops at | Emits | Exit codes (live-verified ✓) |
 |---|---|---|---|---|
@@ -75,7 +78,7 @@ live run.
 | `costume list` | core.clj:751 | wardrobe read | costume table + liveness | 0 ✓ |
 | `costume destroy` | core.clj:772 | wardrobe delete (refuses while live unless `--force`) | removal confirmation | 0 · 1 refused/failed · 2 usage (code-read) |
 | `doctor` | `doctor.clj:629` | probe registry (machine pre-flight; no feature corpus) | probe table; `--list`; `--edn` | 0 all ok · 1 issues found ✓ |
-| `init` | `init/init-cmd` init.clj (branch core.clj) | scaffold write: `sl/` config + glossary + starter feature; AGENTS.md only on `--write-agents` (marker-guarded; the default prints the offer); bails touch-nothing if `sl/shiftlefter.edn` exists, except the explicit `--write-agents` ask still lands | one line per artifact; AGENTS.md offer or outcome | 0 scaffolded AND 0 bailed (code-read; deliberately absent from `--help` until system-wide distribution) |
+| `init` | `init/init-cmd` init.clj:206 (branch core.clj:1021) | scaffold write: `sl/` config + glossary + starter feature; AGENTS.md only on `--write-agents` (marker-guarded; the default prints the offer); bails touch-nothing if `sl/shiftlefter.edn` exists, except the explicit `--write-agents` ask still lands | one line per artifact; AGENTS.md offer or outcome | 0 scaffolded AND 0 bailed (code-read; deliberately absent from `--help` until system-wide distribution) |
 | `daemon serve` | `daemon-cmd` core.clj:810 | long-lived JVM serving `dispatch` over the wire (auto-spawned by `bin/sl`) | socket + port file | blocks; lifecycle codes on the client side |
 | `daemon status` | core.clj:810 | registry read | daemon record (port/pid/jar) | 0 ✓ |
 | `daemon stop` | core.clj:810 | signal + reap | stopped confirmation | 0 ✓ |
@@ -98,11 +101,15 @@ guard-tested against the docs (`exit-contract-guard-test`):
 | 1 | `:failed` | ≥1 scenario failed (valid tests, app wrong) |
 | 2 | `:planning-failed` | invalid before execution — nothing ran (config/parse/discovery/binding, un-runnable invocation, empty selection) |
 | 3 | `:crashed` | runner crash; wins over everything (cold and warm paths both map Throwable → 3) |
-| 4 | `:degraded` | ≥1 scenario `:error` — infrastructure failure; verdict about the app unavailable |
+| 4 | `:degraded` | ≥1 scenario `:error` — the harness family (counted `error`) or a step classified `:error/class :observation` by its adapter (counted `unobserved`); verdict about the app unavailable for those scenarios |
 
 Precedence: 3 anywhere; 2 pre-execution exclusive; execution worst-wins
-4 > 1 > 0. Non-run verbs reuse 0/1/2 with verb-local meanings (noted per
-lane above); none of them can produce 3/4 short of a crash.
+4 > 1 > 0. The axis: 0/1 are verdicts about the app; 2/3/4 are three ways
+the run failed to be a measurement, located by whose side gave way (your
+request / SL's code / the observation channel) — [the exit-codes
+ladder](/docs/architecture/exit-codes/).
+Non-run verbs reuse 0/1/2 with verb-local meanings (noted per lane above);
+none of them can produce 3/4 short of a crash.
 
 
 {: id="siblings"}
@@ -120,12 +127,11 @@ lane above); none of them can produce 3/4 short of a crash.
   failure path's honest exit.
 
 
-{: id="how-this-map-stays-true"}
-## How this map stays true
+{: id="how-this-page-stays-true"}
+## How this page stays true
 
-This page is a mechanical projection of a live-maintained internal map:
-re-verified against the code by probe runs at each re-stamp, regenerated —
-never hand-edited — by the derivation pipeline, and drift-guarded by the
-test suite (a hand edit here fails a test). File:line pins are re-verified
-at each re-stamp.
+This page is a mechanical projection of a live-maintained internal source,
+regenerated — never hand-edited — by the derivation pipeline and
+drift-guarded by the test suite: a hand edit here fails a test, and so
+does a page that no longer matches its source.
 {% endraw %}

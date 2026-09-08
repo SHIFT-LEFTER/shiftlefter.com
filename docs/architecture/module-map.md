@@ -6,14 +6,20 @@ kind: Architecture
 permalink: /docs/architecture/module-map/
 source: docs/architecture/module-map.md
 source_url: https://github.com/shift-lefter/shiftlefter/blob/main/docs/architecture/module-map.md
-synced_from: b17cb676
+synced_from: a426a777
 ---
 {% raw %}
 
 Arrows below are EXTRACTED from `(:require …)` forms across
-`src/shiftlefter/**/*.clj` (525 rows at the 2026-08-26 re-extraction), not
-drawn from memory. Raw edge list: regenerate with the one-liner in
-§ Method.
+`src/shiftlefter/**/*.clj` — **316 require edges** at the 2026-08-30
+re-extraction (distinct `shiftlefter.*` → `shiftlefter.*` pairs, require
+forms only; freshness-guarded by the test suite, which re-runs the
+extraction and fails when this stamp disagrees with the code) — not drawn
+from memory. Raw edge list: regenerate with the one-liner in § Method.
+Re-stamped the same day (+2 over the 314 the basis change
+measured): `stepengine.exec` and `stepengine.exec.step-loop` now require
+`shiftlefter.step` for the shared `error-classes` literal — the guard's
+first live catch.
 
 
 {: id="the-intended-shape-the-laws-as-practiced"}
@@ -35,8 +41,10 @@ formerly-excepted edge now points down into substrate. The dotted
 SVO→CONFIG arrow is the language layer consuming ONLY the cluster's
 `shiftlefter.text` did-you-mean substrate (`svo/{validate,bindings_lint}
 → text`); no svo namespace requires `shiftlefter.config` itself — the
-raw-token row `svo/validate → shiftlefter.config` in the edge list is a
-docstring mention, not a require.
+`svo/validate → shiftlefter.config` row the earlier token grep produced
+was a docstring mention, not a require, and the require-only edge list
+does not carry it (the freshness guard pins that row as its live
+anti-flap fixture).
 
 
 {: id="verdict"}
@@ -51,23 +59,36 @@ is a clean leaf (law 3 passes with zero violations).
 {: id="method"}
 ## Method
 
+The raw edge list, `source-ns -> target-ns`, from the repo root:
+
 ```bash
-for f in $(find src/shiftlefter -name "*.clj"); do
-  ns=$(basename $f .clj); dir=$(dirname $f | sed 's|src/shiftlefter/*||')
-  grep -o "shiftlefter\.[a-z0-9.-]*" $f | sort -u | sed "s|^|${dir:-ROOT}/$ns -> |"
-done
+clojure -M -e "(require 'shiftlefter.arch-doc.freshness)
+  (run! (fn [[a b]] (println a \"->\" b))
+        (shiftlefter.arch-doc.freshness/require-edges \"src/shiftlefter\"))"
 ```
+
+The extraction (`src/shiftlefter/arch_doc/freshness.clj`) reads each
+file's `ns` form as data and walks its `(:require …)` specs (bare symbols,
+`[lib :as x]` vectors, prefix lists), keeping `shiftlefter.*` targets — so
+a docstring or comment that names a namespace is not an edge. The same
+code runs inside the test suite (`shiftlefter.arch-doc.freshness-test`),
+which compares the live edge count to the bold stamp in the header above
+and fails naming the remedy: update the stamp (count and date), re-run
+the extraction, regenerate this page. The earlier method — a
+`grep -o "shiftlefter\.[a-z0-9.-]*"` over each file — counted qualified
+names in prose and each file's own `ns` line too; its 525 rows
+(2026-08-26) against 314 real edges (2026-08-30) is that noise, not a
+relocation, and it is retired so a re-stamp cannot quote it again.
 
 Cluster-level aggregate: `awk` the first path segment of each side, count
 distinct arrows. Re-run after any relocation to verify the arrows moved.
 
 
-{: id="how-this-map-stays-true"}
-## How this map stays true
+{: id="how-this-page-stays-true"}
+## How this page stays true
 
-This page is a mechanical projection of a live-maintained internal map:
-re-verified against the code by probe runs at each re-stamp, regenerated —
-never hand-edited — by the derivation pipeline, and drift-guarded by the
-test suite (a hand edit here fails a test). File:line pins are re-verified
-at each re-stamp.
+This page is a mechanical projection of a live-maintained internal source,
+regenerated — never hand-edited — by the derivation pipeline and
+drift-guarded by the test suite: a hand edit here fails a test, and so
+does a page that no longer matches its source.
 {% endraw %}

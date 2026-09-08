@@ -6,7 +6,7 @@ kind: Architecture
 permalink: /docs/architecture/control-loop/
 source: docs/architecture/control-loop.md
 source_url: https://github.com/shift-lefter/shiftlefter/blob/main/docs/architecture/control-loop.md
-synced_from: b17cb676
+synced_from: a426a777
 ---
 {% raw %}
 
@@ -259,7 +259,7 @@ wrapper placement, not runtime checks: oracles retry, mutations never,
 negation doesn't wait (`step.clj:41-55`, `browser.clj:97-100`). User
 prose: [extending-vocabulary § Timing](/docs/extending-vocabulary/).
 
-**Capture — two sites, one ruled matrix.** Per-step site
+**Capture — two sites, one matrix.** Per-step site
 (`step_loop.clj:267-272`): `:every-step` follows the acting subject, all
 kinds; `:on-failure` fires **on `:failed` only** — provisioning failures
 have no settled instant to witness, Before failures never reach the loop,
@@ -320,12 +320,11 @@ a separate synchronous plane (`core.clj:231-235`).
   pins what that page teaches.
 
 
-{: id="how-this-map-stays-true"}
-## How this map stays true
+{: id="how-this-page-stays-true"}
+## How this page stays true
 
-This page is a mechanical projection of a live-maintained internal map:
-re-verified against the code by probe runs at each re-stamp, regenerated —
-never hand-edited — by the derivation pipeline, and drift-guarded by the
-test suite (a hand edit here fails a test). File:line pins are re-verified
-at each re-stamp.
+This page is a mechanical projection of a live-maintained internal source,
+regenerated — never hand-edited — by the derivation pipeline and
+drift-guarded by the test suite: a hand edit here fails a test, and so
+does a page that no longer matches its source.
 {% endraw %}

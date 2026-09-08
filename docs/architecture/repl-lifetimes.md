@@ -6,7 +6,7 @@ kind: Architecture
 permalink: /docs/architecture/repl-lifetimes/
 source: docs/architecture/repl-lifetimes.md
 source_url: https://github.com/shift-lefter/shiftlefter/blob/main/docs/architecture/repl-lifetimes.md
-synced_from: b17cb676
+synced_from: a426a777
 ---
 {% raw %}
 
@@ -213,12 +213,11 @@ re-authentication needs) was unreachable without dropping to internals.
   reapers own.
 
 
-{: id="how-this-map-stays-true"}
-## How this map stays true
+{: id="how-this-page-stays-true"}
+## How this page stays true
 
-This page is a mechanical projection of a live-maintained internal map:
-re-verified against the code by probe runs at each re-stamp, regenerated —
-never hand-edited — by the derivation pipeline, and drift-guarded by the
-test suite (a hand edit here fails a test). File:line pins are re-verified
-at each re-stamp.
+This page is a mechanical projection of a live-maintained internal source,
+regenerated — never hand-edited — by the derivation pipeline and
+drift-guarded by the test suite: a hand edit here fails a test, and so
+does a page that no longer matches its source.
 {% endraw %}

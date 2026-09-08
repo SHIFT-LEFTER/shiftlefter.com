@@ -5,7 +5,7 @@ kind: Guide
 permalink: /docs/costumes/
 source: docs/COSTUMES.md
 source_url: https://github.com/shift-lefter/shiftlefter/blob/main/docs/COSTUMES.md
-synced_from: 99cba96a
+synced_from: a426a777
 ---
 {% raw %}
 

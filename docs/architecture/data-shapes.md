@@ -6,7 +6,7 @@ kind: Architecture
 permalink: /docs/architecture/data-shapes/
 source: docs/architecture/data-shapes.md
 source_url: https://github.com/shift-lefter/shiftlefter/blob/main/docs/architecture/data-shapes.md
-synced_from: b17cb676
+synced_from: a426a777
 ---
 {% raw %}
 
@@ -27,7 +27,7 @@ run.
 
 Two files enter (the project's `shiftlefter.edn`, the machine's
 `~/.shiftlefter/config.edn`); `project-context/resolve` turns cwd + flags
-into location facts; `runner.config/load-config` merges and validates the
+into location facts; `shiftlefter.config/load-config` merges and validates the
 project config. From there the chain forks and rejoins: the **run leg**
 loads glossary + intents, parses features into pickles, binds them into
 run plans (where the SVO map is stamped), threads a ctx stash through
@@ -61,21 +61,21 @@ contract is docstring/doc, see § Stability tiers).
 
 | Shape | Producer | Spec | Consumers | Stability |
 |---|---|---|---|---|
-| loaded config map | `runner.config/load-config` config.clj:326 (safe wrapper :400; `normalize` :792; `lint-config` :556) | `::config` config.clj:154 + ~44 sub-specs (`::runner` :98, `::interfaces` :129, `::costumes` :136 + `::costume-def` :135, `::svo` :145, `::glossaries` :151, `::timing` :109, …) | projection (project_projection.clj:94), run pipeline (runner/core.clj:622), doctor, repl, usage-index; all downstream reads go through the accessor surface config.clj:417-511, :831-918 | additive; unknown top-level keys are WARNINGS never errors (forward-compat ruling, config.clj:556-568) |
+| loaded config map | `shiftlefter.config/load-config` config.clj:392 (safe wrapper `load-config-safe` :492; `normalize` :1068; `lint-config` :670) | `::config` config.clj:189 + ~44 sub-specs (`::runner` :123, `::interfaces` :159, `::costumes` :166 + `::costume-def` :165, `::svo` :175, `::glossaries` :186, `::timing` :135, …) | projection (project_projection.clj:94), run pipeline (runner/core.clj:622), doctor, repl, usage-index; all downstream reads go through the accessor surface config.clj:509-624, :1121-1215 | additive; unknown top-level keys are WARNINGS never errors (forward-compat rule, config.clj:677-697) |
 
 - Top-level key set:
   `#{:parser :runner :glossaries :interfaces :costumes :svo :timing}`
-  (`known-top-level-keys` config.clj:520-528). `:errors` is synthetic,
+  (`known-top-level-keys` config.clj:633). `:errors` is synthetic,
   added only by `normalize`.
-- **Mode invariant (config.clj:339-343):** the loaded map
+- **Mode invariant (config.clj:405-411):** the loaded map
   contains `:svo` iff the user's file did. `:svo` presence IS Shifted
   mode — `stepengine/compile.clj:62` and `project_projection.clj:471`
   both key on it.
-- **The one computed default (config.clj:307):**
+- **The one computed default (config.clj:350):**
   `:unknown-object` flips to `:warn` iff `[:glossaries :intents]` is
   configured, else `:off` — `apply-conditional-object-default` is the
   single place this is decided (visible live in the trace below).
-- Conventional glossary probing (config.clj:278) runs only when
+- Conventional glossary probing (config.clj:313) runs only when
   the user config has no `:glossaries` key at all — whole-map semantics.
 - Nested maps (`:interfaces` entries, adapter `:config`) are open by
   design; `:webdriver`/`:webdriver-url` deliberately excluded.
@@ -98,7 +98,7 @@ contract is docstring/doc, see § Stability tiers).
 
 | Shape | Producer | Spec | Consumers | Stability |
 |---|---|---|---|---|
-| project-context map | `project-context/resolve` project_context.clj:153; resolved once per invocation at core.clj:913, threaded as opts `:project-context` | — | runner.config :248/:348, projection :68-96, runner.core :179-213, results.clj :69/:130, teardown-marker :37, wardrobe :65, usage-index :76, daemon :150, doctor, orient, resolution | doc-contract; ownership rule "location facts only, prints nothing, diagnostics are data" (ns docstring) |
+| project-context map | `project-context/resolve` project_context.clj:153; resolved once per invocation at core.clj:913, threaded as opts `:project-context` | — | config.clj :295/:307/:433, projection :68-96, runner.core :179-213, results.clj :69/:130, teardown-marker :37, wardrobe :65, usage-index :76, daemon :150, doctor, orient, resolution | doc-contract; ownership rule "location facts only, prints nothing, diagnostics are data" (ns docstring) |
 
 - Key set: `:invocation-root :workspace-root :project-root :config-root
   :config-path :config-source :layout :portable? :diagnostics`
@@ -154,7 +154,7 @@ contract is docstring/doc, see § Stability tiers).
 |---|---|---|---|---|
 | resolution EDN maps | `glossary-edn` resolution.clj:355, `explain-edn` :843, `locator-owners-edn` :857, `vanilla-edn` :80, no-project :105 | — | external tooling/agents (the machine surface) | `:resolution/version` = 1 (resolution.clj:42) on all five shapes; "`--edn` is the stable machine surface; the human format is EXPLICITLY UNSTABLE — do not parse it" (ns docstring) |
 
-- **Structural wording discipline (addendum 2):** full-corpus
+- **Structural wording discipline:** full-corpus
   entries carry `:unused?`, scoped selections carry
   `:referenced-in-selection?` — distinct keys so a consumer cannot read a
   scoped verdict as deletion license (`marker-keys` resolution.clj:203).
@@ -287,9 +287,8 @@ contract is docstring/doc, see § Stability tiers).
 | run result | `execute!` runner/core.clj:1885 → :1264-1280 | — (component specs: `:shiftlefter.runner.run/status` reporter.clj:131) | CLI exit path, programmatic callers | `{:exit-code :run-id :status :counts :result}` + opt `:dropped-events :results-dir :group-root`; `:result` is the RAW exec result BY DESIGN (core.clj:1282-1285) — envelopes are a projection, programmatic callers keep fidelity |
 
 - The exit-code table is its own locked contract (verdict.clj:37): locked
-  at 0.5.1, reopened STRENGTHEN-ONLY for the 0.5.5 window,
-  re-locks at the contracts release — see invocation-map § verdict
-  contract.
+  at 0.5.1, reopened STRENGTHEN-ONLY from 0.5.5 and held that
+  way through the 0.5.x line — see invocation-map § verdict contract.
 
 
 {: id="12-reporter-envelopes--the-seam"}
@@ -299,7 +298,7 @@ contract is docstring/doc, see § Stability tiers).
 |---|---|---|---|---|
 | scenario envelope | `reporter/scenario-envelope` reporter.clj:263 (ALLOWLIST projection) | `::scenario-result` reporter.clj:122 (req only `::status`) | all reporters, HTML island, bus payloads | drops `:scenario-ctx`, `:plan/steps`, `:capability-cleanup` — live objects die here |
 | error envelope | `reporter/error-envelope` reporter.clj:241 | — | failures sections | `:value` is `pr-edn-str`'d exactly ONCE here; downstream passes through, never re-encodes (edn.clj:108-117) |
-| run-ctx | `run-start-ctx` runner/core.clj:491 (+ `:results-dir`/`:artifacts-root` merged :1191-1195) | `::run-ctx` reporter.clj:117 | reporters `on-run-start`, JUnit properties | "deliberately open maps; keys added by later beads must extend, never break" (reporter.clj:77-81) |
+| run-ctx | `run-start-ctx` runner/core.clj:491 (+ `:results-dir`/`:artifacts-root` merged :1191-1195) | `::run-ctx` reporter.clj:117 | reporters `on-run-start`, JUnit properties | "deliberately open maps; keys added later must extend, never break" (reporter.clj:77-81) |
 | run summary | runner/core.clj:1266-1276 | `::run-summary` reporter.clj:139 | reporters `on-run-end` | `::dropped-events` pos-int? — the absent-when-zero anomaly-marker convention |
 
 - **Four load-bearing invariants** (reporter.clj:15-71 — marked
@@ -375,7 +374,7 @@ guarantee tracks who consumes the shape:
 
 | Tier | Guarantee | Shapes |
 |---|---|---|
-| **Locked** | keys additive, never repurposed; doc + goldens are the contract; no version key needed | `--edn` run summary, bus event envelope, attachment refs, exit-code table (strengthen-only until the contracts release) |
+| **Locked** | keys additive, never repurposed; doc + goldens are the contract; no version key needed | `--edn` run summary, bus event envelope, attachment refs, exit-code table (strengthen-only through the 0.5.x line) |
 | **Version-int** | `*/version` integer stamped on every emission; bump = breaking | projection (`:projection/version` + fingerprint key-set), resolution outputs (`:resolution/version`), macro entries (`:representation-version`) |
 | **Spec'd additive** | registered `s/keys` specs, mostly `:opt-un`/open; boundary validation on load | project config, glossary, pickles, bind shapes, exec results, reporter run-ctx/summary |
 | **Reserved-namespace** | key FAMILIES are the contract, map stays open | ctx stash (`:cap/*` `:run/*` `:sl/*`; open ctx until the 0.6 write-fence) |
@@ -529,12 +528,11 @@ No `summary.edn` — the record went to stdout.
   (station 10's time-axis half).
 
 
-{: id="how-this-map-stays-true"}
-## How this map stays true
+{: id="how-this-page-stays-true"}
+## How this page stays true
 
-This page is a mechanical projection of a live-maintained internal map:
-re-verified against the code by probe runs at each re-stamp, regenerated —
-never hand-edited — by the derivation pipeline, and drift-guarded by the
-test suite (a hand edit here fails a test). File:line pins are re-verified
-at each re-stamp.
+This page is a mechanical projection of a live-maintained internal source,
+regenerated — never hand-edited — by the derivation pipeline and
+drift-guarded by the test suite: a hand edit here fails a test, and so
+does a page that no longer matches its source.
 {% endraw %}
