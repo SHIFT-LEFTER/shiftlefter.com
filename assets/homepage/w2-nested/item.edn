@@ -1,0 +1,7 @@
+;; Item — a self-rooted cart row: name, price, status, remove button.
+{:intent "Item"
+ :root {:web {:css "[data-testid='item']"}}
+ :elements {:name   {:bindings {:web {:css "[data-testid='name']"}}}
+            :price  {:bindings {:web {:css "[data-testid='price']"}}}
+            :status {:bindings {:web {:css "[data-testid='status']"}}}
+            :remove {:bindings {:web {:css "[data-testid='remove']"}}}}}

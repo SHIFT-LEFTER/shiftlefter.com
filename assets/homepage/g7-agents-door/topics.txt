@@ -1,0 +1,18 @@
+Available agent-doc topics:
+  intro        What ShiftLefter is, the agent surface, and project-fit pointer.
+  adoption     Bring existing Gherkin: what parses today, what `sl run` reports, what shifting a suite means.
+  overview     Operating model and command map for fresh agents.
+  layout       The project-contents contract: what you bring, what the framework writes.
+  authoring    Subjects, instances, Shifted syntax, and step authoring rules.
+  grammar      The authored grammar: every marker, slot kinds, reserved forms, key names.
+  vocabulary   Glossaries, interfaces, verbs, intents, and partial vocabulary.
+  locators     Intent references, raw locator fallback, and brittleness policy.
+  diagnostics  Unknown subject, verb, interface, and object diagnostics.
+  resolution   sl glossary + sl explain: the resolved vocabulary, provenance, bindings.
+  hooks        Scenario lifecycle hooks: hooks.clj registry, @hook= tags, ordering, failure semantics.
+  lifecycle    Two-phase run model: plan guarantees, the execution weave, failure semantics by stage, parallelism.
+  exit-codes   Exit-code decision procedure: the ladder table, per-exit imperatives, the classification razor.
+  sieve        Vocabulary bootstrap and proposal reconciliation workflow.
+  examples     Generated worked examples: config, glossaries, intents, features, setup.clj.
+  builtins     Generated reference: built-in verbs, frames, step patterns, adapters.
+# exit 0

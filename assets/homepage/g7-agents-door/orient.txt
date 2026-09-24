@@ -1,0 +1,49 @@
+# Orientation
+
+Project checks: ok · fingerprint: 0bef2b76db5f0440270598c2b15c576bfe929ffab25c5d1c6333b0ebc24738dc
+
+## Project context
+
+- project-root: <project>
+- config-root: sl
+- config-path: sl/shiftlefter.edn
+- layout: :sl-directory
+- config-source: :discovered
+
+## Counts
+
+- subjects: 1 · instances: 2 · interfaces: 1
+- verbs: 30 · intents: 0 · stepdefs: 49 · macros: 0
+- diagnostics: 0
+
+## Project checks
+
+Checked: config, glossaries, step files, stepdefs against the glossary, macros, setup declarations.
+Not checked: your features — orient does not read them. `sl run --dry-run` (under Validate / run) is the gate for features.
+
+No diagnostics from these checks.
+
+## Validate / run
+
+- `sl run`
+- `sl run --dry-run`
+
+## Static knowledge (read these)
+
+- `sl agent-doc intro`
+- `sl agent-doc adoption`
+- `sl agent-doc overview`
+- `sl agent-doc layout`
+- `sl agent-doc authoring`
+- `sl agent-doc grammar`
+- `sl agent-doc vocabulary`
+- `sl agent-doc locators`
+- `sl agent-doc diagnostics`
+- `sl agent-doc resolution`
+- `sl agent-doc hooks`
+- `sl agent-doc lifecycle`
+- `sl agent-doc exit-codes`
+- `sl agent-doc sieve`
+- `sl agent-doc examples`
+- `sl agent-doc builtins`
+# exit 0

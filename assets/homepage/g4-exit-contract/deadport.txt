@@ -1,0 +1,15 @@
+run seed: <seed>
+UNOBSERVED The app is not listening
+
+Failures:
+
+Scenario: The app is not listening
+  1) :user/reader opens the browser to 'http://127.0.0.1:9999/'
+     at shiftlefter/stepdefs/browser.clj:659
+     Error: SUT unreachable: ERR_CONNECTION_REFUSED for http://127.0.0.1:9999/
+     class: observation — no answer existed; this step proves nothing about the app
+     Data: {:response {:value {:error "unknown error", :message "unknown error: net::ERR_CONNECTION_REFUSED\n  (Session info: chrome=153.0.8010.53)"}}, :path "session/<id>/url", :method :post, :type :etaoin/http-error, :port <port>, :host "127.0.0.1", :status 500, :url "http://127.0.0.1:9999/", :error/class :observation, :net-error "ERR_CONNECTION_REFUSED"}
+
+
+1 scenario(s): 1 unobserved
+# exit 4

@@ -1,0 +1,195 @@
+[{:scenario/name "Two users login simultaneously",
+  :uri "sl/features/two-users.feature",
+  :line 3,
+  :steps
+  [{:step/text ":user/alice opens the browser to 'http://127.0.0.1:9095/login'",
+    :line 4,
+    :column 5,
+    :step/resolved
+    {:pattern-src
+     ":([\\w./-]+) opens the browser to ('(?:[^']|'')+'|\\{[A-Za-z][A-Za-z0-9]*(?:\\.[A-Za-z][A-Za-z0-9]*)*\\}|[A-Z][A-Za-z0-9_-]*(?:\\.[A-Za-z0-9_-]+)*)",
+     :stepdef-source
+     {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 659},
+     :subject :user/alice,
+     :verb :navigate,
+     :frame :to,
+     :object "'http://127.0.0.1:9095/login'",
+     :interface :web,
+     :interface-type :web}}
+   {:step/text ":user/alice fills {:id \"username\"} with 'alice'",
+    :line 5,
+    :column 5,
+    :step/resolved
+    {:pattern-src
+     ":([\\w./-]+) fills ([A-Z][A-Za-z0-9_-]*(?:\\.[a-z][a-z0-9_-]*(?:\\[-?\\d+\\]|\\[\\*\\])?)+|\\{[^}]+\\}) with ('(?:[^']|'')+'|\\{[A-Za-z][A-Za-z0-9]*(?:\\.[A-Za-z][A-Za-z0-9]*)*\\})",
+     :stepdef-source
+     {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 730},
+     :subject :user/alice,
+     :verb :fill,
+     :frame :with,
+     :object "{:id \"username\"}",
+     :interface :web,
+     :interface-type :web}}
+   {:step/text ":user/alice fills {:id \"password\"} with 'secret1'",
+    :line 6,
+    :column 5,
+    :step/resolved
+    {:pattern-src
+     ":([\\w./-]+) fills ([A-Z][A-Za-z0-9_-]*(?:\\.[a-z][a-z0-9_-]*(?:\\[-?\\d+\\]|\\[\\*\\])?)+|\\{[^}]+\\}) with ('(?:[^']|'')+'|\\{[A-Za-z][A-Za-z0-9]*(?:\\.[A-Za-z][A-Za-z0-9]*)*\\})",
+     :stepdef-source
+     {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 730},
+     :subject :user/alice,
+     :verb :fill,
+     :frame :with,
+     :object "{:id \"password\"}",
+     :interface :web,
+     :interface-type :web}}
+   {:step/text ":user/alice clicks {:css \"button[type='submit']\"}",
+    :line 7,
+    :column 5,
+    :step/resolved
+    {:pattern-src
+     ":([\\w./-]+) clicks ([A-Z][A-Za-z0-9_-]*(?:\\.[a-z][a-z0-9_-]*(?:\\[-?\\d+\\]|\\[\\*\\])?)+|\\{[^}]+\\})",
+     :stepdef-source
+     {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 675},
+     :subject :user/alice,
+     :verb :click,
+     :frame :default,
+     :object "{:css \"button[type='submit']\"}",
+     :interface :web,
+     :interface-type :web}}
+   {:step/text ":user/alice should see 'Welcome, alice!'",
+    :line 8,
+    :column 5,
+    :step/resolved
+    {:pattern-src ":([\\w./-]+) should see '((?:[^']|'')+)'",
+     :stepdef-source
+     {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 882},
+     :subject :user/alice,
+     :verb :see,
+     :frame :on-page,
+     :object "Welcome, alice!",
+     :interface :web,
+     :interface-type :web}}
+   {:step/text ":user/bob opens the browser to 'http://127.0.0.1:9095/login'",
+    :line 9,
+    :column 5,
+    :step/resolved
+    {:pattern-src
+     ":([\\w./-]+) opens the browser to ('(?:[^']|'')+'|\\{[A-Za-z][A-Za-z0-9]*(?:\\.[A-Za-z][A-Za-z0-9]*)*\\}|[A-Z][A-Za-z0-9_-]*(?:\\.[A-Za-z0-9_-]+)*)",
+     :stepdef-source
+     {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 659},
+     :subject :user/bob,
+     :verb :navigate,
+     :frame :to,
+     :object "'http://127.0.0.1:9095/login'",
+     :interface :web,
+     :interface-type :web}}
+   {:step/text ":user/bob fills {:id \"username\"} with 'bob'",
+    :line 10,
+    :column 5,
+    :step/resolved
+    {:pattern-src
+     ":([\\w./-]+) fills ([A-Z][A-Za-z0-9_-]*(?:\\.[a-z][a-z0-9_-]*(?:\\[-?\\d+\\]|\\[\\*\\])?)+|\\{[^}]+\\}) with ('(?:[^']|'')+'|\\{[A-Za-z][A-Za-z0-9]*(?:\\.[A-Za-z][A-Za-z0-9]*)*\\})",
+     :stepdef-source
+     {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 730},
+     :subject :user/bob,
+     :verb :fill,
+     :frame :with,
+     :object "{:id \"username\"}",
+     :interface :web,
+     :interface-type :web}}
+   {:step/text ":user/bob fills {:id \"password\"} with 'secret2'",
+    :line 11,
+    :column 5,
+    :step/resolved
+    {:pattern-src
+     ":([\\w./-]+) fills ([A-Z][A-Za-z0-9_-]*(?:\\.[a-z][a-z0-9_-]*(?:\\[-?\\d+\\]|\\[\\*\\])?)+|\\{[^}]+\\}) with ('(?:[^']|'')+'|\\{[A-Za-z][A-Za-z0-9]*(?:\\.[A-Za-z][A-Za-z0-9]*)*\\})",
+     :stepdef-source
+     {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 730},
+     :subject :user/bob,
+     :verb :fill,
+     :frame :with,
+     :object "{:id \"password\"}",
+     :interface :web,
+     :interface-type :web}}
+   {:step/text ":user/bob clicks {:css \"button[type='submit']\"}",
+    :line 12,
+    :column 5,
+    :step/resolved
+    {:pattern-src
+     ":([\\w./-]+) clicks ([A-Z][A-Za-z0-9_-]*(?:\\.[a-z][a-z0-9_-]*(?:\\[-?\\d+\\]|\\[\\*\\])?)+|\\{[^}]+\\})",
+     :stepdef-source
+     {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 675},
+     :subject :user/bob,
+     :verb :click,
+     :frame :default,
+     :object "{:css \"button[type='submit']\"}",
+     :interface :web,
+     :interface-type :web}}
+   {:step/text ":user/bob should see 'Welcome, bob!'",
+    :line 13,
+    :column 5,
+    :step/resolved
+    {:pattern-src ":([\\w./-]+) should see '((?:[^']|'')+)'",
+     :stepdef-source
+     {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 882},
+     :subject :user/bob,
+     :verb :see,
+     :frame :on-page,
+     :object "Welcome, bob!",
+     :interface :web,
+     :interface-type :web}}
+   {:step/text ":user/alice should see 'Welcome, alice!'",
+    :line 14,
+    :column 5,
+    :step/resolved
+    {:pattern-src ":([\\w./-]+) should see '((?:[^']|'')+)'",
+     :stepdef-source
+     {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 882},
+     :subject :user/alice,
+     :verb :see,
+     :frame :on-page,
+     :object "Welcome, alice!",
+     :interface :web,
+     :interface-type :web}}
+   {:step/text ":user/alice should be on '/dashboard'",
+    :line 15,
+    :column 5,
+    :step/resolved
+    {:pattern-src
+     ":([\\w./-]+) should be on ('(?:[^']|'')+'|\\{[A-Za-z][A-Za-z0-9]*(?:\\.[A-Za-z][A-Za-z0-9]*)*\\}|[A-Z][A-Za-z0-9_-]*(?:\\.[A-Za-z0-9_-]+)*)",
+     :stepdef-source
+     {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 1135},
+     :subject :user/alice,
+     :verb :be,
+     :frame :at,
+     :object "'/dashboard'",
+     :interface :web,
+     :interface-type :web}}
+   {:step/text ":user/bob should be on '/dashboard'",
+    :line 16,
+    :column 5,
+    :step/resolved
+    {:pattern-src
+     ":([\\w./-]+) should be on ('(?:[^']|'')+'|\\{[A-Za-z][A-Za-z0-9]*(?:\\.[A-Za-z][A-Za-z0-9]*)*\\}|[A-Z][A-Za-z0-9_-]*(?:\\.[A-Za-z0-9_-]+)*)",
+     :stepdef-source
+     {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 1135},
+     :subject :user/bob,
+     :verb :be,
+     :frame :at,
+     :object "'/dashboard'",
+     :interface :web,
+     :interface-type :web}}
+   {:step/text ":user/alice waits 3 seconds",
+    :line 17,
+    :column 5,
+    :step/resolved
+    {:pattern-src ":([\\w./-]+) waits (\\d+(?:\\.\\d+)?) seconds?",
+     :stepdef-source
+     {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 1257},
+     :subject :user/alice,
+     :verb :wait,
+     :frame :duration,
+     :interface :web,
+     :interface-type :web}}]}]

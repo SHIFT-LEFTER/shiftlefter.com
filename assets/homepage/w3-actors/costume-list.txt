@@ -1,0 +1,2 @@
+No costumes. Create one with: sl costume init <name>
+# exit 0
