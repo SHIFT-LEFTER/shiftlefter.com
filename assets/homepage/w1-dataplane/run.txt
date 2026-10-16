@@ -2,16 +2,4 @@ run seed: <seed>
 PASSED Alice resets her password using a code sent to her phone
 
 1 scenario(s): 1 passed
-
-SVO validation warnings:
-  WARNING: Unknown object 'Enter Verification Code' in step ":user/alice should see 'Enter Verification Code'"
-         at sl/features/password_reset_sms.feature:11
-         Interface: :web
-         Invalid intent reference: "Enter Verification Code". Expected format: Intent.element, Intent.element[n], or a nested address like Intent.collection[n].element. This slot expects an intent reference (Capitalized.dotted); for free text, declare :object-kind :text on the verb's frame
-
-  WARNING: Unknown object 'Code verified for alice' in step ":user/alice should see 'Code verified for alice'"
-         at sl/features/password_reset_sms.feature:15
-         Interface: :web
-         Invalid intent reference: "Code verified for alice". Expected format: Intent.element, Intent.element[n], or a nested address like Intent.collection[n].element. This slot expects an intent reference (Capitalized.dotted); for free text, declare :object-kind :text on the verb's frame
-
 # exit 0
