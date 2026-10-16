@@ -140,26 +140,73 @@ pre code { background:none; padding:0; font-size:1em; }
 .hero p { margin:0 0 1rem; }
 .credo { font-weight:700; }
 .release-line { font-family:var(--sans); font-size:.78rem; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--soft); }
-.twin-cards { max-width:46rem; display:grid; grid-template-columns:minmax(0,1fr); gap:2rem; margin:0 auto 3rem; }
+/* Front page (sl-4l16): the hero failure report, three doors, three tabs
+ * (Write / Get / Promise), the honesty section, the agents door, the
+ * labeled future beat. Every <figure class="artifact"> is a captured file
+ * from assets/homepage/ rendered at build time — see _includes/home-body.html. */
+.hero-report, .plain-terms, .install, .doors, .tabs, .agents, .future { max-width:52rem; margin-left:auto; margin-right:auto; }
+.hero-report h2 { margin-top:0; }
+.hero-report p, .agents p, .future p, .panel > p, .install p { margin:0 0 1rem; }
+.artifact { margin:0 0 1.1rem; }
+.artifact figcaption { font-family:var(--sans); font-size:.72rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--soft); margin:0 0 .35rem; }
+.artifact figcaption code { text-transform:none; letter-spacing:0; font-size:.95em; }
+.artifact pre { margin:0; }
+.artifact img { width:100%; height:auto; display:block; border:1px solid var(--rule); }
+.artifact details { margin-top:.5rem; }
+.artifact summary { font-family:var(--sans); font-size:.76rem; color:var(--soft); cursor:pointer; }
+pre.tall { max-height:22rem; overflow:auto; }
+pre.wrap { white-space:pre-wrap; overflow-wrap:anywhere; }
+.pair { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:1rem; }
+@media (max-width:56rem) { .pair { grid-template-columns:1fr; } }
+.callouts { list-style:none; margin:0 0 1rem; padding:0; }
+.callouts li { border-top:1px solid var(--rule); padding:.7rem 0; margin:0; }
+.ledger { font-family:var(--sans); font-size:.78rem; color:var(--soft); border-left:3px solid var(--accent); padding-left:.7rem; margin:0 0 .9rem; }
+.links { font-family:var(--sans); font-size:.78rem; font-weight:600; letter-spacing:.04em; text-transform:uppercase; margin:0; }
+.plain-terms { margin-bottom:2.5rem; font-size:1.1rem; border-top:2px solid var(--rule-h); border-bottom:1px solid var(--rule); padding:1.1rem 0; }
+.install { background:var(--card); border-top:2px solid var(--rule-h); border-bottom:1px solid var(--rule); padding:1.3rem 1.4rem; margin-bottom:3rem; }
+.install h3, .card h3 { margin:0 0 .7rem; font-family:var(--sans); font-size:.78rem; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); }
+.install pre { margin:0 0 .9rem; }
+.doors { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; margin-bottom:3rem; }
+@media (max-width:56rem) { .doors { grid-template-columns:1fr; } }
+.door { display:block; color:var(--ink); text-decoration:none; background:var(--card); border-top:2px solid var(--rule-h); border-bottom:1px solid var(--rule); padding:1.1rem 1.2rem; }
+.door:hover { border-top-color:var(--accent); color:var(--ink); }
+.door h3 { margin:0 0 .5rem; font-family:var(--sans); font-size:1.05rem; font-weight:800; letter-spacing:-.01em; }
+.door:hover h3 { color:var(--accent); }
+.door p { margin:0; font-size:.95rem; color:var(--soft); }
+.tab-bar { display:flex; gap:0; border-bottom:2px solid var(--rule-h); margin:0 0 1.6rem; font-family:var(--sans); font-size:.8rem; font-weight:800; letter-spacing:.14em; text-transform:uppercase; }
+.tab-bar a { color:var(--soft); text-decoration:none; padding:.7rem 1.1rem .6rem; border-bottom:3px solid transparent; margin-bottom:-2px; }
+.tab-bar a:hover { color:var(--ink); }
+.panel { display:none; scroll-margin-top:4.5rem; }
+.panel h2 { margin-top:0; }
+.panel .card { margin:0 0 1.6rem; }
+.tabs:not(:has(.panel:target)) #write, .panel:target { display:block; }
+.tabs:not(:has(.panel:target)) .tab-bar a[href="#write"], .tabs:has(#write:target) .tab-bar a[href="#write"], .tabs:has(#get:target) .tab-bar a[href="#get"], .tabs:has(#promise:target) .tab-bar a[href="#promise"] { color:var(--ink); border-bottom-color:var(--accent); }
+/* No :has() → nothing to hide behind: every panel stacked, no tab bar. The
+ * stacked preview (preview-stacked.html) and print use the same layout. */
+@supports not selector(:has(a)) { .panel { display:block; } .tab-bar { display:none; } }
+.home--stacked .panel { display:block; margin-bottom:2.5rem; }
+.home--stacked .tab-bar { display:none; }
+@media print { .panel { display:block; } .tab-bar { display:none; } }
 .card { background:var(--card); border-top:2px solid var(--rule-h); border-bottom:1px solid var(--rule); padding:1.3rem 1.4rem; }
-.card h3 { margin:0 0 .7rem; font-family:var(--sans); font-size:.78rem; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); }
 .card p { margin:0 0 .9rem; }
-.card img { width:100%; display:block; border:1px solid var(--rule); }
-.plain-terms { max-width:46rem; margin:0 auto 3rem; font-size:1.1rem; border-top:2px solid var(--rule-h); border-bottom:1px solid var(--rule); padding:1.1rem 0; }
-.does, .agents { max-width:46rem; margin:0 auto; }
-.does p, .agents p { margin:0 0 1rem; }
-.features { list-style:none; margin:0; padding:0; }
-.features > li { border-top:1px solid var(--rule); padding:1.1rem 0 .4rem; }
+.card.promise h3 { font-size:1.05rem; letter-spacing:-.01em; text-transform:none; color:var(--ink); }
+.exit-todo ul { margin:0; padding-left:1.2rem; font-size:.95rem; }
+.exit-todo li { margin:0 0 .4rem; }
+.also { font-size:.95rem; color:var(--soft); border-top:1px solid var(--rule); padding-top:.9rem; }
 .honestly { max-width:72rem; margin:0 auto; }
-.honestly h2 { max-width:46rem; margin-left:auto; margin-right:auto; }
+.honestly h2 { max-width:52rem; margin-left:auto; margin-right:auto; }
 .cols { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:2.5rem; }
 @media (max-width:56rem) { .cols { grid-template-columns:1fr; } }
 .cols h3 { font-family:var(--sans); font-size:.85rem; font-weight:800; letter-spacing:.1em; text-transform:uppercase; margin:0 0 .8rem; }
 .cols ul { margin:0; padding-left:1.2rem; }
 .cols li { margin:0 0 .55rem; }
-.baton { max-width:46rem; margin:2rem auto 0; font-style:italic; color:var(--soft); border-top:1px solid var(--rule); padding-top:1rem; }
+.baton { max-width:52rem; margin:2rem auto 0; font-style:italic; color:var(--soft); border-top:1px solid var(--rule); padding-top:1rem; }
 .agents { margin-top:1rem; }
-.site-footer { max-width:46rem; margin:3rem auto 0; border-top:2px solid var(--rule-h); padding-top:1.4rem; }
+.asterisk { border-top:1px solid var(--rule); padding-top:.9rem; }
+.future { margin-top:3rem; border-top:2px solid var(--rule-h); padding-top:1.4rem; }
+.future .kicker { margin-bottom:0; }
+.future h2 { margin-top:.4rem; }
+.site-footer { max-width:52rem; margin:3rem auto 0; border-top:2px solid var(--rule-h); padding-top:1.4rem; }
 .footer-hello { margin:0 0 .8rem; font-style:italic; }
 .footer-links { display:flex; gap:1.6rem; flex-wrap:wrap; font-family:var(--sans); font-size:.78rem; font-weight:600; letter-spacing:.06em; text-transform:uppercase; margin:0; }
 .colophon { color:var(--soft); font-size:.8rem; margin:2rem 0 0; }

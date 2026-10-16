@@ -1,0 +1,446 @@
+{%- comment -%}
+The front page body (sl-4l16). Rendered by index.html (tabbed) and, until
+Chair rules tabs-vs-stacked, by preview-stacked.html (the same body with the
+tab hiding switched off). Every artifact below is read from
+assets/homepage/<card>/ at build time via include_relative — nothing is typed
+as output; each file's .stamp.edn says which run produced it. Both pages that
+include this partial MUST live at the site root: include_relative resolves
+against the including PAGE's directory, not this file's.
+{%- endcomment -%}
+{%- capture nl %}
+{% endcapture -%}
+{%- assign stacked = include.stacked | default: false -%}
+
+{%- capture g1_snippet %}{% include_relative assets/homepage/g1-failure/snippet.feature %}{% endcapture -%}
+{%- capture g1_junit %}{% include_relative assets/homepage/g1-failure/junit.xml %}{% endcapture -%}
+{%- capture g1_fragment %}{% include_relative assets/homepage/g1-failure/failure-fragment.edn %}{% endcapture -%}
+{%- capture g2_plan %}{% include_relative assets/homepage/g2-before-the-run/plan.txt %}{% endcapture -%}
+{%- capture g2_refusal %}{% include_relative assets/homepage/g2-before-the-run/refusal.txt %}{% endcapture -%}
+{%- capture g2_refusal_feature %}{% include_relative assets/homepage/g2-before-the-run/refusal.feature %}{% endcapture -%}
+{%- capture g4_ladder %}{% include_relative assets/homepage/g4-exit-contract/ladder.txt %}{% endcapture -%}
+{%- capture g4_deadport %}{% include_relative assets/homepage/g4-exit-contract/deadport.txt %}{% endcapture -%}
+{%- capture g7_topic %}{% include_relative assets/homepage/g7-agents-door/topic-exit-codes.txt %}{% endcapture -%}
+{%- capture g7_topics %}{% include_relative assets/homepage/g7-agents-door/topics.txt %}{% endcapture -%}
+{%- capture g7_orient %}{% include_relative assets/homepage/g7-agents-door/orient.txt %}{% endcapture -%}
+{%- capture g7_bring_feature %}{% include_relative assets/homepage/g7-agents-door/bring.feature %}{% endcapture -%}
+{%- capture g7_bring %}{% include_relative assets/homepage/g7-agents-door/bring.txt %}{% endcapture -%}
+{%- capture w1_snippet %}{% include_relative assets/homepage/w1-dataplane/snippet.feature %}{% endcapture -%}
+{%- capture w1_run %}{% include_relative assets/homepage/w1-dataplane/run.txt %}{% endcapture -%}
+{%- capture w2_snippet %}{% include_relative assets/homepage/w2-nested/snippet.feature %}{% endcapture -%}
+{%- capture w2_cart %}{% include_relative assets/homepage/w2-nested/cart.edn %}{% endcapture -%}
+{%- capture w2_item %}{% include_relative assets/homepage/w2-nested/item.edn %}{% endcapture -%}
+{%- capture w2_run %}{% include_relative assets/homepage/w2-nested/run.txt %}{% endcapture -%}
+{%- capture w3_snippet %}{% include_relative assets/homepage/w3-actors/snippet.feature %}{% endcapture -%}
+{%- capture w3_run %}{% include_relative assets/homepage/w3-actors/run.txt %}{% endcapture -%}
+{%- capture w3_glossary %}{% include_relative assets/homepage/w3-actors/glossary.txt %}{% endcapture -%}
+{%- capture w3_costumes %}{% include_relative assets/homepage/w3-actors/costume-list.txt %}{% endcapture -%}
+{%- capture p3_seq %}{% include_relative assets/homepage/p3-parallel/sequential.txt %}{% endcapture -%}
+{%- capture p3_par %}{% include_relative assets/homepage/p3-parallel/parallel.txt %}{% endcapture -%}
+{%- capture p3_diff %}{% include_relative assets/homepage/p3-parallel/diff.txt %}{% endcapture -%}
+{%- capture p4_check %}{% include_relative assets/homepage/p4-two-passes/fmt-check.txt %}{% endcapture -%}
+{%- capture p4_canonical %}{% include_relative assets/homepage/p4-two-passes/fmt-canonical.txt %}{% endcapture -%}
+{%- capture f_snippet %}{% include_relative assets/homepage/future-as-data/snippet.feature %}{% endcapture -%}
+{%- capture f_defsite %}{% include_relative assets/homepage/future-as-data/def-site.edn %}{% endcapture -%}
+{%- capture r_exit2 %}{% include_relative assets/homepage/recordings/exit-2.txt %}{% endcapture -%}
+{%- capture r_actors %}{% include_relative assets/homepage/recordings/two-actors.txt %}{% endcapture -%}
+
+{%- comment -%} Derived slices — line selections of the captured files, never retyped. {%- endcomment -%}
+{%- assign plan_lines = g2_plan | split: nl -%}
+{%- assign plan_one_step = plan_lines[5] -%}
+{%- assign refusal_lines = g2_refusal | split: nl -%}
+{%- assign refusal_tail = refusal_lines | slice: 7, 9 | join: nl -%}
+{%- assign deadport_lines = g4_deadport | split: nl -%}
+{%- assign deadport_tail = deadport_lines | slice: 5, 10 | join: nl -%}
+{%- assign glossary_lines = w3_glossary | split: nl -%}
+{%- assign strictness_line = glossary_lines[4] -%}
+{%- assign topic_sections = g7_topic | split: "## " -%}
+{%- for s in topic_sections -%}{%- if s contains "What to do on each exit" -%}{%- assign exit_todo = s | remove_first: "What to do on each exit" -%}{%- endif -%}{%- endfor -%}
+{%- assign topic_lines = g7_topic | split: nl -%}
+{%- assign topic_head = topic_lines | slice: 0, 14 | join: nl -%}
+
+<main class="home{% if stacked %} home--stacked{% endif %}">
+  <header class="hero">
+    {% include logo.svg class="hero-mark" %}
+    <h1>ShiftLefter</h1>
+    <p class="tagline">Quality as a <em>dimension</em>, not a phase.</p>
+    <p class="lede">An end-to-end test framework that <strong>compiles your plain-language scenarios against a vocabulary you declare</strong> — checked before a browser opens, honest about what the run could not see.</p>
+    <p class="credo">Never guess before the run. Never lie after it.</p>
+    <p class="release-line">Open source, actively developed — <a href="https://github.com/shift-lefter/shiftlefter/releases" target="_blank" rel="noopener">releases</a></p>
+  </header>
+
+  <section class="hero-report" id="report">
+    <h2>A failure, as it arrives</h2>
+    <p>Four steps against a shopping cart. Three pass. The fourth is what a failure looks like here — and the only thing on this page that was written by hand is the scenario.</p>
+    <figure class="artifact">
+      <figcaption>in — <code>sl/features/cart.feature</code></figcaption>
+      <pre><code>{{ g1_snippet | strip | escape }}</code></pre>
+    </figure>
+    <figure class="artifact">
+      <figcaption>out — the row from the HTML report, as a browser renders it</figcaption>
+      <a href="/assets/homepage/g1-failure/report.html"><img src="/assets/homepage/g1-failure/failure-row.png" alt="The failing scenario's row in the ShiftLefter HTML report: three passed steps, one errored step with the timeout message, the screenshot of the cart page, and the browser console excerpt" width="984" height="750"></a>
+    </figure>
+    <ul class="callouts">
+      <li><strong>Which actor, which thing, which step.</strong> <code>:user/shopper</code>, looking at <code>Cart.items[-1].status</code> — the status of the last cart row — on the fourth step. Not a selector timeout.</li>
+      <li><strong>What it expected and what it saw.</strong> <code>'removed'</code> against <code>'in cart'</code>, after 26 polls inside a three-second deadline. The deadline, the interval, and the poll count are printed, so nobody has to guess whether it waited long enough.</li>
+      <li><strong>The screenshot and the browser console, attached at the instant of failure.</strong> The console line names the app's bug for you: the click landed on item 3, and the app marked <em>Apples</em> removed.</li>
+    </ul>
+    <p class="ledger">Rarity: screenshots on failure are common; the assembled row — actor, intent, step, poll count, console — is uncommon. The console attaches on the WebDriver backend today.</p>
+    <p><a href="/assets/homepage/g1-failure/report.html">Open the real report</a> — one file, no server, failures expanded. A bigger one, 41 scenarios with every outcome in it, is at <a href="/report/">/report/</a>.</p>
+  </section>
+
+  <p class="plain-terms">Underneath is a Gherkin runner: Cucumber's Gherkin, every keyword, 50 of 50 official files; real browsers and SMS; JUnit XML and HTML for CI. <strong>That is the floor, not the pitch.</strong> The pitch is what it refuses to do.</p>
+
+  <section class="install">
+    <h3>Install</h3>
+    <p>Java 21+ is the only requirement. No Clojure toolchain.</p>
+    <pre><code>curl -fsSL https://raw.githubusercontent.com/SHIFT-LEFTER/shiftlefter/main/release/install.sh | bash
+export PATH="$PWD/sl:$PATH"
+sl --version</code></pre>
+    <p>Have a suite? Run <code>sl orient</code> inside it and read what it would and would not run. Starting fresh? <code>sl init</code>, then one scenario.</p>
+  </section>
+
+  <nav class="doors" aria-label="Start where you are">
+    <a class="door" href="#write">
+      <h3>I write tests</h3>
+      <p>A Cucumber step is a regex over a string. Here a step resolves to a subject, a verb and an object your glossary declares. See what that buys.</p>
+    </a>
+    <a class="door" href="#promise">
+      <h3>I run a team</h3>
+      <p>Five promises you can check, an exit code your pipeline gates on, and where it honestly is.</p>
+    </a>
+    <a class="door" href="#agents">
+      <h3>I brought an agent</h3>
+      <p>The documentation is in the jar. Install, then <code>sl orient</code>.</p>
+    </a>
+  </nav>
+
+  <div class="tabs" id="tabs">
+    <nav class="tab-bar" aria-label="The three questions">
+      <a href="#write">Write</a>
+      <a href="#get">Get</a>
+      <a href="#promise">Promise</a>
+    </nav>
+
+    <section class="panel" id="write">
+      <h2>What do I write?</h2>
+      <p>Gherkin. The step is where it differs. In Cucumber a step is a regular expression over a string: whatever matches, runs. Here a step is a sentence — subject, verb, object — and every word has to resolve against a glossary you own before anything runs.</p>
+
+      <article class="card">
+        <h3>A step is a sentence, not a regex</h3>
+        <figure class="artifact">
+          <figcaption>one step of the plan — <code>sl run --dry-run -v</code>: the text, the pattern it bound to, and what it resolved to</figcaption>
+          <pre class="wrap"><code>{{ plan_one_step | strip | escape }}</code></pre>
+        </figure>
+        <p>Every step resolves to <em>who</em>, <em>does what</em>, <em>to which thing</em>, through <em>which interface</em> — before the run. When a word does not resolve, this is the fifteen seconds that follow:</p>
+        <figure class="artifact">
+          <figcaption>two typos in <code>login.feature</code>, then <code>sl run</code></figcaption>
+          <img src="/assets/homepage/recordings/exit-2.gif" alt="Terminal recording: a feature file with two typos is printed, sl run refuses it with two did-you-mean suggestions, and echo $? prints 2" width="1000" height="620" loading="lazy">
+          <details>
+            <summary>the same session as text</summary>
+            <pre><code>{{ r_exit2 | strip | escape }}</code></pre>
+          </details>
+        </figure>
+        <p>An actor nobody declared, a verb that isn't one. Both caught, both with a suggestion; the actor's suggestion comes with the file and line where the right name is declared; the run exits 2 — nothing ran, no browser opened. That move — resolve every word before executing any — is the whole product. We call it compiling behavior. Everything below is what it buys.</p>
+        <p class="ledger">Rarity: rare as a system.</p>
+        <p class="links"><a href="/docs/extending-vocabulary/">Add your own words</a> · <a href="https://github.com/shift-lefter/shiftlefter/blob/main/docs/SVO.md" target="_blank" rel="noopener">The vocabulary rule</a></p>
+      </article>
+
+      <article class="card">
+        <h3>A value crosses interfaces by name</h3>
+        <figure class="artifact">
+          <figcaption>in — five steps of a password reset</figcaption>
+          <pre><code>{{ w1_snippet | strip | escape }}</code></pre>
+        </figure>
+        <figure class="artifact">
+          <figcaption>out</figcaption>
+          <pre><code>{{ w1_run | strip | escape }}</code></pre>
+        </figure>
+        <p>The code arrives by SMS. The pattern names it <code>code</code>. The next step types <code>{code}</code> into a browser field. No glue code, no fixture, no shared variable — a value captured in one step is a word in the next, across interfaces.</p>
+        <p class="ledger">Rarity: rare.</p>
+        <p class="links"><a href="https://github.com/shift-lefter/shiftlefter/blob/main/docs/across-interfaces.md" target="_blank" rel="noopener">Web and SMS in one scenario</a></p>
+      </article>
+
+      <article class="card">
+        <h3>Page objects are data, addressed by path</h3>
+        <figure class="artifact">
+          <figcaption>in — six steps against a cart and a thread</figcaption>
+          <pre><code>{{ w2_snippet | strip | escape }}</code></pre>
+        </figure>
+        <div class="pair">
+          <figure class="artifact">
+            <figcaption>the declared <code>Cart</code></figcaption>
+            <pre><code>{{ w2_cart | strip | escape }}</code></pre>
+          </figure>
+          <figure class="artifact">
+            <figcaption>the declared <code>Item</code></figcaption>
+            <pre><code>{{ w2_item | strip | escape }}</code></pre>
+          </figure>
+        </div>
+        <figure class="artifact">
+          <figcaption>out</figcaption>
+          <pre><code>{{ w2_run | strip | escape }}</code></pre>
+        </figure>
+        <p><code>Cart.items[-1].remove</code> is the remove button on the last cart row. <code>Cart.items[*].price</code> counts them. <code>Thread.post[1].comment[-1].author</code> walks two levels. The objects are two small data files; the selectors live there and nowhere else, so when the page moves you edit one binding and zero scenarios.</p>
+        <p class="ledger">Rarity: rare — page objects are usually classes.</p>
+        <p class="links"><a href="https://github.com/shift-lefter/shiftlefter/blob/main/docs/LOCATORS.md" target="_blank" rel="noopener">How a name finds an element</a></p>
+      </article>
+
+      <article class="card">
+        <h3>Two actors, two browsers, no setup</h3>
+        <figure class="artifact">
+          <figcaption>in — alice and bob in one scenario</figcaption>
+          <pre><code>{{ w3_snippet | strip | escape }}</code></pre>
+        </figure>
+        <figure class="artifact">
+          <figcaption>out — the run opens two real Chrome windows beside the terminal; the recording shows the terminal, cold JVM start on the clock</figcaption>
+          <img src="/assets/homepage/recordings/two-actors.gif" alt="Terminal recording: a two-actor feature file is printed, then sl run passes it" width="1000" height="620" loading="lazy">
+          <details>
+            <summary>the same session as text</summary>
+            <pre><code>{{ r_actors | strip | escape }}</code></pre>
+          </details>
+        </figure>
+        <figure class="artifact">
+          <figcaption><code>sl glossary</code> — the resolved vocabulary of that project</figcaption>
+          <pre><code>{{ w3_glossary | strip | escape }}</code></pre>
+        </figure>
+        <p>alice and bob are two instances of one declared subject. Each gets its own browser; nothing is shared unless you say so. The glossary shows the declaration, and that the project uses it fourteen times.</p>
+        <figure class="artifact">
+          <figcaption><code>sl costume list</code> in that project</figcaption>
+          <pre><code>{{ w3_costumes | strip | escape }}</code></pre>
+        </figure>
+        <p>A costume is a named browser identity an actor wears — profile, locale, sometimes an already-signed-in session — declared once, reused, with custody rules. This project has none; the command says how to make one. Where a costume lives on disk and what it persists: <a href="/docs/costumes/">Costumes</a>.</p>
+        <p class="ledger">Rarity: uncommon. Costumes: common-to-uncommon — most frameworks accept a custom profile; ours is a named, wearable artifact with custody.</p>
+        <p class="links"><a href="https://github.com/shift-lefter/shiftlefter/blob/main/docs/multiple-actors.md" target="_blank" rel="noopener">Multiple actors</a> · <a href="/docs/costumes/">Costumes</a></p>
+      </article>
+
+      <p class="also">Also in the vocabulary, documented rather than demonstrated here: <a href="/docs/extending-vocabulary/">macros</a> — a named step sequence, expanded before binding, provenance kept in the report; <a href="/docs/ci/"><code>@blocked=REF</code> holds</a> — a held scenario that starts passing is a failure; and <a href="/docs/hooks/">lifecycle hooks</a> named in the feature file.</p>
+    </section>
+
+    <section class="panel" id="get">
+      <h2>What do I get back?</h2>
+      <p>Evidence, in your words. Every report format carries the same failure. The plan is printed before the run. The exit code is a contract.</p>
+
+      <article class="card">
+        <h3>The same failure, three ways</h3>
+        <p>The row at the top of this page is the HTML. Here is the JUnit case your CI widget reads, and the machine-readable record a script reads — one failure, one set of attachments.</p>
+        <figure class="artifact">
+          <figcaption><code>--junit-xml</code></figcaption>
+          <pre class="tall"><code>{{ g1_junit | strip | escape }}</code></pre>
+        </figure>
+        <figure class="artifact">
+          <figcaption><code>--edn</code>, the failure and its attachments</figcaption>
+          <pre class="tall"><code>{{ g1_fragment | strip | escape }}</code></pre>
+        </figure>
+        <p class="ledger">Rarity: uncommon — screenshots are common; the assembled failure row is not.</p>
+        <p class="links"><a href="/docs/reports/">Build your own report from the record</a> · <a href="/assets/homepage/g1-failure/report.html">The HTML report</a> · <a href="/report/">A bigger one</a></p>
+      </article>
+
+      <article class="card">
+        <h3>Before the run: the plan, or the refusal</h3>
+        <figure class="artifact">
+          <figcaption><code>sl run --dry-run -v</code> — every scenario, every step, the step definition it bound to, by file and line</figcaption>
+          <pre class="tall"><code>{{ g2_plan | strip | escape }}</code></pre>
+        </figure>
+        <p>If anything cannot bind, you get this instead, and exit 2. The run never started.</p>
+        <div class="pair">
+          <figure class="artifact">
+            <figcaption>in</figcaption>
+            <pre><code>{{ g2_refusal_feature | strip | escape }}</code></pre>
+          </figure>
+          <figure class="artifact">
+            <figcaption>out</figcaption>
+            <pre><code>{{ g2_refusal | strip | escape }}</code></pre>
+          </figure>
+        </div>
+        <p class="ledger">Rarity: rare.</p>
+        <p class="links"><a href="/docs/ci/">The dry-run-first pattern in CI</a></p>
+      </article>
+
+      <article class="card">
+        <h3>The exit code is a contract</h3>
+        <figure class="artifact">
+          <figcaption>four captured runs from this page — the command, the summary line, the exit</figcaption>
+          <pre class="wrap"><code>{{ g4_ladder | strip | escape }}</code></pre>
+        </figure>
+        <p>Exit 0 and 1 are verdicts about your app. Exits 2, 3 and 4 are three different ways the run failed to <em>be</em> a measurement — and 4 is never blamed on the app. Here the port was closed, so the step proves nothing:</p>
+        <figure class="artifact">
+          <figcaption>a run against a port with nothing listening</figcaption>
+          <pre><code>{{ g4_deadport | strip | escape }}</code></pre>
+        </figure>
+        <figure class="artifact exit-todo">
+          <figcaption>what to do on each exit — from <code>sl agent-doc exit-codes</code>, the topic the jar carries</figcaption>
+          {{ exit_todo | markdownify }}
+        </figure>
+        <p class="ledger">Rarity: rare.</p>
+        <p class="links"><a href="/docs/architecture/exit-codes/">Exit codes — the ladder and the error-class contract</a> · <a href="/docs/ci/">Gate on the exit code, route on the record</a></p>
+      </article>
+
+      <p class="also">The documentation that explains all of this ships inside the jar — see <a href="#agents">For agents</a>.</p>
+    </section>
+
+    <section class="panel" id="promise">
+      <h2>What are you promising me?</h2>
+      <p>Five sentences you can check. Each one is proved by something on this page.</p>
+
+      <article class="card promise">
+        <h3>Never guess before the run.</h3>
+        <p>Every step binds and every word checks before a browser opens. A failure to bind names the fix and the file and line where the right thing is declared.</p>
+        <figure class="artifact">
+          <figcaption>the tail of the refusal above</figcaption>
+          <pre><code>{{ refusal_tail | strip | escape }}</code></pre>
+        </figure>
+      </article>
+
+      <article class="card promise">
+        <h3>Never lie after it.</h3>
+        <p>A green is a measurement. A run that could not measure says so in its exit code — never in a green.</p>
+        <figure class="artifact">
+          <figcaption>the app was not listening</figcaption>
+          <pre><code>{{ deadport_tail | strip | escape }}</code></pre>
+        </figure>
+      </article>
+
+      <article class="card promise">
+        <h3>Byte-identical under parallelism.</h3>
+        <p><code>--max-parallel 4</code>, and the report is the same as the sequential run — in content and in order.</p>
+        <div class="pair">
+          <figure class="artifact">
+            <figcaption>sequential</figcaption>
+            <pre><code>{{ p3_seq | strip | escape }}</code></pre>
+          </figure>
+          <figure class="artifact">
+            <figcaption><code>--max-parallel 4</code></figcaption>
+            <pre><code>{{ p3_par | strip | escape }}</code></pre>
+          </figure>
+        </div>
+        <figure class="artifact">
+          <figcaption><code>diff</code> of the two</figcaption>
+          <pre><code>{{ p3_diff | strip | escape }}</code></pre>
+        </figure>
+        <p class="ledger">Rarity: uncommon — parallel is common; byte-identical output is rare.</p>
+      </article>
+
+      <article class="card promise">
+        <h3>Two passes, forever.</h3>
+        <p>The parser never needs step definitions. <code>sl fmt</code> on a suite with no step definitions and no config, formatted losslessly; 50 of 50 official Cucumber files parse and 12 of 12 invalid ones are rejected.</p>
+        <div class="pair">
+          <figure class="artifact">
+            <figcaption><code>sl fmt --check</code></figcaption>
+            <pre><code>{{ p4_check | strip | escape }}</code></pre>
+          </figure>
+          <figure class="artifact">
+            <figcaption><code>sl fmt</code></figcaption>
+            <pre><code>{{ p4_canonical | strip | escape }}</code></pre>
+          </figure>
+        </div>
+      </article>
+
+      <article class="card promise">
+        <h3>Your Gherkin stays Gherkin.</h3>
+        <p>A plain Cucumber suite parses, every keyword. Nothing runs, because nothing in it is typed yet — and it says so, counts what it saw, and names the next command. Compatibility is the floor. The step body is where this is stricter.</p>
+        <div class="pair">
+          <figure class="artifact">
+            <figcaption>in — a Cucumber feature, untouched</figcaption>
+            <pre><code>{{ g7_bring_feature | strip | escape }}</code></pre>
+          </figure>
+          <figure class="artifact">
+            <figcaption>out</figcaption>
+            <pre><code>{{ g7_bring | strip | escape }}</code></pre>
+          </figure>
+        </div>
+      </article>
+
+      <article class="card promise">
+        <h3>How strict, exactly.</h3>
+        <figure class="artifact">
+          <figcaption>from the resolved glossary above</figcaption>
+          <pre class="wrap"><code>{{ strictness_line | strip | escape }}</code></pre>
+        </figure>
+        <p>Unknown subjects and unknown interfaces block. Unknown verbs warn. Unknown objects and raw locators are off by default. Untyped step definitions warn. Each is configurable. Strictness follows ownership: who owns the word decides how hard the check is.</p>
+        <p class="links"><a href="https://github.com/shift-lefter/shiftlefter/blob/main/docs/SVO.md" target="_blank" rel="noopener">The vocabulary rule</a></p>
+      </article>
+    </section>
+  </div>
+
+  <section class="honestly" id="honestly">
+    <h2>Where it is, honestly</h2>
+    <div class="cols">
+      <div>
+        <h3>Solid today</h3>
+        <ul>
+          <li><a href="#report">The failure report</a> — actor, intent, step, screenshot, console; HTML, JUnit XML, machine-readable.</li>
+          <li><a href="#write">Typed steps refused before the run</a>, with suggestions and the declaring file and line.</li>
+          <li><a href="#write">A data plane</a> — a value captured in one step is a word in the next, across web and SMS.</li>
+          <li><a href="#write">Page objects as data</a>, addressed by path, indexed, negative indexes included.</li>
+          <li><a href="#write">Multi-actor browser driving</a> — isolated sessions; costumes for durable identities.</li>
+          <li><a href="#get">The dry-run plan</a> and <a href="#get">the exit-code contract</a>.</li>
+          <li><a href="#promise">Parallel scenarios with identical output</a>; tag selection; JUnit XML, HTML, and machine-readable output.</li>
+          <li><a href="#promise">Gherkin parsing and lossless formatting</a> — 50 of 50 official files, usable as a CI gate.</li>
+          <li><a href="#agents">The documentation inside the jar</a>, and an on-ramp for a suite that has never been typed.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Not yet</h3>
+        <ul>
+          <li><strong>The traceability graph</strong> — requirements to use cases to features to the runs that prove them. Its inputs exist (<a href="#future">below</a>); the graph does not.</li>
+          <li><strong>Semantic diffing of live pages</strong> — a developer preview at the REPL today, not a command.</li>
+          <li><strong>Brownfield migration</strong> — there is an on-ramp (it parses your suite, runs nothing, and says what shifting means), not a converter.</li>
+          <li><strong>Browser-console capture on the Playwright backend</strong> — the WebDriver backend only, today.</li>
+          <li><strong>Derived denials</strong> — what your app must refuse, derived from the glossary. Designed, not shipped.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="baton">One author, with agents in the loop; the agent surface is used on itself. Adopt it for the left column. The right column is why the discipline compounds: the same vocabulary that refuses a typo today is what the graph will read.</p>
+  </section>
+
+  <section class="agents" id="agents">
+    <h2>For agents</h2>
+    <p>If you're an agent, or you brought one: install, then ask the tool itself.</p>
+    <pre><code>curl -fsSL https://raw.githubusercontent.com/SHIFT-LEFTER/shiftlefter/main/release/install.sh | bash
+./sl/sl orient            <span class="c-com"># where am I, what would fail, what to read next</span>
+./sl/sl agent-doc --list</code></pre>
+    <div class="pair">
+      <figure class="artifact">
+        <figcaption><code>sl orient</code> in the two-actor project</figcaption>
+        <pre class="tall"><code>{{ g7_orient | strip | escape }}</code></pre>
+      </figure>
+      <figure class="artifact">
+        <figcaption><code>sl agent-doc --list</code> — the topics the jar carries</figcaption>
+        <pre class="tall"><code>{{ g7_topics | strip | escape }}</code></pre>
+      </figure>
+    </div>
+    <figure class="artifact">
+      <figcaption><code>sl agent-doc exit-codes</code>, the first lines — from a machine that has never seen the repository</figcaption>
+      <pre><code>{{ topic_head | strip | escape }}</code></pre>
+    </figure>
+    <p>Hand it a suite it has never seen and it parses everything, runs nothing, and names the next command — the <a href="#promise">untouched Cucumber feature</a> under Promise. The full agent surface is <a href="https://github.com/shift-lefter/shiftlefter/blob/main/docs/AGENT.md" target="_blank" rel="noopener">documented in the repository</a>; the installer prints a breadcrumb stanza to paste into your <code>AGENTS.md</code>; a plain-text pointer lives at <a href="/llms.txt">/llms.txt</a>.</p>
+    <p class="ledger">Rarity: rare.</p>
+    <p class="asterisk"><strong>Next release:</strong> a skill and a tone prompt — hand your agent the on-ramp, not a URL.</p>
+  </section>
+
+  <section class="future" id="future">
+    <p class="kicker">Design, not shipped</p>
+    <h2>The future, as today's data</h2>
+    <div class="pair">
+      <figure class="artifact">
+        <figcaption>a scenario that says why it exists</figcaption>
+        <pre><code>{{ f_snippet | strip | escape }}</code></pre>
+      </figure>
+      <figure class="artifact">
+        <figcaption>the planning record of the refusal above — every issue names where the right thing is declared</figcaption>
+        <pre class="tall"><code>{{ f_defsite | strip | escape }}</code></pre>
+      </figure>
+    </div>
+    <p><code>@because=CHK-4412</code> is an ordinary typed tag, opaque to the framework, carried into the record. <code>:def-site</code> is a file and a line. A graph from requirements to the runs that prove them is not here. Its inputs already are — this is what it will read.</p>
+  </section>
+
+  <footer class="site-footer">
+    <p class="footer-hello">See the code, or say hello.</p>
+    <p class="footer-links">
+      <a href="https://github.com/shift-lefter/shiftlefter" target="_blank" rel="noopener">View ShiftLefter on GitHub</a>
+      <a href="https://www.linkedin.com/in/Gabriel-Wilkins" target="_blank" rel="noopener">Connect on LinkedIn</a>
+      <a href="mailto:gabriel@shiftlefter.com">Email gabriel@shiftlefter.com</a>
+    </p>
+    <p class="colophon">© 2026 ShiftLefter. Built by Gabriel Wilkins.</p>
+  </footer>
+</main>
