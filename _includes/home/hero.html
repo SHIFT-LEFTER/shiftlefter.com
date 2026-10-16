@@ -1,0 +1,11 @@
+  <header class="hero">
+    {% include logo.svg class="hero-mark" %}
+    <h1>ShiftLefter</h1>
+    <p class="tagline">Quality as a <em>dimension</em>, not a phase.</p>
+    <p class="lede">An end-to-end test framework that <strong>compiles your plain-language scenarios against a vocabulary you declare</strong> — checked before a browser opens, honest about what the run could not see.</p>
+    <p class="credo">Never guess before the run. Never lie after it.</p>
+{%- if include.variant == "nav" %}
+    <p class="shape">On this page: <a href="#report">a real failure, as it arrives</a>; <a href="#write">what you write</a>; <a href="#get">what you get back</a>; <a href="#agents">the door for agents</a>; <a href="#promise">what we promise</a>; <a href="#honestly">where it honestly is</a>; and <a href="#future">the future, as today's data</a>. If you write tests, start with <a href="#write">what you write</a>. If you run a team, <a href="#promise">the promises</a> and <a href="#honestly">the honest section</a>. If you brought an agent, <a href="#agents">the agent door</a>.</p>
+{%- endif %}
+    <p class="release-line">Open source, actively developed — <a href="https://github.com/shift-lefter/shiftlefter/releases" target="_blank" rel="noopener">releases</a></p>
+  </header>

@@ -187,6 +187,58 @@ pre.wrap { white-space:pre-wrap; overflow-wrap:anywhere; }
 .home--stacked .panel { display:block; margin-bottom:2.5rem; }
 .home--stacked .tab-bar { display:none; }
 @media print { .panel { display:block; } .tab-bar { display:none; } }
+/* The jump-nav variant (preview-nav.html): stacked sections, a table of
+ * contents that is a sticky left rail on wide screens and a compact list
+ * under the hero on narrow ones. The current section is marked without a
+ * script: a scroll-driven animation on each link, timed by its section's
+ * view timeline through a narrow band near the top of the viewport; where
+ * scroll timelines are unsupported, the :target'd section marks instead. */
+.shape { border-top:1px solid var(--rule); padding-top:.9rem; }
+.home--nav .honestly, .home--nav .honestly h2, .home--nav .baton { max-width:none; }
+.toc { font-family:var(--sans); font-size:.78rem; font-weight:600; letter-spacing:.04em; text-transform:uppercase; margin:0 0 2.5rem; }
+.toc ol { list-style:none; margin:0; padding:0; display:flex; flex-wrap:wrap; gap:.4rem 1.2rem; }
+/* Narrow screens: the rail becomes a sticky one-line strip that scrolls
+ * sideways, so the contents are reachable from anywhere on the page. */
+@media (max-width:75.99rem) {
+  .home--nav .toc { position:sticky; top:0; z-index:2; background:var(--paper); border-bottom:1px solid var(--rule); padding:.55rem 0; margin:0 0 2rem; }
+  .home--nav .toc ol { flex-wrap:nowrap; overflow-x:auto; gap:0 1.1rem; scrollbar-width:none; }
+  .home--nav .toc li { flex:0 0 auto; }
+}
+.toc a { color:var(--soft); text-decoration:none; border-left:3px solid transparent; padding-left:.5rem; }
+.toc a:hover { color:var(--ink); }
+.toc a.here { color:var(--ink); border-left-color:var(--accent); }
+@media (min-width:76rem) {
+  .home--nav { display:grid; grid-template-columns:13rem minmax(0,52rem); column-gap:3rem; justify-content:center; }
+  .home--nav .hero { grid-column:1 / -1; }
+  .home--nav .toc { grid-column:1; position:sticky; top:1.2rem; align-self:start; margin:0; }
+  .home--nav .toc ol { display:block; }
+  .home--nav .toc li { margin:0 0 .55rem; }
+  .home--nav .toc a { display:block; padding:.15rem 0 .15rem .6rem; }
+  .home--nav .home-content { grid-column:2; min-width:0; }
+}
+@keyframes toc-here { from, to { color:var(--ink); border-left-color:var(--accent); } }
+.home--nav { timeline-scope:--s-report, --s-write, --s-install, --s-get, --s-agents, --s-promise, --s-honestly, --s-future; }
+.home--nav #report { view-timeline:--s-report block; }
+.home--nav #write { view-timeline:--s-write block; }
+.home--nav #install { view-timeline:--s-install block; }
+.home--nav #get { view-timeline:--s-get block; }
+.home--nav #agents { view-timeline:--s-agents block; }
+.home--nav #promise { view-timeline:--s-promise block; }
+.home--nav #honestly { view-timeline:--s-honestly block; }
+.home--nav #future { view-timeline:--s-future block; }
+.home--nav #report, .home--nav #write, .home--nav #install, .home--nav #get, .home--nav #agents, .home--nav #promise, .home--nav #honestly, .home--nav #future { view-timeline-inset:12% 78%; scroll-margin-top:1.2rem; }
+.home--nav .toc a { animation:toc-here linear; animation-fill-mode:none; }
+.home--nav .toc a[href="#report"] { animation-timeline:--s-report; }
+.home--nav .toc a[href="#write"] { animation-timeline:--s-write; }
+.home--nav .toc a[href="#install"] { animation-timeline:--s-install; }
+.home--nav .toc a[href="#get"] { animation-timeline:--s-get; }
+.home--nav .toc a[href="#agents"] { animation-timeline:--s-agents; }
+.home--nav .toc a[href="#promise"] { animation-timeline:--s-promise; }
+.home--nav .toc a[href="#honestly"] { animation-timeline:--s-honestly; }
+.home--nav .toc a[href="#future"] { animation-timeline:--s-future; }
+@supports not (timeline-scope: --x) {
+  .home--nav:has(#report:target) .toc a[href="#report"], .home--nav:has(#write:target) .toc a[href="#write"], .home--nav:has(#install:target) .toc a[href="#install"], .home--nav:has(#get:target) .toc a[href="#get"], .home--nav:has(#agents:target) .toc a[href="#agents"], .home--nav:has(#promise:target) .toc a[href="#promise"], .home--nav:has(#honestly:target) .toc a[href="#honestly"], .home--nav:has(#future:target) .toc a[href="#future"] { color:var(--ink); border-left-color:var(--accent); }
+}
 .card { background:var(--card); border-top:2px solid var(--rule-h); border-bottom:1px solid var(--rule); padding:1.3rem 1.4rem; }
 .card p { margin:0 0 .9rem; }
 .card.promise h3 { font-size:1.05rem; letter-spacing:-.01em; text-transform:none; color:var(--ink); }

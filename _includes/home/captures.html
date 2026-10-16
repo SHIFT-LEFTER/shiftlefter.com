@@ -1,0 +1,59 @@
+{%- comment -%}
+The front page's captured artifacts (sl-4l16), read once per page and used by
+the section partials beside this file. Composed in two orders by
+_includes/home-body.html (tabbed / stacked) and _includes/home-body-nav.html
+(stacked with a jump nav) until Chair rules. Every artifact below is read from
+assets/homepage/<card>/ at build time via include_relative — nothing is typed
+as output; each file's .stamp.edn says which run produced it. Both pages that
+include this partial MUST live at the site root: include_relative resolves
+against the including PAGE's directory, not this file's.
+{%- endcomment -%}
+{%- capture nl %}
+{% endcapture -%}
+
+{%- capture g1_snippet %}{% include_relative assets/homepage/g1-failure/snippet.feature %}{% endcapture -%}
+{%- capture g1_junit %}{% include_relative assets/homepage/g1-failure/junit.xml %}{% endcapture -%}
+{%- capture g1_fragment %}{% include_relative assets/homepage/g1-failure/failure-fragment.edn %}{% endcapture -%}
+{%- capture g2_plan %}{% include_relative assets/homepage/g2-before-the-run/plan.txt %}{% endcapture -%}
+{%- capture g2_refusal %}{% include_relative assets/homepage/g2-before-the-run/refusal.txt %}{% endcapture -%}
+{%- capture g2_refusal_feature %}{% include_relative assets/homepage/g2-before-the-run/refusal.feature %}{% endcapture -%}
+{%- capture g4_ladder %}{% include_relative assets/homepage/g4-exit-contract/ladder.txt %}{% endcapture -%}
+{%- capture g4_deadport %}{% include_relative assets/homepage/g4-exit-contract/deadport.txt %}{% endcapture -%}
+{%- capture g7_topic %}{% include_relative assets/homepage/g7-agents-door/topic-exit-codes.txt %}{% endcapture -%}
+{%- capture g7_topics %}{% include_relative assets/homepage/g7-agents-door/topics.txt %}{% endcapture -%}
+{%- capture g7_orient %}{% include_relative assets/homepage/g7-agents-door/orient.txt %}{% endcapture -%}
+{%- capture g7_bring_feature %}{% include_relative assets/homepage/g7-agents-door/bring.feature %}{% endcapture -%}
+{%- capture g7_bring %}{% include_relative assets/homepage/g7-agents-door/bring.txt %}{% endcapture -%}
+{%- capture w1_snippet %}{% include_relative assets/homepage/w1-dataplane/snippet.feature %}{% endcapture -%}
+{%- capture w1_run %}{% include_relative assets/homepage/w1-dataplane/run.txt %}{% endcapture -%}
+{%- capture w2_snippet %}{% include_relative assets/homepage/w2-nested/snippet.feature %}{% endcapture -%}
+{%- capture w2_cart %}{% include_relative assets/homepage/w2-nested/cart.edn %}{% endcapture -%}
+{%- capture w2_item %}{% include_relative assets/homepage/w2-nested/item.edn %}{% endcapture -%}
+{%- capture w2_run %}{% include_relative assets/homepage/w2-nested/run.txt %}{% endcapture -%}
+{%- capture w3_snippet %}{% include_relative assets/homepage/w3-actors/snippet.feature %}{% endcapture -%}
+{%- capture w3_run %}{% include_relative assets/homepage/w3-actors/run.txt %}{% endcapture -%}
+{%- capture w3_glossary %}{% include_relative assets/homepage/w3-actors/glossary.txt %}{% endcapture -%}
+{%- capture w3_costumes %}{% include_relative assets/homepage/w3-actors/costume-list.txt %}{% endcapture -%}
+{%- capture p3_seq %}{% include_relative assets/homepage/p3-parallel/sequential.txt %}{% endcapture -%}
+{%- capture p3_par %}{% include_relative assets/homepage/p3-parallel/parallel.txt %}{% endcapture -%}
+{%- capture p3_diff %}{% include_relative assets/homepage/p3-parallel/diff.txt %}{% endcapture -%}
+{%- capture p4_check %}{% include_relative assets/homepage/p4-two-passes/fmt-check.txt %}{% endcapture -%}
+{%- capture p4_canonical %}{% include_relative assets/homepage/p4-two-passes/fmt-canonical.txt %}{% endcapture -%}
+{%- capture f_snippet %}{% include_relative assets/homepage/future-as-data/snippet.feature %}{% endcapture -%}
+{%- capture f_defsite %}{% include_relative assets/homepage/future-as-data/def-site.edn %}{% endcapture -%}
+{%- capture r_exit2 %}{% include_relative assets/homepage/recordings/exit-2.txt %}{% endcapture -%}
+{%- capture r_actors %}{% include_relative assets/homepage/recordings/two-actors.txt %}{% endcapture -%}
+
+{%- comment -%} Derived slices — line selections of the captured files, never retyped. {%- endcomment -%}
+{%- assign plan_lines = g2_plan | split: nl -%}
+{%- assign plan_one_step = plan_lines[5] -%}
+{%- assign refusal_lines = g2_refusal | split: nl -%}
+{%- assign refusal_tail = refusal_lines | slice: 7, 9 | join: nl -%}
+{%- assign deadport_lines = g4_deadport | split: nl -%}
+{%- assign deadport_tail = deadport_lines | slice: 5, 10 | join: nl -%}
+{%- assign glossary_lines = w3_glossary | split: nl -%}
+{%- assign strictness_line = glossary_lines[4] -%}
+{%- assign topic_sections = g7_topic | split: "## " -%}
+{%- for s in topic_sections -%}{%- if s contains "What to do on each exit" -%}{%- assign exit_todo = s | remove_first: "What to do on each exit" -%}{%- endif -%}{%- endfor -%}
+{%- assign topic_lines = g7_topic | split: nl -%}
+{%- assign topic_head = topic_lines | slice: 0, 14 | join: nl -%}

@@ -1,0 +1,24 @@
+  <section class="agents" id="agents">
+    <h2>For agents</h2>
+    <p>If you're an agent, or you brought one: install, then ask the tool itself.</p>
+    <pre><code>curl -fsSL https://raw.githubusercontent.com/SHIFT-LEFTER/shiftlefter/main/release/install.sh | bash
+./sl/sl orient            <span class="c-com"># where am I, what would fail, what to read next</span>
+./sl/sl agent-doc --list</code></pre>
+    <div class="pair">
+      <figure class="artifact">
+        <figcaption><code>sl orient</code> in the two-actor project</figcaption>
+        <pre class="tall"><code>{{ g7_orient | strip | escape }}</code></pre>
+      </figure>
+      <figure class="artifact">
+        <figcaption><code>sl agent-doc --list</code> — the topics the jar carries</figcaption>
+        <pre class="tall"><code>{{ g7_topics | strip | escape }}</code></pre>
+      </figure>
+    </div>
+    <figure class="artifact">
+      <figcaption><code>sl agent-doc exit-codes</code>, the first lines — from a machine that has never seen the repository</figcaption>
+      <pre><code>{{ topic_head | strip | escape }}</code></pre>
+    </figure>
+    <p>Hand it a suite it has never seen and it parses everything, runs nothing, and names the next command — the <a href="#promise">untouched Cucumber feature</a> under Promise. The full agent surface is <a href="https://github.com/shift-lefter/shiftlefter/blob/main/docs/AGENT.md" target="_blank" rel="noopener">documented in the repository</a>; the installer prints a breadcrumb stanza to paste into your <code>AGENTS.md</code>; a plain-text pointer lives at <a href="/llms.txt">/llms.txt</a>.</p>
+    <p class="ledger">Rarity: rare.</p>
+    <p class="asterisk"><strong>Next release:</strong> a skill and a tone prompt — hand your agent the on-ramp, not a URL.</p>
+  </section>
