@@ -1,5 +1,93 @@
 ---
 layout: default
 nav: home
+description: "A type checker for your test suite. Compile errors for end-to-end tests: scenarios compile against a vocabulary you own, so a typo or a dangling rename dies before the browser opens; a run that could not measure says so in its exit code, never in a green."
 ---
-{% include home-body.html %}
+{%- comment -%}
+The front page (sl-4l16, the five-page restructure of 2026-10-17): the
+thirty-second and three-minute read. Order per amendment A5 of the brief:
+hook, subhead, pain, thesis, creed, author line; then three proofs in
+miniature, install, who it is for, the agent door, Solid today / Not yet,
+the future as today's data, the numbers strip, footer. Every box is a
+captured file from assets/homepage/, read by _includes/home/captures.html;
+the long version of each proof is on /tour/. This page MUST stay at the
+site root (include_relative resolves against the page).
+{%- endcomment -%}
+{%- include home/captures.html -%}
+<main class="home">
+  <header class="hero">
+    {% include logo.svg class="hero-mark" %}
+    <h1>ShiftLefter</h1>
+    <p class="hook">A type checker for your test suite.</p>
+    <p class="subhead">Compile errors for end-to-end tests.</p>
+    <p class="category">An end-to-end test framework that compiles plain-language scenarios against a vocabulary you declare.</p>
+    <p class="pain">Your end-to-end suite fails with a selector timeout, and nobody can tell an app bug from a test bug from a down environment. A green on a down environment is a lie. Steps are regular expressions over strings, so nothing is checked until a browser is open. And the tests your coding agent wrote are one-offs nobody will maintain.</p>
+    <p class="thesis">BDD was right that plain-language scenarios are the contract between people and the machine, and wrong that regexes and hand-written glue could hold it up. Agents remove the glue cost. A typed vocabulary removes the rot.</p>
+    <p class="credo">Agents write the tests. The vocabulary is yours. The compiler is the referee.</p>
+    <p class="credo heal">We don’t heal your tests. We name what changed.</p>
+    <p class="author">Built by one engineer with agents in the loop — <a href="/why/">why I built this</a>.</p>
+  </header>
+
+  <section class="proofs" id="proofs">
+    <h2>Three proofs</h2>
+    <p class="captured">Nothing on this site is mocked: every box is output captured from a real run, kept under <a href="/assets/homepage/">assets/homepage</a> with the commit and command that produced it. <a href="/tour/">The tour</a> has the long version of each.</p>
+
+    <article class="proof" id="proof-refusal">
+      <h3>Compile errors, before a browser opens</h3>
+      <p><code>:user/alice</code> is a declared subject and an instance — a keyword naming the subject’s type and the instance, declared in the glossary. Misspell the actor, or name an element the glossary never declared, and the run refuses to start:</p>
+      <figure class="artifact">
+        <figcaption><code>sl run</code> — the refusal</figcaption>
+        <pre><code>{{ refusal_mini | strip | escape }}</code></pre>
+      </figure>
+      <p>A typo is the fastest case to see. The real ones: a glossary entry renamed and dangling across forty scenarios, a merge that leaves references pointing nowhere, a refactored step library. Each dies before a browser opens, with a suggestion and the file and line where the right name is declared. <a href="/tour/#refusal">The refusal, in full →</a></p>
+    </article>
+
+    <article class="proof" id="proof-exit">
+      <h3>A green is a measurement</h3>
+      <p>A run that could not observe the app says so in its exit code, never in a green. Here the port had nothing listening:</p>
+      <figure class="artifact">
+        <figcaption><code>sl run</code> against a closed port</figcaption>
+        <pre><code>{{ deadport_mini | strip | escape }}</code></pre>
+      </figure>
+      <p>Exits 0 and 1 are verdicts about your app. Exit 4 means no answer existed, and it is never blamed on the app. <a href="/tour/#exit-codes">The exit-code contract →</a></p>
+    </article>
+
+    <article class="proof" id="proof-failure">
+      <h3>The failure, in your words</h3>
+      <p>Which actor, which thing, which step; expected against seen, with the poll count; the screenshot and the browser console attached at the instant of failure:</p>
+      <figure class="artifact">
+        <figcaption>the failed row of the HTML report, as text</figcaption>
+        <pre class="wrap"><code>{{ row_mini | strip | escape }}</code></pre>
+      </figure>
+      <p>The console line names the app’s bug: the click landed on item 3 and the app marked <em>Apples</em> removed. <a href="/tour/#failure">The failure row, with the screenshot →</a></p>
+    </article>
+  </section>
+
+{% include home/install.html %}
+
+  <p class="who">For whoever owns a Cucumber or Playwright suite that fails for reasons nobody can read — and, increasingly, for whoever’s coding agent writes tests nobody will maintain.</p>
+
+  <section class="agent-door" id="agents">
+    <h2>If you brought an agent</h2>
+    <p>Install, then <code>sl orient</code>. The documentation is in the jar, from a machine that has never seen the repository; hand it a suite nobody has typed and it parses everything, runs nothing, and names the next command. <a href="/agents/">For agents →</a></p>
+  </section>
+
+{% include home/honestly.html %}
+
+{% include home/future.html %}
+
+  <ul class="numbers" aria-label="By the numbers">
+    {%- comment -%} Verified values only (amendment A7). Releases: v0.1.0 … v0.5.7
+    = 15 tags, true from the 0.5.7 tag this page ships with; recount at each
+    release. Conformance: test/shiftlefter/gherkin/compliance_test.clj:89,
+    cucumber/gherkin v42.0.1. Verbs: `sl agent-doc builtins` (4 SMS + 26 web).
+    Topics: `sl agent-doc --list`. {%- endcomment %}
+    <li><strong>15</strong> tagged releases</li>
+    <li><strong>50 of 50</strong> official Gherkin files parse; <strong>12 of 12</strong> invalid ones rejected</li>
+    <li><strong>30</strong> built-in verbs, web and SMS</li>
+    <li><strong>16</strong> documentation topics inside the jar</li>
+    <li><strong>1</strong> author</li>
+  </ul>
+
+{% include home/footer.html %}
+</main>

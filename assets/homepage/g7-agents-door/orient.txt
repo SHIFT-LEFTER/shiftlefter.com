@@ -1,6 +1,6 @@
 # Orientation
 
-Project checks: ok · fingerprint: 0bef2b76db5f0440270598c2b15c576bfe929ffab25c5d1c6333b0ebc24738dc
+Project checks: ok · fingerprint: 84674c00b1d0aa79167dd24f849576d8e62dd97a1ba645569193c4e43ce24372
 
 ## Project context
 
@@ -13,7 +13,7 @@ Project checks: ok · fingerprint: 0bef2b76db5f0440270598c2b15c576bfe929ffab25c5
 ## Counts
 
 - subjects: 1 · instances: 2 · interfaces: 1
-- verbs: 30 · intents: 0 · stepdefs: 49 · macros: 0
+- verbs: 30 · intents: 1 · stepdefs: 49 · macros: 0
 - diagnostics: 0
 
 ## Project checks

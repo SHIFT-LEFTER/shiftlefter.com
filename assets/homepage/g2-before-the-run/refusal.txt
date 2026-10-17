@@ -1,15 +1,17 @@
 run seed: <seed>
 
-Undefined steps:
-  - :user/alice clcks {:css "button[type='submit']"} (sl/features/login.feature:7:5)
-      did you mean "clicks"? — :([\w./-]+) clicks ([A-Z][A-Za-z0-9_-]*(?:\.[a-z][a-z0-9_-]*(?:\[-?\d+\]|\[\*\])?)+|\{[^}]+\}) (shiftlefter/stepdefs/browser.clj:675)
-
 SVO validation issues:
-  WARNING: Unknown subject :user/alicce in step ":user/alicce opens the browser to 'http://127.0.0.1:9095/login'"
+  ERROR: Unknown subject :user/alicce in step ":user/alicce opens the browser to 'http://127.0.0.1:9095/login'"
          at sl/features/login.feature:5
          Known subjects: :user/alice, :user/bob
          Did you mean: :user/alice?
          Declared in: sl/glossary/subjects.edn:10
+
+  ERROR: Unknown object 'Login.sumbit' in step ":user/alice clicks Login.sumbit"
+         at sl/features/login.feature:7
+         Interface: :web
+         Unknown intent/element: Login.sumbit. Did you mean: Login.submit?
+         Declared in: sl/glossary/intents/login.edn:7
 
 
 2 binding issue(s) found. Cannot execute.

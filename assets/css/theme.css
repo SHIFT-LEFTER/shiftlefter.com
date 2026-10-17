@@ -140,13 +140,24 @@ pre code { background:none; padding:0; font-size:1em; }
 .hero p { margin:0 0 1rem; }
 .credo { font-weight:700; }
 .release-line { font-family:var(--sans); font-size:.78rem; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--soft); }
-/* Front page (sl-4l16): the hero failure report, three doors, three tabs
- * (Write / Get / Promise), the honesty section, the agents door, the
- * labeled future beat. Every <figure class="artifact"> is a captured file
- * from assets/homepage/ rendered at build time — see _includes/home-body.html. */
-.hero-report, .plain-terms, .install, .doors, .tabs, .agents, .future { max-width:52rem; margin-left:auto; margin-right:auto; }
-.hero-report h2 { margin-top:0; }
-.hero-report p, .agents p, .future p, .panel > p, .install p { margin:0 0 1rem; }
+/* The five pages (sl-4l16): the front page (hook, pain, thesis, creed,
+ * three proofs in miniature, install, the agent door, Solid/Not yet, the
+ * future beat, the numbers strip), the tour, the compare table, the agents
+ * page and the why page. Every <figure class="artifact"> is a captured file
+ * from assets/homepage/ rendered at build time — see _includes/home/captures.html. */
+.proofs, .install, .who, .agent-door, .future, .numbers, .page-head, .feature, .essay-body, .compare-note { max-width:52rem; margin-left:auto; margin-right:auto; }
+.hero .hook { font-family:var(--sans); font-size:2rem; font-weight:800; letter-spacing:-.02em; line-height:1.1; margin:.2rem 0 .3rem; }
+.hero .subhead { font-size:1.35rem; font-style:italic; margin:0 0 1.2rem; }
+.hero .category { font-family:var(--sans); font-size:.9rem; color:var(--soft); border-top:1px solid var(--rule); padding-top:.8rem; margin:0 0 1.2rem; }
+.hero .pain { font-size:1.08rem; }
+.hero .thesis { font-size:1.08rem; }
+.hero .heal { color:var(--accent); }
+.hero .author { font-family:var(--sans); font-size:.82rem; color:var(--soft); margin:0; }
+.proofs h2 { margin-top:0; }
+.captured { font-size:.95rem; color:var(--soft); margin:0 0 1.4rem; }
+.proof { margin:0 0 2rem; border-top:1px solid var(--rule); padding-top:1rem; }
+.proof h3 { margin:0 0 .6rem; font-family:var(--sans); font-size:1.1rem; font-weight:800; letter-spacing:-.01em; }
+.proof p { margin:0 0 .9rem; }
 .artifact { margin:0 0 1.1rem; }
 .artifact figcaption { font-family:var(--sans); font-size:.72rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--soft); margin:0 0 .35rem; }
 .artifact figcaption code { text-transform:none; letter-spacing:0; font-size:.95em; }
@@ -164,91 +175,16 @@ pre.wrap { white-space:pre-wrap; overflow-wrap:anywhere; }
 @media (max-width:56rem) { .pair { grid-template-columns:minmax(0,1fr); } }
 .callouts { list-style:none; margin:0 0 1rem; padding:0; }
 .callouts li { border-top:1px solid var(--rule); padding:.7rem 0; margin:0; }
-.ledger { font-family:var(--sans); font-size:.78rem; color:var(--soft); border-left:3px solid var(--accent); padding-left:.7rem; margin:0 0 .9rem; }
-.links { font-family:var(--sans); font-size:.78rem; font-weight:600; letter-spacing:.04em; text-transform:uppercase; margin:0; }
-.plain-terms { margin-bottom:2.5rem; font-size:1.1rem; border-top:2px solid var(--rule-h); border-bottom:1px solid var(--rule); padding:1.1rem 0; }
-.install { background:var(--card); border-top:2px solid var(--rule-h); border-bottom:1px solid var(--rule); padding:1.3rem 1.4rem; margin-bottom:3rem; }
+.links { font-family:var(--sans); font-size:.78rem; font-weight:600; letter-spacing:.04em; text-transform:uppercase; margin:0 0 .5rem; }
+.install { background:var(--card); border-top:2px solid var(--rule-h); border-bottom:1px solid var(--rule); padding:1.3rem 1.4rem; margin-bottom:2rem; }
 .install h3, .card h3 { margin:0 0 .7rem; font-family:var(--sans); font-size:.78rem; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); }
+.install p { margin:0 0 1rem; }
 .install pre { margin:0 0 .9rem; }
-.doors { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; margin-bottom:3rem; }
-@media (max-width:56rem) { .doors { grid-template-columns:1fr; } }
-.door { display:block; color:var(--ink); text-decoration:none; background:var(--card); border-top:2px solid var(--rule-h); border-bottom:1px solid var(--rule); padding:1.1rem 1.2rem; }
-.door:hover { border-top-color:var(--accent); color:var(--ink); }
-.door h3 { margin:0 0 .5rem; font-family:var(--sans); font-size:1.05rem; font-weight:800; letter-spacing:-.01em; }
-.door:hover h3 { color:var(--accent); }
-.door p { margin:0; font-size:.95rem; color:var(--soft); }
-.tab-bar { display:flex; gap:0; border-bottom:2px solid var(--rule-h); margin:0 0 1.6rem; font-family:var(--sans); font-size:.8rem; font-weight:800; letter-spacing:.14em; text-transform:uppercase; }
-.tab-bar a { color:var(--soft); text-decoration:none; padding:.7rem 1.1rem .6rem; border-bottom:3px solid transparent; margin-bottom:-2px; }
-.tab-bar a:hover { color:var(--ink); }
-.panel { display:none; scroll-margin-top:4.5rem; }
-.panel h2 { margin-top:0; }
-.panel .card { margin:0 0 1.6rem; }
-.tabs:not(:has(.panel:target)) #write, .panel:target { display:block; }
-.tabs:not(:has(.panel:target)) .tab-bar a[href="#write"], .tabs:has(#write:target) .tab-bar a[href="#write"], .tabs:has(#get:target) .tab-bar a[href="#get"], .tabs:has(#promise:target) .tab-bar a[href="#promise"] { color:var(--ink); border-bottom-color:var(--accent); }
-/* No :has() → nothing to hide behind: every panel stacked, no tab bar. The
- * stacked preview (preview-stacked.html) and print use the same layout. */
-@supports not selector(:has(a)) { .panel { display:block; } .tab-bar { display:none; } }
-.home--stacked .panel { display:block; margin-bottom:2.5rem; }
-.home--stacked .tab-bar { display:none; }
-@media print { .panel { display:block; } .tab-bar { display:none; } }
-/* The jump-nav variant (preview-nav.html): stacked sections, a table of
- * contents that is a sticky left rail on wide screens and a compact list
- * under the hero on narrow ones. The current section is marked without a
- * script: a scroll-driven animation on each link, timed by its section's
- * view timeline through a narrow band near the top of the viewport; where
- * scroll timelines are unsupported, the :target'd section marks instead. */
-.shape { border-top:1px solid var(--rule); padding-top:.9rem; }
-.home--nav .honestly, .home--nav .honestly h2, .home--nav .baton { max-width:none; }
-.toc { font-family:var(--sans); font-size:.78rem; font-weight:600; letter-spacing:.04em; text-transform:uppercase; margin:0 0 2.5rem; }
-.toc ol { list-style:none; margin:0; padding:0; display:flex; flex-wrap:wrap; gap:.4rem 1.2rem; }
-/* Narrow screens: the rail becomes a sticky one-line strip that scrolls
- * sideways, so the contents are reachable from anywhere on the page. */
-@media (max-width:75.99rem) {
-  .home--nav .toc { position:sticky; top:0; z-index:2; background:var(--paper); border-bottom:1px solid var(--rule); padding:.55rem 0; margin:0 0 2rem; }
-  .home--nav .toc ol { flex-wrap:nowrap; overflow-x:auto; gap:0 1.1rem; scrollbar-width:none; }
-  .home--nav .toc li { flex:0 0 auto; }
-}
-.toc a { color:var(--soft); text-decoration:none; border-left:3px solid transparent; padding-left:.5rem; }
-.toc a:hover { color:var(--ink); }
-.toc a.here { color:var(--ink); border-left-color:var(--accent); }
-@media (min-width:76rem) {
-  .home--nav { display:grid; grid-template-columns:13rem minmax(0,52rem); column-gap:3rem; justify-content:center; }
-  .home--nav .hero { grid-column:1 / -1; }
-  .home--nav .toc { grid-column:1; position:sticky; top:1.2rem; align-self:start; margin:0; }
-  .home--nav .toc ol { display:block; }
-  .home--nav .toc li { margin:0 0 .55rem; }
-  .home--nav .toc a { display:block; padding:.15rem 0 .15rem .6rem; }
-  .home--nav .home-content { grid-column:2; min-width:0; }
-}
-@keyframes toc-here { from, to { color:var(--ink); border-left-color:var(--accent); } }
-.home--nav { timeline-scope:--s-report, --s-write, --s-install, --s-get, --s-agents, --s-promise, --s-honestly, --s-future; }
-.home--nav #report { view-timeline:--s-report block; }
-.home--nav #write { view-timeline:--s-write block; }
-.home--nav #install { view-timeline:--s-install block; }
-.home--nav #get { view-timeline:--s-get block; }
-.home--nav #agents { view-timeline:--s-agents block; }
-.home--nav #promise { view-timeline:--s-promise block; }
-.home--nav #honestly { view-timeline:--s-honestly block; }
-.home--nav #future { view-timeline:--s-future block; }
-.home--nav #report, .home--nav #write, .home--nav #install, .home--nav #get, .home--nav #agents, .home--nav #promise, .home--nav #honestly, .home--nav #future { view-timeline-inset:12% 78%; scroll-margin-top:1.2rem; }
-.home--nav .toc a { animation:toc-here linear; animation-fill-mode:none; }
-.home--nav .toc a[href="#report"] { animation-timeline:--s-report; }
-.home--nav .toc a[href="#write"] { animation-timeline:--s-write; }
-.home--nav .toc a[href="#install"] { animation-timeline:--s-install; }
-.home--nav .toc a[href="#get"] { animation-timeline:--s-get; }
-.home--nav .toc a[href="#agents"] { animation-timeline:--s-agents; }
-.home--nav .toc a[href="#promise"] { animation-timeline:--s-promise; }
-.home--nav .toc a[href="#honestly"] { animation-timeline:--s-honestly; }
-.home--nav .toc a[href="#future"] { animation-timeline:--s-future; }
-@supports not (timeline-scope: --x) {
-  .home--nav:has(#report:target) .toc a[href="#report"], .home--nav:has(#write:target) .toc a[href="#write"], .home--nav:has(#install:target) .toc a[href="#install"], .home--nav:has(#get:target) .toc a[href="#get"], .home--nav:has(#agents:target) .toc a[href="#agents"], .home--nav:has(#promise:target) .toc a[href="#promise"], .home--nav:has(#honestly:target) .toc a[href="#honestly"], .home--nav:has(#future:target) .toc a[href="#future"] { color:var(--ink); border-left-color:var(--accent); }
-}
-.card { background:var(--card); border-top:2px solid var(--rule-h); border-bottom:1px solid var(--rule); padding:1.3rem 1.4rem; }
-.card p { margin:0 0 .9rem; }
-.card.promise h3 { font-size:1.05rem; letter-spacing:-.01em; text-transform:none; color:var(--ink); }
+.who { font-size:1.08rem; font-style:italic; margin:0 auto 2rem; }
+.agent-door { border-top:1px solid var(--rule); padding-top:.4rem; margin-bottom:1rem; }
+.agent-door p, .future p { margin:0 0 1rem; }
 .exit-todo ul { margin:0; padding-left:1.2rem; font-size:.95rem; }
 .exit-todo li { margin:0 0 .4rem; }
-.also { font-size:.95rem; color:var(--soft); border-top:1px solid var(--rule); padding-top:.9rem; }
 .honestly { max-width:72rem; margin:0 auto; }
 .honestly h2 { max-width:52rem; margin-left:auto; margin-right:auto; }
 .cols { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:2.5rem; }
@@ -257,11 +193,41 @@ pre.wrap { white-space:pre-wrap; overflow-wrap:anywhere; }
 .cols ul { margin:0; padding-left:1.2rem; }
 .cols li { margin:0 0 .55rem; }
 .baton { max-width:52rem; margin:2rem auto 0; font-style:italic; color:var(--soft); border-top:1px solid var(--rule); padding-top:1rem; }
-.agents { margin-top:1rem; }
 .asterisk { border-top:1px solid var(--rule); padding-top:.9rem; }
 .future { margin-top:3rem; border-top:2px solid var(--rule-h); padding-top:1.4rem; }
 .future .kicker { margin-bottom:0; }
 .future h2 { margin-top:.4rem; }
+.numbers { list-style:none; margin:3rem auto 0; padding:1.2rem 0 0; border-top:2px solid var(--rule-h); display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:1rem; font-family:var(--sans); font-size:.8rem; line-height:1.3; color:var(--soft); }
+.numbers li { margin:0; }
+.numbers strong { display:block; font-size:1.6rem; font-weight:800; letter-spacing:-.02em; color:var(--ink); }
+@media (max-width:56rem) { .numbers { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+/* The inner pages: a heading block in the essay register, then sections. */
+.page-head { margin:2.5rem auto 2.5rem; }
+.page-head .standfirst { margin-bottom:0; }
+.feature { border-top:1px solid var(--rule); padding-top:.4rem; margin-bottom:2.5rem; }
+.feature h2 { margin-top:1rem; }
+.feature p { margin:0 0 1rem; }
+.feature ul { margin:0 0 1rem; padding-left:1.2rem; }
+.feature li { margin:0 0 .5rem; }
+.artifact.pending figcaption::after { content:" · written to the landed syntax, recapture pending"; font-weight:400; letter-spacing:0; text-transform:none; }
+.essay-body p { margin:0 0 1rem; font-size:1.05rem; }
+.signoff { font-family:var(--sans); font-size:.85rem; color:var(--soft); border-top:1px solid var(--rule); padding-top:.9rem; }
+.compare { max-width:72rem; }
+.compare-table { width:100%; border-collapse:collapse; font-size:.95rem; margin:0 0 1.5rem; }
+.compare-table th, .compare-table td { text-align:left; vertical-align:top; padding:.8rem .8rem .8rem 0; border-top:1px solid var(--rule); }
+.compare-table thead th { font-family:var(--sans); font-size:.72rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--soft); border-top:none; border-bottom:2px solid var(--rule-h); }
+.compare-table tbody th { font-family:var(--sans); font-size:.9rem; font-weight:800; letter-spacing:-.01em; width:11rem; }
+.compare-table td a { white-space:nowrap; }
+@media (max-width:56rem) {
+  .compare-table, .compare-table thead, .compare-table tbody, .compare-table tr, .compare-table th, .compare-table td { display:block; width:auto; }
+  .compare-table thead { display:none; }
+  .compare-table tr { border-top:2px solid var(--rule-h); padding:.6rem 0; }
+  .compare-table th, .compare-table td { border-top:none; padding:.3rem 0; }
+  .compare-table td::before { display:block; font-family:var(--sans); font-size:.68rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--soft); margin-bottom:.2rem; }
+  .compare-table td:nth-of-type(1)::before { content:"The named tool"; }
+  .compare-table td:nth-of-type(2)::before { content:"ShiftLefter"; }
+}
+.compare-note { font-size:.85rem; color:var(--soft); border-top:1px solid var(--rule); padding-top:.9rem; }
 .site-footer { max-width:52rem; margin:3rem auto 0; border-top:2px solid var(--rule-h); padding-top:1.4rem; }
 .footer-hello { margin:0 0 .8rem; font-style:italic; }
 .footer-links { display:flex; gap:1.6rem; flex-wrap:wrap; font-family:var(--sans); font-size:.78rem; font-weight:600; letter-spacing:.06em; text-transform:uppercase; margin:0; }

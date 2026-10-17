@@ -1,12 +1,11 @@
 {%- comment -%}
-The front page's captured artifacts (sl-4l16), read once per page and used by
-the section partials beside this file. Composed in two orders by
-_includes/home-body.html (tabbed / stacked) and _includes/home-body-nav.html
-(stacked with a jump nav) until Chair rules. Every artifact below is read from
-assets/homepage/<card>/ at build time via include_relative — nothing is typed
-as output; each file's .stamp.edn says which run produced it. Both pages that
-include this partial MUST live at the site root: include_relative resolves
-against the including PAGE's directory, not this file's.
+The captured artifacts (sl-4l16), read once per page and used by the front
+page (index.html), the tour (tour.html) and the agents page (agents.html).
+Every artifact below is read from assets/homepage/<card>/ at build time via
+include_relative — nothing is typed as output; each file's .stamp.edn says
+which run produced it. Every page that includes this partial MUST live at
+the site root: include_relative resolves against the including PAGE's
+directory, not this file's.
 {%- endcomment -%}
 {%- capture nl %}
 {% endcapture -%}
@@ -14,6 +13,7 @@ against the including PAGE's directory, not this file's.
 {%- capture g1_snippet %}{% include_relative assets/homepage/g1-failure/snippet.feature %}{% endcapture -%}
 {%- capture g1_junit %}{% include_relative assets/homepage/g1-failure/junit.xml %}{% endcapture -%}
 {%- capture g1_fragment %}{% include_relative assets/homepage/g1-failure/failure-fragment.edn %}{% endcapture -%}
+{%- capture g1_row %}{% include_relative assets/homepage/g1-failure/rendered-row.txt %}{% endcapture -%}
 {%- capture g2_plan %}{% include_relative assets/homepage/g2-before-the-run/plan.txt %}{% endcapture -%}
 {%- capture g2_refusal %}{% include_relative assets/homepage/g2-before-the-run/refusal.txt %}{% endcapture -%}
 {%- capture g2_refusal_feature %}{% include_relative assets/homepage/g2-before-the-run/refusal.feature %}{% endcapture -%}
@@ -44,13 +44,23 @@ against the including PAGE's directory, not this file's.
 {%- capture r_exit2 %}{% include_relative assets/homepage/recordings/exit-2.txt %}{% endcapture -%}
 {%- capture r_actors %}{% include_relative assets/homepage/recordings/two-actors.txt %}{% endcapture -%}
 
-{%- comment -%} Derived slices — line selections of the captured files, never retyped. {%- endcomment -%}
+{%- comment -%} Derived slices — line selections of the captured files, never
+retyped. The indexes are 0-based lines of the file as captured; re-check them
+after any recapture (scripts/homepage/capture.sh). {%- endcomment -%}
 {%- assign plan_lines = g2_plan | split: nl -%}
 {%- assign plan_one_step = plan_lines[5] -%}
 {%- assign refusal_lines = g2_refusal | split: nl -%}
-{%- assign refusal_tail = refusal_lines | slice: 7, 9 | join: nl -%}
+{%- comment -%} The unknown-object block (the typo'd intent element) and the verdict lines. {%- endcomment -%}
+{%- assign refusal_mini_a = refusal_lines | slice: 9, 5 | join: nl -%}
+{%- assign refusal_mini_b = refusal_lines | slice: 16, 2 | join: nl -%}
+{%- assign refusal_mini = refusal_mini_a | append: nl | append: nl | append: refusal_mini_b -%}
 {%- assign deadport_lines = g4_deadport | split: nl -%}
+{%- comment -%} The verdict, the step, the error, its class, the summary, the exit. {%- endcomment -%}
+{%- assign deadport_mini = deadport_lines[1] | append: nl | append: deadport_lines[5] | append: nl | append: deadport_lines[6] | append: nl | append: deadport_lines[8] | append: nl | append: deadport_lines[9] | append: nl | append: nl | append: deadport_lines[13] | append: nl | append: deadport_lines[14] -%}
 {%- assign deadport_tail = deadport_lines | slice: 5, 10 | join: nl -%}
+{%- assign row_lines = g1_row | split: nl -%}
+{%- comment -%} The failed step, its poll count, the timeout message, the two attachments' kinds, the console line. {%- endcomment -%}
+{%- assign row_mini = row_lines[12] | append: "  " | append: row_lines[13] | append: nl | append: row_lines[15] | append: nl | append: row_lines[17] | append: nl | append: row_lines[18] | append: " · " | append: row_lines[22] | append: nl | append: row_lines[28] -%}
 {%- assign glossary_lines = w3_glossary | split: nl -%}
 {%- assign strictness_line = glossary_lines[4] -%}
 {%- assign topic_sections = g7_topic | split: "## " -%}

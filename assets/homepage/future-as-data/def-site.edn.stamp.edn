@@ -1,13 +1,13 @@
 {:artifact "future-as-data/def-site.edn"
- :dev-commit "f3723b79"
+ :dev-commit "640a4a74"
  :dev-tree-dirty? false
  :sl-version "0.5.6"
  :source "scripts/homepage/projects/dym"
  :staged-at "/private/tmp/sl-homepage/dym"
  :command "edn-select.clj def-site future-as-data/refusal.edn"
  :exit 0
- :date "2026-09-24"
- :browser {:chrome "153.0.8010.53" :chromedriver "152.0.7977.82" :backend :etaoin}
+ :date "2026-10-17"
+ :browser {:chrome "154.0.8037.100" :chromedriver "154.0.8037.92" :backend :etaoin}
  :scrubbed []
  :derived-from "future-as-data/refusal.edn"
  :regenerate "scripts/homepage/capture.sh future"}

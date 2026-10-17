@@ -10,13 +10,14 @@
      * before first paint, so a forced theme never flashes the other one. */
     try { var t = localStorage.getItem("theme"); if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t); } catch (e) {}
   </script>
-  <title>{% if page.title %}{{ page.title }} · {{ site.title }}{% else %}ShiftLefter — Quality as a dimension, not a phase{% endif %}</title>
+  <title>{% if page.title %}{{ page.title }} · {{ site.title }}{% else %}ShiftLefter — A type checker for your test suite{% endif %}</title>
+  {%- if page.description %}
+  <meta name="description" content="{{ page.description | escape }}">
+  {%- endif %}
   {%- if page.url == "/" %}
-  <meta name="description"
-        content="An end-to-end test framework that compiles your plain-language scenarios against a vocabulary you declare — checked before a browser opens, honest about what the run could not see. Real browsers and SMS; JUnit XML and HTML for CI.">
-  <meta property="og:title" content="ShiftLefter — Quality as a dimension, not a phase">
+  <meta property="og:title" content="ShiftLefter — A type checker for your test suite">
   <meta property="og:description"
-        content="Never guess before the run. Never lie after it. Scenarios compiled against a vocabulary you declare, checked before a browser opens.">
+        content="Compile errors for end-to-end tests. Scenarios compile against a vocabulary you own; a typo or a dangling rename dies before the browser opens. We don't heal your tests. We name what changed.">
   <meta property="og:image" content="https://shiftlefter.com/assets/homepage/g1-failure/failure-row.png">
   <meta property="og:url" content="https://shiftlefter.com/">
   <meta property="og:type" content="website">

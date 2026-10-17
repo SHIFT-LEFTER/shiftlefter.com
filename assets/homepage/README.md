@@ -21,7 +21,7 @@ messages, counts, exit codes, poll counts, actor and intent names, and every
 | `w2-nested/` | W2 — nested page objects | `Cart.items[-1].remove` clicked, `3 Cart.items[*].price elements` counted, `Thread.post[1].comment[-1].author` read; the declared `cart.edn` / `item.edn` |
 | `w3-actors/` | W3 — actors | alice and bob in one scenario, two browsers; the resolved glossary; the (empty) costume list |
 | `g1-failure/` | G1 — the failure report | one real failure: actor, intent, step, screenshot and console, as console text, EDN, JUnit, and the self-contained HTML report (`report.html` + `attachments/`); `failure-row.png` is that report's row as a browser renders it |
-| `g2-before-the-run/` | G2 — before the run | the dry-run plan (every step → its stepdef, file:line) and a refusal: two typos, two did-you-means, the `Declared in:` line, exit 2, no browser opened |
+| `g2-before-the-run/` | G2 — before the run | the dry-run plan (every step → its stepdef, file:line) and a refusal: a typo'd actor and a typo'd intent element, two did-you-means, each with its `Declared in:` file and line, exit 2, no browser opened |
 | `g4-exit-contract/` | G4 — the exit contract | a closed port → `1 unobserved`, exit 4; `ladder.txt` — four captured runs, exits 0 / 1 / 2 / 4 |
 | `g7-agents-door/` | G7 — the agents door | the packaged topic list, one topic, `sl orient`, and a plain Cucumber suite refused with the shift hint |
 | `p3-parallel/` | P3 | the same suite sequential and `--max-parallel 4`; `diff.txt` is empty |

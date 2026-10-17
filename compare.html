@@ -1,0 +1,108 @@
+---
+layout: default
+title: Compared
+permalink: /compare/
+description: "ShiftLefter beside Cucumber, raw Playwright or WebDriver, Serenity's Screenplay pattern, and self-healing tools: what each does, then what ShiftLefter does, one row per claim."
+---
+{%- comment -%}
+The compare page (sl-f7y5): the rarity claims that used to sit on the draft
+front page as "Rarity: rare / uncommon" labels, collapsed into a table
+against NAMED references. Every row says what the other tool does, then
+what ShiftLefter does. The claims about other tools were checked against
+those tools' own documentation on 2026-10-17; sources:
+
+  Cucumber step definitions — https://cucumber.io/docs/cucumber/step-definitions/
+    "A Step Definition is a method with an expression that links it to one
+    or more Gherkin steps." "A step definition's expression can either be a
+    Regular Expression or a Cucumber Expression."
+  Cucumber undefined steps — https://cucumber.io/docs/guides/10-minute-tutorial/
+    reported when the suite runs (UndefinedStepException; "You can implement
+    these steps using the snippet(s) below").
+  Playwright locators — https://playwright.dev/docs/locators
+    "Every time a locator is used for an action, an up-to-date DOM element
+    is located in the page."
+  Playwright page objects — https://playwright.dev/docs/pom
+    a helper class per page, locators as fields, methods for actions.
+  Playwright trace viewer — https://playwright.dev/docs/trace-viewer
+    screencast, DOM snapshots per action, console, network; `trace: 'on-first-retry'`.
+  Playwright MCP — https://github.com/microsoft/playwright-mcp
+    "Uses Playwright's accessibility tree, not pixel-based input."
+  Serenity/JS Screenplay — https://serenity-js.org/handbook/design/screenplay-pattern/
+    Tasks are "reusable building blocks from which your team can assemble
+    test scenarios"; Abilities are classes wrapping integration libraries.
+  Serenity BDD Screenplay — https://serenity-bdd.github.io/docs/screenplay/screenplay_fundamentals
+    Tasks are Performable implementations; "each actor can have their own
+    browser if we have a scenario with more than one actor" (OnlineCast).
+  Healenium — https://github.com/healenium/healenium
+    "Healenium works by automatically detecting and healing test failures
+    caused by changes in the UI."
+{%- endcomment -%}
+<main class="home compare">
+  <header class="page-head">
+    <p class="kicker">Compared</p>
+    <h1>What the others do, and what this does</h1>
+    <p class="standfirst">One row per claim. The left column is the named tool on its own terms, from its own documentation; the right is ShiftLefter. Where the other tool is simply better at something, the row says so.</p>
+  </header>
+
+  <table class="compare-table">
+    <thead>
+      <tr><th scope="col">On</th><th scope="col">The named tool</th><th scope="col">ShiftLefter</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row">What a step is</th>
+        <td><strong>Cucumber.</strong> A step definition is a method with an expression — a regular expression or a Cucumber Expression — that links it to one or more Gherkin steps. The text is matched; capture groups become the method’s arguments. Whatever matches, runs.</td>
+        <td>A step is a sentence: a subject, a verb and an object, each resolved against a glossary you own. The glue is the vocabulary, not a method per phrase. <a href="/tour/#refusal">The refusal</a></td>
+      </tr>
+      <tr>
+        <th scope="row">When a mistake is found</th>
+        <td><strong>Cucumber</strong> reports an undefined step when the suite runs, with a snippet to implement it. <strong>Playwright</strong> locates an element “every time a locator is used for an action”; a wrong locator is a timeout, at run time, with the browser open.</td>
+        <td>Before the run. A misspelled actor, a misspelled element, a dangling rename: each stops the run with a suggestion and the file and line where the right name is declared. Exit 2; no browser opened. <a href="/tour/#refusal">The refusal</a></td>
+      </tr>
+      <tr>
+        <th scope="row">Page objects</th>
+        <td><strong>Playwright</strong> recommends a helper class per page, locators as fields, methods for the actions. <strong>Screenplay</strong> (Serenity) puts targets and tasks in classes too.</td>
+        <td>A page object is a data file: an intent with the elements and collections it owns. Addressed by path — <code>Cart.items[-1].remove</code> — with indexes, negative indexes, and <code>[*]</code> for all members. No code. <a href="/tour/#page-objects">Page objects as data</a></td>
+      </tr>
+      <tr>
+        <th scope="row">Reusing a workflow</th>
+        <td><strong>Screenplay</strong> composes Tasks from Interactions in code; Tasks are “reusable building blocks from which your team can assemble test scenarios.” It is a good pattern, and it is a class hierarchy.</td>
+        <td>A macro: a named step sequence written in Gherkin, expanded before binding, with provenance kept in the report. The reuse Screenplay reaches for, without the classes. <a href="/docs/extending-vocabulary/">Macros</a></td>
+      </tr>
+      <tr>
+        <th scope="row">Several actors</th>
+        <td><strong>Screenplay</strong> (Serenity BDD) has actors as first-class objects, and with a cast “each actor can have their own browser.” Set up in code. <strong>Playwright</strong> gives you browser contexts to isolate sessions, also in code.</td>
+        <td>Declare <code>:user</code> with instances <code>alice</code> and <code>bob</code> in a two-line glossary; write <code>:user/alice</code> and <code>:user/bob</code> in one scenario; each gets its own browser. No setup. <a href="/tour/#actors">Two actors</a></td>
+      </tr>
+      <tr>
+        <th scope="row">On failure</th>
+        <td><strong>Playwright’s</strong> trace viewer records a screencast, a DOM snapshot before and after each action, the console and the network — richer per action than anything here. <strong>Cucumber</strong> gives you the step’s exception and stack trace.</td>
+        <td>The row: which actor, which intent, which step; expected against seen, with the poll count; the screenshot and the console attached at the instant of failure — in your vocabulary, and the same in HTML, JUnit XML and the machine-readable record. <a href="/tour/#failure">The failure row</a></td>
+      </tr>
+      <tr>
+        <th scope="row">A down environment</th>
+        <td><strong>Playwright</strong> and <strong>Cucumber</strong> report a failed navigation as a failed test: the same red as a wrong assertion, and the same exit status.</td>
+        <td>Exit 4, <em>unobserved</em>: the run could not measure, so it says so in its exit code and never issues a verdict about the app. Exits 0 and 1 are verdicts; 2, 3 and 4 are three ways the run failed to be a measurement. <a href="/tour/#exit-codes">The exit-code contract</a></td>
+      </tr>
+      <tr>
+        <th scope="row">When the page changes</th>
+        <td><strong>Self-healing tools</strong> (Healenium, for one) work “by automatically detecting and healing test failures caused by changes in the UI”: a locator that stops matching is replaced and the run goes on.</td>
+        <td>We don’t heal your tests. We name what changed. The locator lives in one intent file, so the fix is one binding and zero scenarios — and a reference that no longer resolves is a refusal, not a guess.</td>
+      </tr>
+      <tr>
+        <th scope="row">For agents</th>
+        <td><strong>Playwright MCP</strong> lets an agent drive a live browser through the accessibility tree — a strong way to explore an app. What it leaves behind is a session.</td>
+        <td>The agent reads the vocabulary and the documentation inside the jar (<code>sl orient</code>, <code>sl agent-doc</code>) and writes scenarios that compile. What it leaves behind is a feature file and a glossary the next person can read. <a href="/agents/">For agents</a></td>
+      </tr>
+      <tr>
+        <th scope="row">Gherkin compatibility</th>
+        <td><strong>Cucumber</strong> is the reference implementation of Gherkin, and its step libraries are written against Cucumber’s API.</td>
+        <td>The parser accepts every legal Gherkin file (50 of 50 official files; 12 of 12 invalid ones rejected). The compiler runs only typed steps, by choice. An existing step library does not run here; feature files and page objects migrate. <a href="/tour/#parser">The parser</a></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p class="compare-note">Cucumber is a trademark of its maintainers, Playwright of Microsoft, Serenity of its maintainers, Healenium of EPAM. None of them is affiliated with ShiftLefter. Each claim above about another tool was read from that tool’s own documentation on the date in this page’s source; if one has drifted, <a href="mailto:gabriel@shiftlefter.com">say so</a> and it will be corrected.</p>
+
+{% include home/footer.html %}
+</main>

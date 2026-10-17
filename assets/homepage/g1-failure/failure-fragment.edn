@@ -6,7 +6,7 @@
    :scenario/name "Removing the last item marks that item removed",
    :scenario/id #uuid "00000000-0000-0000-0000-000000000000",
    :location
-   {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 926},
+   {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 938},
    :error
    {:type :step/exception,
     :message
@@ -18,7 +18,7 @@
      :deadline-ms 3000,
      :deadline-source :default,
      :interval-ms 100,
-     :poll-counts {:attempts 25, :answered 0, :threw 25, :observation-throws 0},
+     :poll-counts {:attempts 26, :answered 0, :threw 26, :observation-throws 0},
      :last-error
      {:message "Expected element text to contain 'removed' but was 'in cart'",
       :type :browser/assertion-failed,
@@ -37,7 +37,7 @@
                  "attachments/removing-the-last-item-marks-that-item-removed/failure-screenshot-web-shopper.png",
                  :media-type "image/png",
                  :bytes <bytes>}],
-   :poll-counts {:attempts 25, :answered 0, :threw 25, :observation-throws 0}}],
+   :poll-counts {:attempts 26, :answered 0, :threw 26, :observation-throws 0}}],
  :attachments
  [{:scenario/name "Removing the last item marks that item removed",
    :scenario/id #uuid "00000000-0000-0000-0000-000000000000",

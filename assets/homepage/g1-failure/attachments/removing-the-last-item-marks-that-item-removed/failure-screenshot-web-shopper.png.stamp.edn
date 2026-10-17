@@ -1,13 +1,13 @@
 {:artifact "g1-failure/attachments/removing-the-last-item-marks-that-item-removed/failure-screenshot-web-shopper.png"
- :dev-commit "f3723b79"
+ :dev-commit "640a4a74"
  :dev-tree-dirty? false
  :sl-version "0.5.6"
  :source "scripts/homepage/projects/hero"
  :staged-at "/private/tmp/sl-homepage/hero"
- :command "cp sl/results/20260924T200705Z/cart/attachments/removing-the-last-item-marks-that-item-removed/failure-screenshot-web-shopper.png attachments/removing-the-last-item-marks-that-item-removed/failure-screenshot-web-shopper.png"
+ :command "cp sl/results/20261017T185437Z/cart/attachments/removing-the-last-item-marks-that-item-removed/failure-screenshot-web-shopper.png attachments/removing-the-last-item-marks-that-item-removed/failure-screenshot-web-shopper.png"
  :exit 0
- :date "2026-09-24"
- :browser {:chrome "153.0.8010.53" :chromedriver "152.0.7977.82" :backend :etaoin}
+ :date "2026-10-17"
+ :browser {:chrome "154.0.8037.100" :chromedriver "154.0.8037.92" :backend :etaoin}
  :scrubbed []
- :bytes 29823
+ :bytes 30296
  :regenerate "scripts/homepage/capture.sh g1"}

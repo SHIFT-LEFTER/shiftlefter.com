@@ -1,0 +1,31 @@
+---
+layout: default
+title: Why I built this
+permalink: /why/
+description: "Why ShiftLefter exists: the thesis that plain-language scenarios are the contract between people and the machine, and one engineer building the compiler for it with agents in the loop."
+---
+{%- comment -%}
+The why-I-built-this page (sl-4l16): short; the thesis, the one-author-
+with-agents story, a link to Writing. The only page on the site where the
+author is the subject. Drafted by the Herald from the doctrine sheet and the
+project's record — Chair's voice pass owns every sentence here.
+{%- endcomment -%}
+<main class="home why">
+  <header class="page-head">
+    <p class="kicker">Why I built this</p>
+    <h1>The contract was right. The glue was wrong.</h1>
+    <p class="standfirst">A note from the author. Everything else on this site is about the tool; this page is about why one engineer has spent the better part of a year building a compiler for test scenarios, with agents in the loop.</p>
+  </header>
+
+  <article class="essay-body">
+    <p>BDD got the important thing right: a plain-language scenario is the contract between the people who want a behavior and the machine that checks it. A product owner can read it. A new engineer can read it. An agent can read it. Nothing else in a test suite has that property.</p>
+    <p>What held the contract up was wrong. A step was a regular expression over a string, bound to a method somebody had to write by hand. So nothing was checked until a browser was open; a renamed phrase dangled silently across a suite; and the glue grew until the team stopped writing scenarios, because every new sentence was a new method. The scenarios rotted. The idea got blamed.</p>
+    <p>Two things changed. Coding agents removed the cost of the glue — they will happily write the fortieth step definition — and in doing so made the rot faster, because a test nobody wrote is a test nobody maintains. And the fix for rot was sitting in plain sight the whole time: a vocabulary. If the words a scenario may use are declared once — who can act, what they can do, what things on the page are called — then every sentence can be checked against that vocabulary before anything runs, the way a compiler checks a program. A typo dies at the desk. A rename is a compile error, not a Tuesday.</p>
+    <p>So the creed: agents write the tests, the vocabulary is yours, the compiler is the referee. The human owns the words; the machine refuses to guess at them; and after the run it refuses to lie — a run that could not observe the app says so in its exit code, never in a green.</p>
+    <p>ShiftLefter is one author with agents in the loop, and the agent surface is used on itself: the documentation that ships inside the jar is what the agents that build it read. Fifteen releases so far, each one captured and shown rather than described — <a href="/">the front page</a> shows nothing it cannot prove.</p>
+    <p>The longer argument is in the writing: <a href="/writing/2026/08/your-system-is-not-your-application/">Your System Is Not Your Application</a>, on what an end-to-end test is actually for, and <a href="/writing/2026/08/the-pony-test/">The Pony Test</a>, on handing a blinded agent your pitch and grading what it imagines. More at <a href="/writing/">Writing</a>.</p>
+    <p class="signoff">— Gabriel Wilkins · <a href="https://www.linkedin.com/in/Gabriel-Wilkins" target="_blank" rel="noopener">LinkedIn</a> · <a href="mailto:gabriel@shiftlefter.com">gabriel@shiftlefter.com</a></p>
+  </article>
+
+{% include home/footer.html %}
+</main>
