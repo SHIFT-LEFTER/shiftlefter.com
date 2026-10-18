@@ -47,7 +47,7 @@ breadcrumb, the "next release" line. Links the agent-facing manual
     <div class="pair">
       <figure class="artifact">
         <figcaption>in — a Cucumber feature, untouched</figcaption>
-        <pre><code>{{ g7_bring_feature | strip | escape }}</code></pre>
+        <pre><code class="language-gherkin">{% include home/gherkin.html src=g7_bring_feature %}</code></pre>
       </figure>
       <figure class="artifact">
         <figcaption>out</figcaption>
@@ -64,7 +64,7 @@ breadcrumb, the "next release" line. Links the agent-facing manual
       <li><a href="/llms.txt">/llms.txt</a> — a plain-text pointer to this site and the repository.</li>
       <li><a href="/tour/">The tour</a> — every feature with its captured in and out, for the human you brought along.</li>
     </ul>
-    <p class="asterisk"><strong>Next release:</strong> a skill and a tone prompt — hand your agent the on-ramp, not a URL.</p>
+    <p class="asterisk"><strong>Next release:</strong> a skill and a tone prompt — hand your agent the on-ramp, not a URL. For the record: without a skill, a fresh agent given this framework and a FastAPI service authored an HTTP interface for it — five scenarios dry-run green on the first attempt, and the first live run green (August 2026). The skill turns that into a recipe.</p>
   </section>
 
 {% include home/footer.html %}

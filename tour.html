@@ -19,7 +19,7 @@ MUST stay at the site root (include_relative resolves against the page).
   <header class="page-head">
     <p class="kicker">The tour</p>
     <h1>What you write, and what comes back</h1>
-    <p class="standfirst">Every feature, one at a time, each with a scenario in and a captured result out. Nothing here is mocked: each box is a file under <a href="/assets/homepage/">assets/homepage</a>, stamped with the commit and the command that produced it. <a href="/">The front page</a> is the short version.</p>
+    <p class="standfirst">Every feature, one at a time, each with a scenario in and a captured result out. Nothing here is mocked: each box is a file under <a href="/assets/homepage/">assets/homepage</a>, stamped with the commit and the command that produced it. Every example is a small project that <code>scripts/homepage/capture.sh</code> runs at each regeneration, and the boxes are its output — so the tour proves each claim as of the last capture. <a href="/">The front page</a> is the short version.</p>
   </header>
 
   <section class="feature" id="refusal">
@@ -27,7 +27,7 @@ MUST stay at the site root (include_relative resolves against the page).
     <p>A scenario is four lines of Gherkin. <code>:user/alice</code> is a declared subject and an instance — a keyword naming the subject’s type and the instance, declared in the glossary. <code>Login.submit</code> is an intent reference: an <em>intent</em> is a named thing on a page, with the elements it owns, declared as a small data file. Here the actor is misspelled on the first step and the element on the third:</p>
     <figure class="artifact">
       <figcaption>in — <code>sl/features/login.feature</code></figcaption>
-      <pre><code>{{ g2_refusal_feature | strip | escape }}</code></pre>
+      <pre><code class="language-gherkin">{% include home/gherkin.html src=g2_refusal_feature %}</code></pre>
     </figure>
     <figure class="artifact">
       <figcaption>out — <code>sl run</code></figcaption>
@@ -43,8 +43,11 @@ MUST stay at the site root (include_relative resolves against the page).
       </details>
     </figure>
     <p>A typo is the fastest case to see, not the important one. The important ones are a glossary entry renamed and left dangling across forty scenarios; a merge that leaves references pointing at nothing; a step library refactored underneath a suite nobody re-ran. Each is the same failure to resolve, caught the same way, at the same moment: before a browser opens.</p>
+    {%- comment -%} P2 interim (sl-4l16): the caption's last sentence, here and
+    under #exit-codes, goes when sl-jima lands (the plan line leads with the
+    resolved triple, pattern behind -vv) and the plan is recaptured. {%- endcomment %}
     <figure class="artifact">
-      <figcaption>one step of the plan — <code>sl run --dry-run -v</code>: the text, the pattern it bound to, and what it resolved to</figcaption>
+      <figcaption>one step of the plan — <code>sl run --dry-run -v</code>: the text, the pattern it bound to, and what it resolved to. The pattern belongs to the built-in step; you never write it.</figcaption>
       <pre class="wrap"><code>{{ plan_one_step | strip | escape }}</code></pre>
     </figure>
     <p>How strict, exactly: unknown subjects and unknown interfaces block; unknown verbs warn; unknown intent references are errors; raw locators in step text are off by default; untyped step definitions warn. Each is configurable. Strictness follows ownership: whoever owns the word decides how hard the check is.</p>
@@ -56,7 +59,7 @@ MUST stay at the site root (include_relative resolves against the page).
     <p>Four steps against a shopping cart. Three pass. The fourth is what a failure looks like here:</p>
     <figure class="artifact">
       <figcaption>in — <code>sl/features/cart.feature</code></figcaption>
-      <pre><code>{{ g1_snippet | strip | escape }}</code></pre>
+      <pre><code class="language-gherkin">{% include home/gherkin.html src=g1_snippet %}</code></pre>
     </figure>
     <figure class="artifact">
       <figcaption>out — the row from the HTML report, as a browser renders it</figcaption>
@@ -71,11 +74,11 @@ MUST stay at the site root (include_relative resolves against the page).
     <div class="pair">
       <figure class="artifact">
         <figcaption><code>--junit-xml</code></figcaption>
-        <pre class="tall"><code>{{ g1_junit | strip | escape }}</code></pre>
+        <div class="tall">{% highlight xml %}{{ g1_junit | strip }}{% endhighlight %}</div>
       </figure>
       <figure class="artifact">
         <figcaption><code>--edn</code>, the failure and its attachments</figcaption>
-        <pre class="tall"><code>{{ g1_fragment | strip | escape }}</code></pre>
+        <div class="tall">{% highlight clojure %}{{ g1_fragment | strip }}{% endhighlight %}</div>
       </figure>
     </div>
     <p class="links"><a href="/assets/homepage/g1-failure/report.html">Open the real report</a> · <a href="/report/">A bigger one, 41 scenarios</a> · <a href="/docs/reports/">Build your own from the record</a></p>
@@ -91,22 +94,23 @@ MUST stay at the site root (include_relative resolves against the page).
     {{ w1_snippet }} and the captured intents file. The "out" IS captured. {%- endcomment %}
     <div class="pair">
       <figure class="artifact pending">
-        <figcaption>in — five steps of the reset</figcaption>
-        <pre><code>    Then :user/alice should see 'Enter Verification Code'
+        <figcaption>in — five steps of the reset, one scenario</figcaption>
+        {%- capture crossing_in %}    Then :user/alice should see 'Enter Verification Code'
     When [:sms] :user/alice receives an SMS to '+15550001111' matching Reset.smsCode
     And  :user/alice fills Login.code with {code}
     And  :user/alice clicks Login.submit
-    Then :user/alice should see 'Code verified for alice'</code></pre>
+    Then :user/alice should see 'Code verified for alice'{% endcapture %}
+        <pre><code class="language-gherkin">{% include home/gherkin.html src=crossing_in %}</code></pre>
       </figure>
       <figure class="artifact pending">
         <figcaption>the declared <code>Reset</code> intent — the message is an element with a shape and no locator</figcaption>
-        <pre><code>{:intent "Reset"
+        {% highlight clojure %}{:intent "Reset"
  :elements {:smsCode {:bindings {:sms {}}
-                      :shape "verification code is: (?&lt;code&gt;\\d{6})"}}}</code></pre>
+                      :shape "verification code is: (?<code>\\d{6})"}}}{% endhighlight %}
       </figure>
     </div>
     <figure class="artifact">
-      <figcaption>out</figcaption>
+      <figcaption>out — that scenario</figcaption>
       <pre><code>{{ w1_run | strip | escape }}</code></pre>
     </figure>
     <p>The code arrives by SMS. The shape names it <code>code</code>. The next step types <code>{code}</code> into a browser field. No glue code, no fixture, no shared variable: a value captured in one step is a word in the next, across interfaces. When the wording of the message changes, one intent file changes and no scenario does.</p>
@@ -116,21 +120,21 @@ MUST stay at the site root (include_relative resolves against the page).
   <section class="feature" id="page-objects">
     <h2>Page objects are data, addressed by path</h2>
     <figure class="artifact">
-      <figcaption>in — six steps against a cart and a thread</figcaption>
-      <pre><code>{{ w2_snippet | strip | escape }}</code></pre>
+      <figcaption>in — the first of the feature’s six scenarios: six steps against a cart and a thread</figcaption>
+      <pre><code class="language-gherkin">{% include home/gherkin.html src=w2_snippet %}</code></pre>
     </figure>
     <div class="pair">
       <figure class="artifact">
         <figcaption>the declared <code>Cart</code></figcaption>
-        <pre><code>{{ w2_cart | strip | escape }}</code></pre>
+        {% highlight clojure %}{{ w2_cart | strip }}{% endhighlight %}
       </figure>
       <figure class="artifact">
         <figcaption>the declared <code>Item</code></figcaption>
-        <pre><code>{{ w2_item | strip | escape }}</code></pre>
+        {% highlight clojure %}{{ w2_item | strip }}{% endhighlight %}
       </figure>
     </div>
     <figure class="artifact">
-      <figcaption>out</figcaption>
+      <figcaption>out — the whole feature, all six scenarios</figcaption>
       <pre><code>{{ w2_run | strip | escape }}</code></pre>
     </figure>
     <p><code>Cart.items[-1].remove</code> is the remove button on the last cart row: a collection, a negative index, an element. <code>Cart.items[*].price</code> fans out to every row, so <em>should see 3 … elements</em> is a count of all members. <code>Thread.post[1].comment[-1].author</code> walks two levels of nesting with an index at each. The objects are two small data files; the locators live there and nowhere else, so when the page moves you edit one binding and zero scenarios.</p>
@@ -141,7 +145,7 @@ MUST stay at the site root (include_relative resolves against the page).
     <h2>Two actors, two browsers, and costumes</h2>
     <figure class="artifact">
       <figcaption>in — alice and bob in one scenario</figcaption>
-      <pre><code>{{ w3_snippet | strip | escape }}</code></pre>
+      <pre><code class="language-gherkin">{% include home/gherkin.html src=w3_snippet %}</code></pre>
     </figure>
     <figure class="artifact">
       <figcaption>out — the run opens two real Chrome windows beside the terminal; the recording shows the terminal, cold JVM start on the clock</figcaption>
@@ -156,6 +160,7 @@ MUST stay at the site root (include_relative resolves against the page).
       <pre><code>{{ w3_glossary | strip | escape }}</code></pre>
     </figure>
     <p>alice and bob are two instances of one declared subject. Each gets its own browser; nothing is shared unless you say so. The glossary shows the declaration and that the project uses it fourteen times.</p>
+    <p>Subjects are types, with instances, for three reasons. Every line says who is acting and in what context — not <em>I</em>, not <em>the user</em>, not a convention kept in a wiki — so “why is the admin in this scenario?” is answered by the line itself. A browser per instance costs nothing: name a second instance and its session exists, with no context to create and thread through the test body; an environment, or a costume, is assigned to the instance once. And because they are types, the same scenario can later run as someone else and the answers compared — <a href="/#denials">derived denials</a>, under Not yet.</p>
     <figure class="artifact">
       <figcaption><code>sl costume list</code> in that project</figcaption>
       <pre><code>{{ w3_costumes | strip | escape }}</code></pre>
@@ -167,7 +172,7 @@ MUST stay at the site root (include_relative resolves against the page).
   <section class="feature" id="exit-codes">
     <h2>The plan, or the refusal; and the exit code is a contract</h2>
     <figure class="artifact">
-      <figcaption><code>sl run --dry-run -v</code> — every scenario, every step, the step definition it bound to, by file and line</figcaption>
+      <figcaption><code>sl run --dry-run -v</code> in the two-actor project — every scenario, every step, the step definition it bound to, by file and line. The pattern belongs to the built-in step; you never write it.</figcaption>
       <pre class="tall"><code>{{ g2_plan | strip | escape }}</code></pre>
     </figure>
     <p>Before anything runs, the whole plan. If anything cannot bind you get <a href="#refusal">the refusal</a> instead, and exit 2. Either way the exit code means one thing:</p>
@@ -192,17 +197,17 @@ MUST stay at the site root (include_relative resolves against the page).
     <p><code>--max-parallel 4</code>, and the report is the same as the sequential run — in content and in order.</p>
     <div class="pair">
       <figure class="artifact">
-        <figcaption>sequential</figcaption>
+        <figcaption>sequential — the six-scenario feature from <a href="#page-objects">page objects</a></figcaption>
         <pre><code>{{ p3_seq | strip | escape }}</code></pre>
       </figure>
       <figure class="artifact">
-        <figcaption><code>--max-parallel 4</code></figcaption>
+        <figcaption>the same feature, <code>--max-parallel 4</code></figcaption>
         <pre><code>{{ p3_par | strip | escape }}</code></pre>
       </figure>
     </div>
     <figure class="artifact">
       <figcaption><code>diff</code> of the two</figcaption>
-      <pre><code>{{ p3_diff | strip | escape }}</code></pre>
+      {% highlight diff %}{{ p3_diff | strip }}{% endhighlight %}
     </figure>
   </section>
 
@@ -216,14 +221,14 @@ MUST stay at the site root (include_relative resolves against the page).
       </figure>
       <figure class="artifact">
         <figcaption><code>sl fmt</code></figcaption>
-        <pre><code>{{ p4_canonical | strip | escape }}</code></pre>
+        <pre><code class="language-gherkin">{% include home/gherkin.html src=p4_canonical %}</code></pre>
       </figure>
     </div>
     <p>The compiler, by choice, runs only typed steps: strictness over compatibility. An existing step library does not run here; feature files and page objects migrate. A plain Cucumber suite parses, every keyword, and nothing runs, because nothing in it is typed yet — and it says so, counts what it saw, and names the next command. <em>Unshifted</em> in that output means untyped; shifted means typed.</p>
     <div class="pair">
       <figure class="artifact">
         <figcaption>in — a Cucumber feature, untouched</figcaption>
-        <pre><code>{{ g7_bring_feature | strip | escape }}</code></pre>
+        <pre><code class="language-gherkin">{% include home/gherkin.html src=g7_bring_feature %}</code></pre>
       </figure>
       <figure class="artifact">
         <figcaption>out</figcaption>
@@ -239,13 +244,13 @@ MUST stay at the site root (include_relative resolves against the page).
     <div class="pair">
       <figure class="artifact">
         <figcaption><code>sl/shiftlefter.edn</code> — the one line</figcaption>
-        <pre><code>{:interfaces
+        {% highlight clojure %}{:interfaces
  {:web {:type :web
-        :adapter :playwright}}}</code></pre>
+        :adapter :playwright}}}{% endhighlight %}
       </figure>
       <figure class="artifact">
         <figcaption>the one dependency — a <code>deps.edn</code> coordinate, or three jars dropped in <code>sl/lib/</code></figcaption>
-        <pre><code>{:deps {com.microsoft.playwright/playwright {:mvn/version "1.50.0"}}}</code></pre>
+        {% highlight clojure %}{:deps {com.microsoft.playwright/playwright {:mvn/version "1.50.0"}}}{% endhighlight %}
       </figure>
     </div>
     <p>The step contract is the same on both: a feature file that runs on one runs on the other, with the same vocabulary, the same planning errors, and the same nested addressing. The two backends do differ — console capture and costumes are WebDriver-only today — and the differences are kept in <a href="https://github.com/shift-lefter/shiftlefter/blob/main/docs/INSTALL-TIERS.md#backend-differences" target="_blank" rel="noopener">one table</a> rather than smoothed over.</p>

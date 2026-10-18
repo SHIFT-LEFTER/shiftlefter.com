@@ -4,11 +4,11 @@
     <div class="pair">
       <figure class="artifact">
         <figcaption>a scenario that says why it exists</figcaption>
-        <pre><code>{{ f_snippet | strip | escape }}</code></pre>
+        <pre><code class="language-gherkin">{% include home/gherkin.html src=f_snippet %}</code></pre>
       </figure>
       <figure class="artifact">
         <figcaption>the planning record of the refusal above — every issue names where the right thing is declared</figcaption>
-        <pre class="tall"><code>{{ f_defsite | strip | escape }}</code></pre>
+        <div class="tall">{% highlight clojure %}{{ f_defsite | strip }}{% endhighlight %}</div>
       </figure>
     </div>
     <p><code>@because=CHK-4412</code> is an ordinary typed tag, carried into the record. <code>:def-site</code> is a file and a line. The graph from requirements to the runs that prove them is not here; its inputs already are.</p>

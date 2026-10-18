@@ -33,7 +33,7 @@
   --sl-accent:var(--accent); --sl-rule:var(--rule);
 }
 * { box-sizing:border-box; }
-body { margin:0; background:var(--paper); color:var(--ink); font:17px/1.42 Charter,"Bitstream Charter",Georgia,serif; text-wrap:pretty; }
+body { margin:0; background:var(--paper); color:var(--ink); font:20px/1.42 Charter,"Bitstream Charter",Georgia,serif; text-wrap:pretty; }
 a { color:var(--accent); }
 a:hover { color:var(--ink); }
 
@@ -117,6 +117,23 @@ pre code { background:none; padding:0; font-size:1em; }
 .c-err { color:var(--accent); font-weight:700; }
 .c-hint { color:var(--soft); font-style:italic; }
 .c-com { color:var(--soft); }
+/* Code color (sl-4l16, punch item P3): Rouge token classes, build time, CSS
+ * only. The EDN (clojure lexer), XML and diff boxes come from {% highlight %};
+ * the Gherkin boxes from _includes/home/gherkin.html, which emits the same
+ * classes. One palette, light and dark. .err is deliberately unstyled. */
+:root { --tok-str:#3d5a3c; --tok-sym:#8a6412; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --tok-str:#9fc49a; --tok-sym:#e3b23c; }
+}
+:root[data-theme="dark"] { --tok-str:#9fc49a; --tok-sym:#e3b23c; }
+pre .k, pre .kd, pre .kn, pre .kr { color:var(--accent); font-weight:700; }
+pre .s, pre .s1, pre .s2, pre .sr, pre .gi { color:var(--tok-str); }
+pre .no, pre .ss, pre .nv, pre .kc { color:var(--tok-sym); }
+pre .nt, pre .nc, pre .nf { color:var(--ink); font-weight:700; }
+pre .na { color:var(--soft); }
+pre .c, pre .c1, pre .cm { color:var(--soft); font-style:italic; }
+pre .gd { color:var(--accent); }
+pre .gh, pre .gu { color:var(--soft); font-weight:700; }
 
 .writing { max-width:45rem; margin:0 auto; padding:2.6rem 1.5rem 4rem; }
 .writing-sub { font-style:italic; color:var(--soft); margin:0; }
@@ -161,11 +178,11 @@ pre code { background:none; padding:0; font-size:1em; }
 .artifact { margin:0 0 1.1rem; }
 .artifact figcaption { font-family:var(--sans); font-size:.72rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--soft); margin:0 0 .35rem; }
 .artifact figcaption code { text-transform:none; letter-spacing:0; font-size:.95em; }
-.artifact pre { margin:0; }
+.artifact pre, .artifact .highlight { margin:0; }
 .artifact img { width:100%; height:auto; display:block; border:1px solid var(--rule); }
 .artifact details { margin-top:.5rem; }
 .artifact summary { font-family:var(--sans); font-size:.76rem; color:var(--soft); cursor:pointer; }
-pre.tall { max-height:22rem; overflow:auto; }
+pre.tall, .tall pre { max-height:22rem; overflow:auto; }
 pre.wrap { white-space:pre-wrap; overflow-wrap:anywhere; }
 .pair { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:1rem; }
 /* minmax(0,1fr), never a bare 1fr: a bare 1fr is minmax(auto,1fr), and a

@@ -72,7 +72,7 @@ those tools' own documentation on 2026-10-17; sources:
       <tr>
         <th scope="row">Several actors</th>
         <td><strong>Screenplay</strong> (Serenity BDD) has actors as first-class objects, and with a cast “each actor can have their own browser.” Set up in code. <strong>Playwright</strong> gives you browser contexts to isolate sessions, also in code.</td>
-        <td>Declare <code>:user</code> with instances <code>alice</code> and <code>bob</code> in a two-line glossary; write <code>:user/alice</code> and <code>:user/bob</code> in one scenario; each gets its own browser. No setup. <a href="/tour/#actors">Two actors</a></td>
+        <td>Declare <code>:user</code> with instances <code>alice</code> and <code>bob</code> in a two-line glossary; write <code>:user/alice</code> and <code>:user/bob</code> in one scenario; each gets its own browser. No setup. Nothing in the harness says what alice may do; the scenarios do, and substituting the actor is how you find out. <a href="/tour/#actors">Two actors</a></td>
       </tr>
       <tr>
         <th scope="row">On failure</th>
@@ -87,12 +87,12 @@ those tools' own documentation on 2026-10-17; sources:
       <tr>
         <th scope="row">When the page changes</th>
         <td><strong>Self-healing tools</strong> (Healenium, for one) work “by automatically detecting and healing test failures caused by changes in the UI”: a locator that stops matching is replaced and the run goes on.</td>
-        <td>We don’t heal your tests. We name what changed. The locator lives in one intent file, so the fix is one binding and zero scenarios — and a reference that no longer resolves is a refusal, not a guess.</td>
+        <td>We don’t heal your tests. We name what changed. An agent working with ShiftLefter gets the same named delta and may heal it itself, as an explicit edit to one binding that the record shows — never a silent substitution at run time. The locator lives in one intent file, so the fix is one binding and zero scenarios — and a reference that no longer resolves is a refusal, not a guess.</td>
       </tr>
       <tr>
         <th scope="row">For agents</th>
         <td><strong>Playwright MCP</strong> lets an agent drive a live browser through the accessibility tree — a strong way to explore an app. What it leaves behind is a session.</td>
-        <td>The agent reads the vocabulary and the documentation inside the jar (<code>sl orient</code>, <code>sl agent-doc</code>) and writes scenarios that compile. What it leaves behind is a feature file and a glossary the next person can read. <a href="/agents/">For agents</a></td>
+        <td>The agent reads the vocabulary and the documentation inside the jar (<code>sl orient</code>, <code>sl agent-doc</code>) and writes scenarios that compile. The live door is the REPL: <code>sl repl</code>, for humans and agents alike, runs steps against a live browser. What it leaves behind is a feature file and a glossary the next person can read. <a href="/agents/">For agents</a></td>
       </tr>
       <tr>
         <th scope="row">Gherkin compatibility</th>
@@ -102,7 +102,7 @@ those tools' own documentation on 2026-10-17; sources:
     </tbody>
   </table>
 
-  <p class="compare-note">Cucumber is a trademark of its maintainers, Playwright of Microsoft, Serenity of its maintainers, Healenium of EPAM. None of them is affiliated with ShiftLefter. Each claim above about another tool was read from that tool’s own documentation on the date in this page’s source; if one has drifted, <a href="mailto:gabriel@shiftlefter.com">say so</a> and it will be corrected.</p>
+  <p class="compare-note">Cucumber, Playwright, Serenity and Healenium are trademarks of their respective owners. None of them is affiliated with ShiftLefter. Each claim above about another tool was read from that tool’s own documentation on the date in this page’s source; if one has drifted, <a href="mailto:gabriel@shiftlefter.com">say so</a> and it will be corrected.</p>
 
 {% include home/footer.html %}
 </main>
