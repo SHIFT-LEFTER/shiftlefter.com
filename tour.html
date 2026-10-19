@@ -41,11 +41,8 @@ This page MUST stay at the site root (include_relative resolves against the page
       </details>
     </figure>
     <p>A typo is the fastest case to see, not the important one. The important ones are a glossary entry renamed and left dangling across forty scenarios; a merge that leaves references pointing at nothing; a step library refactored underneath a suite nobody re-ran. Each is the same failure to resolve, caught the same way, at the same moment: before a browser opens.</p>
-    {%- comment -%} P2 interim (sl-4l16): the caption's last sentence, here and
-    under #exit-codes, goes when sl-jima lands (the plan line leads with the
-    resolved triple, pattern behind -vv) and the plan is recaptured. {%- endcomment %}
     <figure class="artifact">
-      <figcaption>one step of the plan — <code>sl run --dry-run -v</code>: the text, the pattern it bound to, and what it resolved to. The pattern belongs to the built-in step; you never write it.</figcaption>
+      <figcaption>one step of the plan — <code>sl run --dry-run -v</code>: the text, what it resolved to, and the step definition it bound to, by file and line</figcaption>
       <pre class="wrap"><code>{{ plan_one_step | strip | escape }}</code></pre>
     </figure>
     <p>How strict, exactly: unknown subjects and unknown interfaces block; unknown verbs warn; unknown intent references are errors; raw locators in step text are off by default; untyped step definitions warn. Each is configurable. Strictness follows ownership: whoever owns the word decides how hard the check is.</p>
@@ -158,7 +155,7 @@ This page MUST stay at the site root (include_relative resolves against the page
   <section class="feature" id="exit-codes">
     <h2>The plan, or the refusal; and the exit code is a contract</h2>
     <figure class="artifact">
-      <figcaption><code>sl run --dry-run -v</code> in the two-actor project — every scenario, every step, the step definition it bound to, by file and line. The pattern belongs to the built-in step; you never write it.</figcaption>
+      <figcaption><code>sl run --dry-run -v</code> in the two-actor project — every scenario, every step, what it resolved to, and the step definition it bound to, by file and line</figcaption>
       <pre class="tall"><code>{{ g2_plan | strip | escape }}</code></pre>
     </figure>
     <p>Before anything runs, the whole plan. If anything cannot bind you get <a href="#refusal">the refusal</a> instead, and exit 2. Either way the exit code means one thing:</p>

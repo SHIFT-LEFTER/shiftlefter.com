@@ -1,5 +1,5 @@
 {:artifact "g1-failure/failure-row.png"
- :dev-commit "727b6a11"
+ :dev-commit "d573b865"
  :dev-tree-dirty? false
  :sl-version "0.5.6"
  :source "scripts/homepage/projects/hero"
