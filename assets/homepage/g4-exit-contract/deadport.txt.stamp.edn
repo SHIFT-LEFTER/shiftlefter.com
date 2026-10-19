@@ -1,12 +1,12 @@
 {:artifact "g4-exit-contract/deadport.txt"
- :dev-commit "640a4a74"
+ :dev-commit "727b6a11"
  :dev-tree-dirty? false
  :sl-version "0.5.6"
  :source "scripts/homepage/projects/deadport"
  :staged-at "/private/tmp/sl-homepage/deadport"
  :command "sl run sl/features/"
  :exit 4
- :date "2026-10-17"
+ :date "2026-10-19"
  :browser {:chrome "154.0.8037.100" :chromedriver "154.0.8037.92" :backend :etaoin}
  :scrubbed [:session :port :seed]
  :regenerate "scripts/homepage/capture.sh g4"}

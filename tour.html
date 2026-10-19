@@ -9,10 +9,8 @@ The tour (sl-4l16): the twenty-minute read, split BY FEATURE — never by
 "what you write" against "what you get back" (that split was tried and
 ruled unreadable). Each section stands alone with its own in/out pair. No
 rarity labels (those are /compare/), no on-this-page paragraph. Every box
-is a captured file from assets/homepage/ read by _includes/home/captures.html
-— except the one marked PENDING sl-ectw, which is written to the landed
-syntax and is replaced by the recapture once that bead merges. This page
-MUST stay at the site root (include_relative resolves against the page).
+is a captured file from assets/homepage/ read by _includes/home/captures.html.
+This page MUST stay at the site root (include_relative resolves against the page).
 {%- endcomment -%}
 {%- include home/captures.html -%}
 <main class="home tour">
@@ -86,34 +84,22 @@ MUST stay at the site root (include_relative resolves against the page).
 
   <section class="feature" id="crossing">
     <h2>A value crosses interfaces by name</h2>
-    <p>A password reset: the browser asks for a code, the code arrives by SMS, the browser gets the code. The SMS line is a second interface, same grammar — <code>[:sms]</code> names it on the step. The message’s shape lives on the intent that owns it, as data, and the named group inside it becomes a word the next step can use:</p>
-    {%- comment -%} PENDING sl-ectw (amendment A2): the "in" below and the Reset
-    intent are WRITTEN to the landed syntax — the capture shape on the intent
-    element, not in the step text. Once sl-ectw merges to main, rerun
-    scripts/homepage/capture.sh w1 and replace these two figures with
-    {{ w1_snippet }} and the captured intents file. The "out" IS captured. {%- endcomment %}
+    <p>A password reset: the browser asks for a code, the code arrives by SMS, the browser gets the code. The SMS step is a second interface, same grammar: <em>receives an SMS</em> is a built-in verb of the <code>:sms</code> interface. The message’s shape lives on the intent that owns it, as data, and what the shape captures becomes a word the next step can use:</p>
     <div class="pair">
-      <figure class="artifact pending">
+      <figure class="artifact">
         <figcaption>in — five steps of the reset, one scenario</figcaption>
-        {%- capture crossing_in %}    Then :user/alice should see 'Enter Verification Code'
-    When [:sms] :user/alice receives an SMS to '+15550001111' matching Reset.smsCode
-    And  :user/alice fills Login.code with {code}
-    And  :user/alice clicks Login.submit
-    Then :user/alice should see 'Code verified for alice'{% endcapture %}
-        <pre><code class="language-gherkin">{% include home/gherkin.html src=crossing_in %}</code></pre>
+        <pre><code class="language-gherkin">{% include home/gherkin.html src=w1_snippet %}</code></pre>
       </figure>
-      <figure class="artifact pending">
+      <figure class="artifact">
         <figcaption>the declared <code>Reset</code> intent — the message is an element with a shape and no locator</figcaption>
-        {% highlight clojure %}{:intent "Reset"
- :elements {:smsCode {:bindings {:sms {}}
-                      :shape "verification code is: (?<code>\\d{6})"}}}{% endhighlight %}
+        {% highlight clojure %}{{ w1_reset | strip }}{% endhighlight %}
       </figure>
     </div>
     <figure class="artifact">
       <figcaption>out — that scenario</figcaption>
       <pre><code>{{ w1_run | strip | escape }}</code></pre>
     </figure>
-    <p>The code arrives by SMS. The shape names it <code>code</code>. The next step types <code>{code}</code> into a browser field. No glue code, no fixture, no shared variable: a value captured in one step is a word in the next, across interfaces. When the wording of the message changes, one intent file changes and no scenario does.</p>
+    <p>The code arrives by SMS. <code>Reset.smsCode</code> names the message’s declared shape; its one group binds to the element’s own name, <code>{smsCode}</code>, and the next step types that into a browser field. No glue code, no fixture, no shared variable: a value captured in one step is a word in the next, across interfaces. When the wording of the message changes, one intent file changes and no scenario does.</p>
     <p class="links"><a href="https://github.com/shift-lefter/shiftlefter/blob/main/docs/across-interfaces.md" target="_blank" rel="noopener">Web and SMS in one scenario</a></p>
   </section>
 

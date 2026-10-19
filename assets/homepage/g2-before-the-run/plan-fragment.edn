@@ -9,7 +9,7 @@
     {:pattern-src
      ":([\\w./-]+) opens the browser to ('(?:[^']|'')+'|\\{[A-Za-z][A-Za-z0-9]*(?:\\.[A-Za-z][A-Za-z0-9]*)*\\}|[A-Z][A-Za-z0-9_-]*(?:\\.[A-Za-z0-9_-]+)*)",
      :stepdef-source
-     {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 668},
+     {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 680},
      :subject :user/alice,
      :verb :navigate,
      :frame :to,
@@ -21,9 +21,9 @@
     :column 5,
     :step/resolved
     {:pattern-src
-     ":([\\w./-]+) fills ([A-Z][A-Za-z0-9_-]*(?:\\.[a-z][a-z0-9_-]*(?:\\[-?\\d+\\]|\\[\\*\\])?)+|\\{[^}]+\\}) with ('(?:[^']|'')+'|\\{[A-Za-z][A-Za-z0-9]*(?:\\.[A-Za-z][A-Za-z0-9]*)*\\})",
+     ":([\\w./-]+) fills ([A-Z][A-Za-z0-9_-]*(?:\\.[a-z][A-Za-z0-9_-]*(?:\\[-?\\d+\\]|\\[\\*\\])?)+|\\{[^}]+\\}) with ('(?:[^']|'')+'|\\{[A-Za-z][A-Za-z0-9]*(?:\\.[A-Za-z][A-Za-z0-9]*)*\\})",
      :stepdef-source
-     {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 739},
+     {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 751},
      :subject :user/alice,
      :verb :fill,
      :frame :with,
@@ -35,9 +35,9 @@
     :column 5,
     :step/resolved
     {:pattern-src
-     ":([\\w./-]+) fills ([A-Z][A-Za-z0-9_-]*(?:\\.[a-z][a-z0-9_-]*(?:\\[-?\\d+\\]|\\[\\*\\])?)+|\\{[^}]+\\}) with ('(?:[^']|'')+'|\\{[A-Za-z][A-Za-z0-9]*(?:\\.[A-Za-z][A-Za-z0-9]*)*\\})",
+     ":([\\w./-]+) fills ([A-Z][A-Za-z0-9_-]*(?:\\.[a-z][A-Za-z0-9_-]*(?:\\[-?\\d+\\]|\\[\\*\\])?)+|\\{[^}]+\\}) with ('(?:[^']|'')+'|\\{[A-Za-z][A-Za-z0-9]*(?:\\.[A-Za-z][A-Za-z0-9]*)*\\})",
      :stepdef-source
-     {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 739},
+     {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 751},
      :subject :user/alice,
      :verb :fill,
      :frame :with,
@@ -49,9 +49,9 @@
     :column 5,
     :step/resolved
     {:pattern-src
-     ":([\\w./-]+) clicks ([A-Z][A-Za-z0-9_-]*(?:\\.[a-z][a-z0-9_-]*(?:\\[-?\\d+\\]|\\[\\*\\])?)+|\\{[^}]+\\})",
+     ":([\\w./-]+) clicks ([A-Z][A-Za-z0-9_-]*(?:\\.[a-z][A-Za-z0-9_-]*(?:\\[-?\\d+\\]|\\[\\*\\])?)+|\\{[^}]+\\})",
      :stepdef-source
-     {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 684},
+     {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 696},
      :subject :user/alice,
      :verb :click,
      :frame :default,
@@ -64,7 +64,7 @@
     :step/resolved
     {:pattern-src ":([\\w./-]+) should see ('(?:[^']|'')+')",
      :stepdef-source
-     {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 897},
+     {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 909},
      :subject :user/alice,
      :verb :see,
      :frame :on-page,
@@ -78,7 +78,7 @@
     {:pattern-src
      ":([\\w./-]+) opens the browser to ('(?:[^']|'')+'|\\{[A-Za-z][A-Za-z0-9]*(?:\\.[A-Za-z][A-Za-z0-9]*)*\\}|[A-Z][A-Za-z0-9_-]*(?:\\.[A-Za-z0-9_-]+)*)",
      :stepdef-source
-     {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 668},
+     {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 680},
      :subject :user/bob,
      :verb :navigate,
      :frame :to,
@@ -90,9 +90,9 @@
     :column 5,
     :step/resolved
     {:pattern-src
-     ":([\\w./-]+) fills ([A-Z][A-Za-z0-9_-]*(?:\\.[a-z][a-z0-9_-]*(?:\\[-?\\d+\\]|\\[\\*\\])?)+|\\{[^}]+\\}) with ('(?:[^']|'')+'|\\{[A-Za-z][A-Za-z0-9]*(?:\\.[A-Za-z][A-Za-z0-9]*)*\\})",
+     ":([\\w./-]+) fills ([A-Z][A-Za-z0-9_-]*(?:\\.[a-z][A-Za-z0-9_-]*(?:\\[-?\\d+\\]|\\[\\*\\])?)+|\\{[^}]+\\}) with ('(?:[^']|'')+'|\\{[A-Za-z][A-Za-z0-9]*(?:\\.[A-Za-z][A-Za-z0-9]*)*\\})",
      :stepdef-source
-     {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 739},
+     {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 751},
      :subject :user/bob,
      :verb :fill,
      :frame :with,
@@ -104,9 +104,9 @@
     :column 5,
     :step/resolved
     {:pattern-src
-     ":([\\w./-]+) fills ([A-Z][A-Za-z0-9_-]*(?:\\.[a-z][a-z0-9_-]*(?:\\[-?\\d+\\]|\\[\\*\\])?)+|\\{[^}]+\\}) with ('(?:[^']|'')+'|\\{[A-Za-z][A-Za-z0-9]*(?:\\.[A-Za-z][A-Za-z0-9]*)*\\})",
+     ":([\\w./-]+) fills ([A-Z][A-Za-z0-9_-]*(?:\\.[a-z][A-Za-z0-9_-]*(?:\\[-?\\d+\\]|\\[\\*\\])?)+|\\{[^}]+\\}) with ('(?:[^']|'')+'|\\{[A-Za-z][A-Za-z0-9]*(?:\\.[A-Za-z][A-Za-z0-9]*)*\\})",
      :stepdef-source
-     {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 739},
+     {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 751},
      :subject :user/bob,
      :verb :fill,
      :frame :with,
@@ -118,9 +118,9 @@
     :column 5,
     :step/resolved
     {:pattern-src
-     ":([\\w./-]+) clicks ([A-Z][A-Za-z0-9_-]*(?:\\.[a-z][a-z0-9_-]*(?:\\[-?\\d+\\]|\\[\\*\\])?)+|\\{[^}]+\\})",
+     ":([\\w./-]+) clicks ([A-Z][A-Za-z0-9_-]*(?:\\.[a-z][A-Za-z0-9_-]*(?:\\[-?\\d+\\]|\\[\\*\\])?)+|\\{[^}]+\\})",
      :stepdef-source
-     {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 684},
+     {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 696},
      :subject :user/bob,
      :verb :click,
      :frame :default,
@@ -133,7 +133,7 @@
     :step/resolved
     {:pattern-src ":([\\w./-]+) should see ('(?:[^']|'')+')",
      :stepdef-source
-     {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 897},
+     {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 909},
      :subject :user/bob,
      :verb :see,
      :frame :on-page,
@@ -146,7 +146,7 @@
     :step/resolved
     {:pattern-src ":([\\w./-]+) should see ('(?:[^']|'')+')",
      :stepdef-source
-     {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 897},
+     {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 909},
      :subject :user/alice,
      :verb :see,
      :frame :on-page,
@@ -160,7 +160,7 @@
     {:pattern-src
      ":([\\w./-]+) should be on ('(?:[^']|'')+'|\\{[A-Za-z][A-Za-z0-9]*(?:\\.[A-Za-z][A-Za-z0-9]*)*\\}|[A-Z][A-Za-z0-9_-]*(?:\\.[A-Za-z0-9_-]+)*)",
      :stepdef-source
-     {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 1147},
+     {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 1190},
      :subject :user/alice,
      :verb :be,
      :frame :at,
@@ -174,7 +174,7 @@
     {:pattern-src
      ":([\\w./-]+) should be on ('(?:[^']|'')+'|\\{[A-Za-z][A-Za-z0-9]*(?:\\.[A-Za-z][A-Za-z0-9]*)*\\}|[A-Z][A-Za-z0-9_-]*(?:\\.[A-Za-z0-9_-]+)*)",
      :stepdef-source
-     {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 1147},
+     {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 1190},
      :subject :user/bob,
      :verb :be,
      :frame :at,
@@ -187,7 +187,7 @@
     :step/resolved
     {:pattern-src ":([\\w./-]+) waits (\\d+(?:\\.\\d+)?) seconds?",
      :stepdef-source
-     {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 1269},
+     {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 1312},
      :subject :user/alice,
      :verb :wait,
      :frame :duration,

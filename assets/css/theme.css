@@ -226,7 +226,6 @@ pre.wrap { white-space:pre-wrap; overflow-wrap:anywhere; }
 .feature p { margin:0 0 1rem; }
 .feature ul { margin:0 0 1rem; padding-left:1.2rem; }
 .feature li { margin:0 0 .5rem; }
-.artifact.pending figcaption::after { content:" · written to the landed syntax, recapture pending"; font-weight:400; letter-spacing:0; text-transform:none; }
 .essay-body p { margin:0 0 1rem; font-size:1.05rem; }
 .signoff { font-family:var(--sans); font-size:.85rem; color:var(--soft); border-top:1px solid var(--rule); padding-top:.9rem; }
 .compare { max-width:72rem; }

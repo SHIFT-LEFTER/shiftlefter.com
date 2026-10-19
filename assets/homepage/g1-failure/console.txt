@@ -5,9 +5,9 @@ Failures:
 
 Scenario: Removing the last item marks that item removed
   1) :user/shopper should see Cart.items[-1].status with text 'removed'
-     at shiftlefter/stepdefs/browser.clj:938
+     at shiftlefter/stepdefs/browser.clj:950
      Error: Timed out after <ms> (deadline 3000ms via default, interval 100ms) — :user/shopper should see Cart.items[-1].status with text 'removed'. Last error: Expected element text to contain 'removed' but was 'in cart'
-     Data: {:type :step/poll-timeout, :elapsed-ms <ms>, :deadline-ms 3000, :deadline-source :default, :interval-ms 100, :poll-counts {:attempts 25, :answered 0, :threw 25, :observation-throws 0}, :last-error {:message "Expected element text to contain 'removed' but was 'in cart'", :type :browser/assertion-failed, :data {:type :browser/assertion-failed, :expected "removed", :actual "in cart", :locator "Cart.items[-1].status"}}}
+     Data: {:type :step/poll-timeout, :elapsed-ms <ms>, :deadline-ms 3000, :deadline-source :default, :interval-ms 100, :poll-counts {:attempts 26, :answered 0, :threw 26, :observation-throws 0}, :last-error {:message "Expected element text to contain 'removed' but was 'in cart'", :type :browser/assertion-failed, :data {:type :browser/assertion-failed, :expected "removed", :actual "in cart", :locator "Cart.items[-1].status"}}}
      attachment: screenshot -> attachments/removing-the-last-item-marks-that-item-removed/failure-screenshot-web-shopper.png
      attachment: console -> attachments/removing-the-last-item-marks-that-item-removed/console-web-shopper.log
 

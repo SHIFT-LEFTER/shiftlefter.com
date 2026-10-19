@@ -6,7 +6,7 @@
    :scenario/name "Removing the last item marks that item removed",
    :scenario/id #uuid "00000000-0000-0000-0000-000000000000",
    :location
-   {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 938},
+   {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 950},
    :error
    {:type :step/exception,
     :message
