@@ -1,0 +1,2 @@
+INFO console-api http://localhost:9097/cart.html 0:1071 "cart: rendered 3 items"
+WARNING console-api http://localhost:9097/cart.html 0:199 "cart: remove clicked on item 3 - marked \"Apples\" removed"

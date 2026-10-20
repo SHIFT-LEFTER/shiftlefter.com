@@ -1,0 +1,14 @@
+run seed: <seed>
+
+Undefined steps:
+  - I am logged in as a shopper (features/checkout.feature:4:5)
+  - I add a widget to my cart (features/checkout.feature:5:5)
+  - I check out (features/checkout.feature:6:5)
+  - I should see my order number (features/checkout.feature:7:5)
+
+4 binding issue(s) found. Cannot execute.
+
+This reads as an unshifted suite: every selected step is undefined.
+ShiftLefter parsed 1 feature file(s), 1 scenario(s), 4 distinct step text(s) — and executes only typed steps.
+To shift this suite, run: sl agent-doc adoption
+# exit 2

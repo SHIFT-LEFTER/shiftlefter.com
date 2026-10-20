@@ -1,0 +1,13 @@
+;; Homepage G1 hero project (sl-z6kt). WebDriver (etaoin) backend; the capture
+;; policy attaches the screenshot and the browser console at the instant of
+;; failure. Intents discovered at glossary/intents/ (Cart, Item).
+{:interfaces {:web {:type :web :adapter :etaoin
+                    :config {:base-url "http://localhost:9097"
+                             ;; etaoin's :size is a [width height] vector; the
+                             ;; adapter docstring's map form crashes provisioning
+                             ;; (banked on sl-z6kt, 2026-09-24).
+                             :adapter-opts {:size [900 480]}}}}
+ :runner {:capture {:screenshot :on-failure :console :on-failure}}
+ :enforcement {:unknown-subject :error
+               :unknown-verb :warn
+               :unknown-interface :error}}

@@ -1,0 +1,14 @@
+{:artifact "g4-exit-contract/deadport.feature"
+ :dev-commit "d6e8ac59"
+ :tag "v0.5.7"
+ :dev-tree-dirty? false
+ :sl-version "0.5.7"
+ :source "scripts/homepage/projects/deadport"
+ :staged-at "/private/tmp/sl-homepage/deadport"
+ :command "sed -n '1,5p' sl/features/dead.feature"
+ :exit 0
+ :date "2026-10-20"
+ :browser {:chrome "154.0.8037.100" :chromedriver "154.0.8037.92" :backend :etaoin}
+ :scrubbed []
+ :lines "1,5p of 5 lines in sl/features/dead.feature"
+ :regenerate "scripts/homepage/capture.sh g4"}

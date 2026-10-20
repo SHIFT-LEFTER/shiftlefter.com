@@ -33,7 +33,7 @@
   --sl-accent:var(--accent); --sl-rule:var(--rule);
 }
 * { box-sizing:border-box; }
-body { margin:0; background:var(--paper); color:var(--ink); font:17px/1.42 Charter,"Bitstream Charter",Georgia,serif; text-wrap:pretty; }
+body { margin:0; background:var(--paper); color:var(--ink); font:20px/1.42 Charter,"Bitstream Charter",Georgia,serif; text-wrap:pretty; }
 a { color:var(--accent); }
 a:hover { color:var(--ink); }
 
@@ -117,6 +117,23 @@ pre code { background:none; padding:0; font-size:1em; }
 .c-err { color:var(--accent); font-weight:700; }
 .c-hint { color:var(--soft); font-style:italic; }
 .c-com { color:var(--soft); }
+/* Code color (sl-4l16, punch item P3): Rouge token classes, build time, CSS
+ * only. The EDN (clojure lexer), XML and diff boxes come from {% highlight %};
+ * the Gherkin boxes from _includes/home/gherkin.html, which emits the same
+ * classes. One palette, light and dark. .err is deliberately unstyled. */
+:root { --tok-str:#3d5a3c; --tok-sym:#8a6412; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --tok-str:#9fc49a; --tok-sym:#e3b23c; }
+}
+:root[data-theme="dark"] { --tok-str:#9fc49a; --tok-sym:#e3b23c; }
+pre .k, pre .kd, pre .kn, pre .kr { color:var(--accent); font-weight:700; }
+pre .s, pre .s1, pre .s2, pre .sr, pre .gi { color:var(--tok-str); }
+pre .no, pre .ss, pre .nv, pre .kc { color:var(--tok-sym); }
+pre .nt, pre .nc, pre .nf { color:var(--ink); font-weight:700; }
+pre .na { color:var(--soft); }
+pre .c, pre .c1, pre .cm { color:var(--soft); font-style:italic; }
+pre .gd { color:var(--accent); }
+pre .gh, pre .gu { color:var(--soft); font-weight:700; }
 
 .writing { max-width:45rem; margin:0 auto; padding:2.6rem 1.5rem 4rem; }
 .writing-sub { font-style:italic; color:var(--soft); margin:0; }
@@ -140,26 +157,94 @@ pre code { background:none; padding:0; font-size:1em; }
 .hero p { margin:0 0 1rem; }
 .credo { font-weight:700; }
 .release-line { font-family:var(--sans); font-size:.78rem; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--soft); }
-.twin-cards { max-width:46rem; display:grid; grid-template-columns:minmax(0,1fr); gap:2rem; margin:0 auto 3rem; }
-.card { background:var(--card); border-top:2px solid var(--rule-h); border-bottom:1px solid var(--rule); padding:1.3rem 1.4rem; }
-.card h3 { margin:0 0 .7rem; font-family:var(--sans); font-size:.78rem; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); }
-.card p { margin:0 0 .9rem; }
-.card img { width:100%; display:block; border:1px solid var(--rule); }
-.plain-terms { max-width:46rem; margin:0 auto 3rem; font-size:1.1rem; border-top:2px solid var(--rule-h); border-bottom:1px solid var(--rule); padding:1.1rem 0; }
-.does, .agents { max-width:46rem; margin:0 auto; }
-.does p, .agents p { margin:0 0 1rem; }
-.features { list-style:none; margin:0; padding:0; }
-.features > li { border-top:1px solid var(--rule); padding:1.1rem 0 .4rem; }
+/* The five pages (sl-4l16): the front page (hook, pain, thesis, creed,
+ * three proofs in miniature, install, the agent door, Solid/Not yet, the
+ * future beat, the numbers strip), the tour, the compare table, the agents
+ * page and the why page. Every <figure class="artifact"> is a captured file
+ * from assets/homepage/ rendered at build time — see _includes/home/captures.html. */
+.proofs, .install, .who, .agent-door, .future, .numbers, .page-head, .feature, .essay-body, .compare-note { max-width:52rem; margin-left:auto; margin-right:auto; }
+.hero .hook { font-family:var(--sans); font-size:2rem; font-weight:800; letter-spacing:-.02em; line-height:1.1; margin:.2rem 0 .3rem; }
+.hero .subhead { font-size:1.35rem; font-style:italic; margin:0 0 1.2rem; }
+.hero .category { font-family:var(--sans); font-size:.9rem; color:var(--soft); border-top:1px solid var(--rule); padding-top:.8rem; margin:0 0 1.2rem; }
+.hero .pain { font-size:1.08rem; }
+.hero .thesis { font-size:1.08rem; }
+.hero .heal { color:var(--accent); }
+.hero .author { font-family:var(--sans); font-size:.82rem; color:var(--soft); margin:0; }
+.proofs h2 { margin-top:0; }
+.captured { font-size:.95rem; color:var(--soft); margin:0 0 1.4rem; }
+.proof { margin:0 0 2rem; border-top:1px solid var(--rule); padding-top:1rem; }
+.proof h3 { margin:0 0 .6rem; font-family:var(--sans); font-size:1.1rem; font-weight:800; letter-spacing:-.01em; }
+.proof p { margin:0 0 .9rem; }
+.artifact { margin:0 0 1.1rem; }
+.artifact figcaption { font-family:var(--sans); font-size:.72rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--soft); margin:0 0 .35rem; }
+.artifact figcaption code { text-transform:none; letter-spacing:0; font-size:.95em; }
+.artifact pre, .artifact .highlight { margin:0; }
+.artifact img { width:100%; height:auto; display:block; border:1px solid var(--rule); }
+.artifact details { margin-top:.5rem; }
+.artifact summary { font-family:var(--sans); font-size:.76rem; color:var(--soft); cursor:pointer; }
+pre.tall, .tall pre { max-height:22rem; overflow:auto; }
+pre.wrap { white-space:pre-wrap; overflow-wrap:anywhere; }
+.pair { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:1rem; }
+/* minmax(0,1fr), never a bare 1fr: a bare 1fr is minmax(auto,1fr), and a
+ * grid item's auto minimum is its min-content — the longest unbreakable
+ * line in the pre inside — which pushes the whole page wider than a phone
+ * (found at sl-kghp's probe). */
+@media (max-width:56rem) { .pair { grid-template-columns:minmax(0,1fr); } }
+.callouts { list-style:none; margin:0 0 1rem; padding:0; }
+.callouts li { border-top:1px solid var(--rule); padding:.7rem 0; margin:0; }
+.links { font-family:var(--sans); font-size:.78rem; font-weight:600; letter-spacing:.04em; text-transform:uppercase; margin:0 0 .5rem; }
+.install { background:var(--card); border-top:2px solid var(--rule-h); border-bottom:1px solid var(--rule); padding:1.3rem 1.4rem; margin-bottom:2rem; }
+.install h3, .card h3 { margin:0 0 .7rem; font-family:var(--sans); font-size:.78rem; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); }
+.install p { margin:0 0 1rem; }
+.install pre { margin:0 0 .9rem; }
+.who { font-size:1.08rem; font-style:italic; margin:0 auto 2rem; }
+.agent-door { border-top:1px solid var(--rule); padding-top:.4rem; margin-bottom:1rem; }
+.agent-door p, .future p { margin:0 0 1rem; }
+.exit-todo ul { margin:0; padding-left:1.2rem; font-size:.95rem; }
+.exit-todo li { margin:0 0 .4rem; }
 .honestly { max-width:72rem; margin:0 auto; }
-.honestly h2 { max-width:46rem; margin-left:auto; margin-right:auto; }
+.honestly h2 { max-width:52rem; margin-left:auto; margin-right:auto; }
 .cols { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:2.5rem; }
 @media (max-width:56rem) { .cols { grid-template-columns:1fr; } }
 .cols h3 { font-family:var(--sans); font-size:.85rem; font-weight:800; letter-spacing:.1em; text-transform:uppercase; margin:0 0 .8rem; }
 .cols ul { margin:0; padding-left:1.2rem; }
 .cols li { margin:0 0 .55rem; }
-.baton { max-width:46rem; margin:2rem auto 0; font-style:italic; color:var(--soft); border-top:1px solid var(--rule); padding-top:1rem; }
-.agents { margin-top:1rem; }
-.site-footer { max-width:46rem; margin:3rem auto 0; border-top:2px solid var(--rule-h); padding-top:1.4rem; }
+.baton { max-width:52rem; margin:2rem auto 0; font-style:italic; color:var(--soft); border-top:1px solid var(--rule); padding-top:1rem; }
+.asterisk { border-top:1px solid var(--rule); padding-top:.9rem; }
+.future { margin-top:3rem; border-top:2px solid var(--rule-h); padding-top:1.4rem; }
+.future .kicker { margin-bottom:0; }
+.future h2 { margin-top:.4rem; }
+.numbers { list-style:none; margin:3rem auto 0; padding:1.2rem 0 0; border-top:2px solid var(--rule-h); display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:1rem; font-family:var(--sans); font-size:.8rem; line-height:1.3; color:var(--soft); }
+.numbers li { margin:0; }
+.numbers strong { display:block; font-size:1.6rem; font-weight:800; letter-spacing:-.02em; color:var(--ink); }
+@media (max-width:56rem) { .numbers { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+/* The inner pages: a heading block in the essay register, then sections. */
+.page-head { margin:2.5rem auto 2.5rem; }
+.page-head .standfirst { margin-bottom:0; }
+.feature { border-top:1px solid var(--rule); padding-top:.4rem; margin-bottom:2.5rem; }
+.feature h2 { margin-top:1rem; }
+.feature p { margin:0 0 1rem; }
+.feature ul { margin:0 0 1rem; padding-left:1.2rem; }
+.feature li { margin:0 0 .5rem; }
+.essay-body p { margin:0 0 1rem; font-size:1.05rem; }
+.signoff { font-family:var(--sans); font-size:.85rem; color:var(--soft); border-top:1px solid var(--rule); padding-top:.9rem; }
+.compare { max-width:72rem; }
+.compare-table { width:100%; border-collapse:collapse; font-size:.95rem; margin:0 0 1.5rem; }
+.compare-table th, .compare-table td { text-align:left; vertical-align:top; padding:.8rem .8rem .8rem 0; border-top:1px solid var(--rule); }
+.compare-table thead th { font-family:var(--sans); font-size:.72rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--soft); border-top:none; border-bottom:2px solid var(--rule-h); }
+.compare-table tbody th { font-family:var(--sans); font-size:.9rem; font-weight:800; letter-spacing:-.01em; width:11rem; }
+.compare-table td a { white-space:nowrap; }
+@media (max-width:56rem) {
+  .compare-table, .compare-table thead, .compare-table tbody, .compare-table tr, .compare-table th, .compare-table td { display:block; width:auto; }
+  .compare-table thead { display:none; }
+  .compare-table tr { border-top:2px solid var(--rule-h); padding:.6rem 0; }
+  .compare-table th, .compare-table td { border-top:none; padding:.3rem 0; }
+  .compare-table td::before { display:block; font-family:var(--sans); font-size:.68rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--soft); margin-bottom:.2rem; }
+  .compare-table td:nth-of-type(1)::before { content:"The named tool"; }
+  .compare-table td:nth-of-type(2)::before { content:"ShiftLefter"; }
+}
+.compare-note { font-size:.85rem; color:var(--soft); border-top:1px solid var(--rule); padding-top:.9rem; }
+.site-footer { max-width:52rem; margin:3rem auto 0; border-top:2px solid var(--rule-h); padding-top:1.4rem; }
 .footer-hello { margin:0 0 .8rem; font-style:italic; }
 .footer-links { display:flex; gap:1.6rem; flex-wrap:wrap; font-family:var(--sans); font-size:.78rem; font-weight:600; letter-spacing:.06em; text-transform:uppercase; margin:0; }
 .colophon { color:var(--soft); font-size:.8rem; margin:2rem 0 0; }

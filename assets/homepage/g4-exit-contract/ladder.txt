@@ -1,0 +1,4 @@
+sl run sl/features/           1 scenario(s): 1 passed                               exit 0
+sl run sl/features/ --html report.html --junit-xml junit.xml  1 scenario(s): 1 failed                               exit 1
+sl run sl/features/           2 binding issue(s) found. Cannot execute.             exit 2
+sl run sl/features/           1 scenario(s): 1 unobserved                           exit 4

@@ -1,0 +1,10 @@
+run seed: <seed>
+PASSED The last cart row, the fan-out count, and a two-level address
+PASSED A negative index resolves to the LAST element, and a click acts on it
+PASSED An element and an attribute after an index
+PASSED A [*] fan-out is a count assertion
+PASSED An index on a non-terminal segment followed by more path
+PASSED Two levels of indexing
+
+6 scenario(s): 6 passed
+# exit 0

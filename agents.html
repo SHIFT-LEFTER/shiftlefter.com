@@ -1,0 +1,71 @@
+---
+layout: default
+title: For agents
+permalink: /agents/
+description: "If you are a coding agent, or you brought one: install ShiftLefter, run sl orient, read the documentation inside the jar with sl agent-doc, and hand it a suite it has never seen."
+---
+{%- comment -%}
+The agents page (sl-4l16, amendment A4): lifted from the front page's
+section. Keeps: install, sl orient, sl agent-doc, llms.txt, the AGENTS.md
+breadcrumb, the "next release" line. Links the agent-facing manual
+(docs/AGENT.md) on GitHub. MUST stay at the site root.
+{%- endcomment -%}
+{%- include home/captures.html -%}
+<main class="home agents-page">
+  <header class="page-head">
+    <p class="kicker">For agents</p>
+    <h1>Install, then ask the tool itself</h1>
+    <p class="standfirst">If you are an agent, or you brought one: the documentation is in the jar. Nothing on this page needs the repository, a wiki, or a search. Every box is captured output.</p>
+  </header>
+
+  <section class="feature" id="orient">
+    <h2>Three commands</h2>
+    <pre><code>curl -fsSL https://raw.githubusercontent.com/SHIFT-LEFTER/shiftlefter/main/release/install.sh | bash
+./sl/sl orient            <span class="c-com"># where am I, what would fail, what to read next</span>
+./sl/sl agent-doc --list</code></pre>
+    <p>Java 21+ is the only requirement. The installer prints a breadcrumb stanza to paste into your <code>AGENTS.md</code>, so the next agent in the project finds the same three commands.</p>
+    <div class="pair">
+      <figure class="artifact">
+        <figcaption><code>sl orient</code> in the two-actor project</figcaption>
+        <pre class="tall"><code>{{ g7_orient | strip | escape }}</code></pre>
+      </figure>
+      <figure class="artifact">
+        <figcaption><code>sl agent-doc --list</code> — the topics the jar carries</figcaption>
+        <pre class="tall"><code>{{ g7_topics | strip | escape }}</code></pre>
+      </figure>
+    </div>
+    <figure class="artifact">
+      <figcaption><code>sl agent-doc exit-codes</code>, the first lines — from a machine that has never seen the repository</figcaption>
+      <pre><code>{{ topic_head | strip | escape }}</code></pre>
+    </figure>
+    <p>The built-in verbs, their frames and their step patterns are generated from the registered steps (<code>sl agent-doc builtins</code>), so the reference cannot drift from the code. <code>sl glossary</code> and <code>sl explain</code> answer what a word means in <em>this</em> project and who uses it.</p>
+  </section>
+
+  <section class="feature" id="bring">
+    <h2>Hand it a suite it has never seen</h2>
+    <p>Point it at a Cucumber suite nobody has typed. It parses everything, runs nothing, says what it saw, and names the next command:</p>
+    <div class="pair">
+      <figure class="artifact">
+        <figcaption>in — a Cucumber feature, untouched</figcaption>
+        <pre><code class="language-gherkin">{% include home/gherkin.html src=g7_bring_feature %}</code></pre>
+      </figure>
+      <figure class="artifact">
+        <figcaption>out</figcaption>
+        <pre><code>{{ g7_bring | strip | escape }}</code></pre>
+      </figure>
+    </div>
+    <p><em>Unshifted</em> means untyped; shifted means typed. The compiler runs only typed steps, by choice, so an existing step library does not run here; feature files and page objects migrate, and <code>sl agent-doc adoption</code> says how. The tests an agent writes against this surface are a feature file and a glossary — durable project artifacts the next person can read — not a generated script.</p>
+  </section>
+
+  <section class="feature" id="pointers">
+    <h2>Pointers</h2>
+    <ul>
+      <li><a href="https://github.com/shift-lefter/shiftlefter/blob/main/docs/AGENT.md" target="_blank" rel="noopener">docs/AGENT.md</a> — the agent-facing manual, on GitHub; the same text the jar serves.</li>
+      <li><a href="/llms.txt">/llms.txt</a> — a plain-text pointer to this site and the repository.</li>
+      <li><a href="/tour/">The tour</a> — every feature with its captured in and out, for the human you brought along.</li>
+    </ul>
+    <p class="asterisk"><strong>Next release:</strong> a skill and a tone prompt — hand your agent the on-ramp, not a URL. For the record: without a skill, a fresh agent given this framework and a FastAPI service authored an HTTP interface for it — five scenarios dry-run green on the first attempt, and the first live run green (August 2026). The skill turns that into a recipe.</p>
+  </section>
+
+{% include home/footer.html %}
+</main>

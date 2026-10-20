@@ -5,7 +5,7 @@ kind: Architecture
 permalink: /docs/architecture/
 source: docs/architecture/index.md
 source_url: https://github.com/shift-lefter/shiftlefter/blob/main/docs/architecture/index.md
-synced_from: a426a777
+synced_from: d6e8ac59
 ---
 {% raw %}
 

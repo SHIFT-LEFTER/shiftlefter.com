@@ -1,0 +1,11 @@
+# Glossary (resolved)
+
+Config: sl/shiftlefter.edn (discovered)
+Substrate: git: not a repository
+Strictness (:enforcement effective): raw-locator :warn · unknown-interface :error · unknown-object :warn · unknown-subject :error · unknown-verb :warn · untyped-stepdef :warn
+Corpus: 1 feature file(s), 1 scenario(s)
+
+## Subjects (1)
+
+- :user [user-file] [used ×14] — Standard application user — instances: alice, bob
+# exit 0

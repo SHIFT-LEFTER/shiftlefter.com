@@ -1,0 +1,68 @@
+{:run/status :failed,
+ :run/exit-code 1,
+ :failures
+ [{:step/text ":user/shopper should see Cart.items[-1].status with text 'removed'",
+   :step/id #uuid "00000000-0000-0000-0000-000000000000",
+   :scenario/name "Removing the last item marks that item removed",
+   :scenario/id #uuid "00000000-0000-0000-0000-000000000000",
+   :location
+   {:ns shiftlefter.stepdefs.browser, :file "shiftlefter/stepdefs/browser.clj", :line 950},
+   :error
+   {:type :step/exception,
+    :message
+    "Timed out after <ms> (deadline 3000ms via default, interval 100ms) — :user/shopper should see Cart.items[-1].status with text 'removed'. Last error: Expected element text to contain 'removed' but was 'in cart'",
+    :exception-class "clojure.lang.ExceptionInfo",
+    :data
+    {:type :step/poll-timeout,
+     :elapsed-ms <ms>,
+     :deadline-ms 3000,
+     :deadline-source :default,
+     :interval-ms 100,
+     :poll-counts {:attempts 27, :answered 0, :threw 27, :observation-throws 0},
+     :last-error
+     {:message "Expected element text to contain 'removed' but was 'in cart'",
+      :type :browser/assertion-failed,
+      :data
+      {:type :browser/assertion-failed,
+       :expected "removed",
+       :actual "in cart",
+       :locator "Cart.items[-1].status"}}}},
+   :attachments
+   [#:attachment{:kind :screenshot,
+                 :source :capture-policy,
+                 :interface :web,
+                 :duration-ms <ms>,
+                 :subject :shopper,
+                 :path
+                 "attachments/removing-the-last-item-marks-that-item-removed/failure-screenshot-web-shopper.png",
+                 :media-type "image/png",
+                 :bytes <bytes>}],
+   :poll-counts {:attempts 27, :answered 0, :threw 27, :observation-throws 0}}],
+ :attachments
+ [{:scenario/name "Removing the last item marks that item removed",
+   :scenario/id #uuid "00000000-0000-0000-0000-000000000000",
+   :attachments
+   [#:attachment{:path
+                 "attachments/removing-the-last-item-marks-that-item-removed/console-web-shopper.log",
+                 :bytes <bytes>,
+                 :interface :web,
+                 :source :capture-policy,
+                 :excerpt
+                 "INFO console-api http://localhost:9097/cart.html 0:1071 \"cart: rendered 3 items\"\nWARNING console-api http://localhost:9097/cart.html 0:199 \"cart: remove clicked on item 3 - marked \\\"Apples\\\" removed\"",
+                 :duration-ms <ms>,
+                 :kind :console,
+                 :subject :shopper,
+                 :media-type "text/plain"}],
+   :steps
+   [{:step/id #uuid "00000000-0000-0000-0000-000000000000",
+     :step/text ":user/shopper should see Cart.items[-1].status with text 'removed'",
+     :attachments
+     [#:attachment{:kind :screenshot,
+                   :source :capture-policy,
+                   :interface :web,
+                   :duration-ms <ms>,
+                   :subject :shopper,
+                   :path
+                   "attachments/removing-the-last-item-marks-that-item-removed/failure-screenshot-web-shopper.png",
+                   :media-type "image/png",
+                   :bytes <bytes>}]}]}]}

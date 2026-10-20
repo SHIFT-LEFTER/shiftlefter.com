@@ -1,0 +1,13 @@
+{:artifact "g4-exit-contract/ladder.txt"
+ :dev-commit "d6e8ac59"
+ :tag "v0.5.7"
+ :dev-tree-dirty? false
+ :sl-version "0.5.7"
+ :source "scripts/homepage/projects/deadport"
+ :staged-at "/private/tmp/sl-homepage/deadport"
+ :command "assembled from w3-actors/run.txt g1-failure/console.txt g2-before-the-run/refusal.txt g4-exit-contract/deadport.txt"
+ :exit 0
+ :date "2026-10-20"
+ :browser {:chrome "154.0.8037.100" :chromedriver "154.0.8037.92" :backend :etaoin}
+ :scrubbed []
+ :regenerate "scripts/homepage/capture.sh g4"}

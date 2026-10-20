@@ -1,0 +1,29 @@
+ERROR
+Removing the last item marks that item removed
+<s>
+PASSED
+When :user/shopper opens the browser to Cart
+<s>
+PASSED
+Then :user/shopper should see 3 Cart.items[*] elements
+<s>
+PASSED
+When :user/shopper clicks Cart.items[-1].remove
+<s>
+ERROR
+Then :user/shopper should see Cart.items[-1].status with text 'removed'
+<s>
+26 polls
+clojure.lang.ExceptionInfo
+Timed out after <ms> (deadline 3000ms via default, interval 100ms) — :user/shopper should see Cart.items[-1].status with text 'removed'. Last error: Expected element text to contain 'removed' but was 'in cart'
+screenshot
+attachments/removing-the-last-item-marks-that-item-removed/failure-screenshot-web-shopper.png
+via capture policy
+29.1 KB
+console
+attachments/removing-the-last-item-marks-that-item-removed/console-web-shopper.log
+via capture policy
+199 B
+excerpt
+INFO console-api http://localhost:9097/cart.html 0:1071 "cart: rendered 3 items"
+WARNING console-api http://localhost:9097/cart.html 0:199 "cart: remove clicked on item 3 - marked \"Apples\" removed"

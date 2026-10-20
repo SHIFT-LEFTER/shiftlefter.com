@@ -1,0 +1,5 @@
+run seed: <seed>
+PASSED Alice resets her password using a code sent to her phone
+
+1 scenario(s): 1 passed
+# exit 0

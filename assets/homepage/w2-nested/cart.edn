@@ -1,0 +1,6 @@
+;; Cart — the card's own example shape (Cart.items[-1].remove, Cart.items[*].price).
+{:intent "Cart"
+ :location {:web {:path "/cart.html"}}
+ :root {:web {:css "[data-testid='cart']"}}
+ :elements {}
+ :collections {:items {:intent "Item" :cardinality :many}}}

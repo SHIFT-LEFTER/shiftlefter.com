@@ -1,0 +1,5 @@
+run seed: <seed>
+PASSED Two users login simultaneously
+
+1 scenario(s): 1 passed
+# exit 0

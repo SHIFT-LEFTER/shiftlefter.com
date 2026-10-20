@@ -1,0 +1,76 @@
+{%- comment -%}
+Build-time coloring for a captured Gherkin box (sl-4l16, punch item P3).
+Rouge's gherkin lexer cannot lex a ShiftLefter step: its scenario-keyword
+rule is `(.*?)(:)`, so the colon in every subject (`:user/alice`) turns the
+rest of the step into one error token. This include classifies the words
+instead. The text stays the captured file word for word — splitting on a
+sentinel keeps the empty strings, so indentation and double spaces
+survive — and the token classes are Rouge's (k, kd, nt, ss, nc, nv, s, c1),
+so the one theme block in theme.css covers both. No scripts, CSS only.
+Usage: {% include home/gherkin.html src=some_captured_variable %}
+{%- endcomment -%}
+{%- assign gk_nl = "
+" -%}
+{%- assign gk_sp = " " -%}
+{%- assign gk_sent = "¦" -%}
+{%- assign gk_steps = "Given,When,Then,And,But,*" | split: "," -%}
+{%- assign gk_blocks = "Feature:,Scenario:,Background:,Examples:,Rule:,Outline:" | split: "," -%}
+{%- assign gk_lines = include.src | rstrip | split: gk_nl -%}
+{%- for gk_line in gk_lines -%}
+  {%- unless forloop.first -%}{{ gk_nl }}{%- endunless -%}
+  {%- assign gk_trim = gk_line | lstrip -%}
+  {%- assign gk_first = gk_trim | slice: 0, 1 -%}
+  {%- assign gk_head = gk_trim | split: gk_sp | first -%}
+  {%- comment -%} Ruby's split(" ") is awk-style — it drops leading spaces and collapses runs — so the spaces become a sentinel first. {%- endcomment -%}
+  {%- assign gk_words = gk_line | replace: gk_sp, gk_sent | split: gk_sent -%}
+  {%- if gk_first == "#" -%}
+    <span class="c1">{{ gk_line | escape }}</span>
+  {%- elsif gk_steps contains gk_head -%}
+    {%- assign gk_quote = false -%}
+    {%- assign gk_kw = false -%}
+    {%- for gk_w in gk_words -%}
+      {%- unless forloop.first -%}{{ gk_sp }}{%- endunless -%}
+      {%- assign gk_c0 = gk_w | slice: 0, 1 -%}
+      {%- assign gk_c1 = gk_w | slice: 1, 1 -%}
+      {%- assign gk_cz = gk_w | slice: -1, 1 -%}
+      {%- assign gk_c0u = gk_c0 | upcase -%}
+      {%- assign gk_c0d = gk_c0 | downcase -%}
+      {%- assign gk_c1u = gk_c1 | upcase -%}
+      {%- assign gk_c1d = gk_c1 | downcase -%}
+      {%- if gk_w == "" -%}
+      {%- elsif gk_quote -%}
+        <span class="s">{{ gk_w | escape }}</span>
+        {%- if gk_cz == "'" -%}{%- assign gk_quote = false -%}{%- endif -%}
+      {%- elsif gk_kw == false -%}
+        <span class="k">{{ gk_w | escape }}</span>{%- assign gk_kw = true -%}
+      {%- elsif gk_c0 == "'" -%}
+        <span class="s">{{ gk_w | escape }}</span>
+        {%- if gk_cz != "'" or gk_w.size == 1 -%}{%- assign gk_quote = true -%}{%- endif -%}
+      {%- elsif gk_c0 == "@" -%}
+        <span class="nt">{{ gk_w | escape }}</span>
+      {%- elsif gk_c0 == ":" or gk_c0 == "[" -%}
+        <span class="ss">{{ gk_w | escape }}</span>
+      {%- elsif gk_c0 == "{" -%}
+        <span class="nv">{{ gk_w | escape }}</span>
+      {%- elsif gk_c0 == gk_c0u and gk_c0 != gk_c0d and gk_c1 == gk_c1d and gk_c1 != gk_c1u -%}
+        <span class="nc">{{ gk_w | escape }}</span>
+      {%- else -%}
+        {{ gk_w | escape }}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- else -%}
+    {%- assign gk_kw = false -%}
+    {%- for gk_w in gk_words -%}
+      {%- unless forloop.first -%}{{ gk_sp }}{%- endunless -%}
+      {%- assign gk_c0 = gk_w | slice: 0, 1 -%}
+      {%- if gk_w == "" -%}
+      {%- elsif gk_kw == false and gk_blocks contains gk_w -%}
+        <span class="kd">{{ gk_w | escape }}</span>{%- assign gk_kw = true -%}
+      {%- elsif gk_c0 == "@" -%}
+        <span class="nt">{{ gk_w | escape }}</span>{%- assign gk_kw = true -%}
+      {%- else -%}
+        {{ gk_w | escape }}{%- assign gk_kw = true -%}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+{%- endfor -%}

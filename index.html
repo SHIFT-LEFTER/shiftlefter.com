@@ -1,99 +1,93 @@
 ---
 layout: default
 nav: home
+description: "A type checker for your test suite. Compile errors for end-to-end tests: scenarios compile against a vocabulary you own, so a typo or a dangling rename dies before the browser opens; a run that could not measure says so in its exit code, never in a green."
 ---
+{%- comment -%}
+The front page (sl-4l16, the five-page restructure of 2026-10-17): the
+thirty-second and three-minute read. Order per amendment A5 of the brief:
+hook, subhead, pain, thesis, creed, author line; then three proofs in
+miniature, install, who it is for, the agent door, Solid today / Not yet,
+the future as today's data, the numbers strip, footer. Every box is a
+captured file from assets/homepage/, read by _includes/home/captures.html;
+the long version of each proof is on /tour/. This page MUST stay at the
+site root (include_relative resolves against the page).
+{%- endcomment -%}
+{%- include home/captures.html -%}
 <main class="home">
   <header class="hero">
     {% include logo.svg class="hero-mark" %}
     <h1>ShiftLefter</h1>
-    <p class="tagline">Quality as a <em>dimension</em>, not a phase.</p>
-    <p class="lede">A <strong>typed vocabulary for your app’s behavior</strong> — your actors, your actions, your intents, defined once and shared by every human and every AI agent that touches your tests. Scenarios are validated against it <strong>before anything runs</strong>.</p>
-    <p class="credo">We don’t heal your tests — we name what changed.</p>
-    <p>Failures arrive in your vocabulary — which actor, which intent, which step — not as a selector timeout.</p>
-    <p class="release-line">Open source, actively developed — <a href="https://github.com/shift-lefter/shiftlefter/releases" target="_blank" rel="noopener">releases</a></p>
+    <p class="hook">A type checker for your test suite.</p>
+    <p class="subhead">Compile errors for end-to-end tests.</p>
+    <p class="category">An end-to-end test framework that compiles plain-language scenarios against a vocabulary you declare.</p>
+    <p class="pain">Your end-to-end suite fails with a selector timeout, and nobody can tell an app bug from a test bug from a down environment. A green on a down environment is a lie. Steps are regular expressions over strings, so nothing is checked until a browser is open. And the tests your coding agent wrote are one-offs nobody will maintain.</p>
+    <p class="thesis">BDD was right that plain-language scenarios are the contract between people and the machine, and wrong that regexes and hand-written glue could hold it up. Agents remove the glue cost. A typed vocabulary removes the rot.</p>
+    <p class="credo">Agents write the tests. The vocabulary is yours. The compiler is the referee.</p>
+    <p class="credo heal">We don’t heal your tests. We name what changed.</p>
+    <p class="author">Built by one engineer with agents in the loop — <a href="/why/">why I built this</a>.</p>
   </header>
 
-  <div class="twin-cards">
-    <section class="card">
-      <h3>Install</h3>
-      <p>Java 21+ is the only requirement. No Clojure toolchain.</p>
-      <pre><code>curl -fsSL https://raw.githubusercontent.com/SHIFT-LEFTER/shiftlefter/main/release/install.sh | bash
-export PATH="$PWD/sl:$PATH"
-sl --version</code></pre>
-    </section>
-    <section class="card">
-      <h3>A real run report</h3>
-      <p>Every <code>sl run</code> can write a self-contained HTML report — one file, no server, failures expanded. <a href="/report/">This one is real</a>, failures and all. Its pair: <a href="/report/planning.html">a planning failure</a> — the run that refused to start, and what it teaches at the point of failure.</p>
-      <a href="/report/"><img src="/report-screenshot.png" alt="ShiftLefter HTML run report — scenario results with expanded failure transcripts"></a>
-    </section>
-  </div>
+  <section class="proofs" id="proofs">
+    <h2>Three proofs</h2>
+    <p class="captured">Nothing on this site is mocked: every box is output captured from a real run, kept under <a href="/assets/homepage/">assets/homepage</a> with the commit and command that produced it. <a href="/tour/">The tour</a> has the long version of each.</p>
 
-  <p class="plain-terms">In plain terms: <strong>a Cucumber-compatible Gherkin test runner</strong> — Clojure core, real browsers and SMS, JUnit XML and HTML reports for CI — <strong>with a type system for what your tests are allowed to say</strong>.</p>
+    <article class="proof" id="proof-refusal">
+      <h3>Compile errors, before a browser opens</h3>
+      <p><code>:user/alice</code> is a declared subject and an instance — a keyword naming the subject’s type and the instance, declared in the glossary. Misspell the actor, or name an element the glossary never declared, and the run refuses to start:</p>
+      <figure class="artifact">
+        <figcaption><code>sl run</code> — the refusal</figcaption>
+        <pre><code>{{ refusal_mini | strip | escape }}</code></pre>
+      </figure>
+      <p>A typo is the fastest case to see. The real ones: a glossary entry renamed and dangling across forty scenarios, a merge that leaves references pointing nowhere, a refactored step library. Each dies before a browser opens, with a suggestion and the file and line where the right name is declared. <a href="/tour/#refusal">The refusal, in full →</a></p>
+    </article>
 
-  <section class="does">
-    <h2>What ShiftLefter does</h2>
-    <ul class="features">
-      <li>
-        <p><strong>A vocabulary you own, enforced before anything runs.</strong> Your glossary declares who can act. Every scenario is checked against it at bind time, so a typo’d actor dies with a suggestion — before a browser ever opens, not four minutes into a run. This is real output:</p>
-        <pre><code>SVO validation issues:
-  <span class="c-err">ERROR:</span> Unknown subject :user/alicce in step
-         ":user/alicce fills {:id "password"} with 'SuperSecretPassword!'"
-         at features/two-users.feature:6
-         Known subjects: :user/alice, :user/bob
-         <span class="c-hint">Did you mean: :user/alice?</span>
+    <article class="proof" id="proof-exit">
+      <h3>A green is a measurement</h3>
+      <p>A run that could not observe the app says so in its exit code, never in a green. Here the port had nothing listening:</p>
+      <figure class="artifact">
+        <figcaption><code>sl run</code> against a closed port</figcaption>
+        <pre><code>{{ deadport_mini | strip | escape }}</code></pre>
+      </figure>
+      <p>Exits 0 and 1 are verdicts about your app. Exit 4 means no answer existed, and it is never blamed on the app. <a href="/tour/#exit-codes">The exit-code contract →</a></p>
+    </article>
 
-1 binding issue(s) found. Cannot execute.  <span class="c-com"># exit 2 — no browser was harmed</span></code></pre>
-      </li>
-      <li><p><strong>Macro expansion, not steps-calling-steps.</strong> Define “the user logs in” as a Gherkin step sequence, and ShiftLefter expands it at compile time — the runner sees every step with full provenance. When the login flow changes, update one macro definition, not 47 scenarios. Non-developers can read and edit the macro file. The workflow reuse teams reach for Screenplay to get — without the shadow-SUT complexity.</p></li>
-      <li><p><strong>Many actors, more than one interface.</strong> Each actor gets its own isolated session — <code>:user/alice</code> and <code>:user/bob</code> log in side by side without sharing state. Web runs on a pluggable WebDriver/Playwright backend; SMS is a first-class second interface, so a 2FA flow can span web and text in a single scenario.</p></li>
-      <li><p><strong>A well-behaved CI citizen.</strong> <code>--junit-xml</code> writes results your CI ingests natively (verified against a real GitLab <code>artifacts:reports:junit</code> ingest). <code>--tags @smoke</code> runs the subset your MR pipeline needs. <code>--max-parallel</code> runs scenarios concurrently with byte-identical report output, and <code>@serial</code> marks the ones that must run alone. Results print live, per scenario, as they finish.</p></li>
-      <li><p><strong>An agent front door.</strong> <code>sl orient</code> tells a coding agent — or you — what mode a project is in, what would fail, and what to read next. <code>sl agent-doc</code> serves the doctrine from inside the jar, and the step-vocabulary reference is generated from the registered steps, so it cannot drift from the code. Tests live in durable project artifacts — glossary, intents, config — not one-shot generated scripts.</p></li>
-    </ul>
+    <article class="proof" id="proof-failure">
+      <h3>The failure, in your words</h3>
+      <p>Which actor, which thing, which step; expected against seen, with the poll count; the screenshot and the browser console attached at the instant of failure:</p>
+      <figure class="artifact">
+        <figcaption>the failed row of the HTML report, as text</figcaption>
+        <pre class="wrap"><code>{{ row_mini | strip | escape }}</code></pre>
+      </figure>
+      <p>The console line names the app’s bug: the click landed on item 3 and the app marked <em>Apples</em> removed. <a href="/tour/#failure">The failure row, with the screenshot →</a></p>
+    </article>
   </section>
 
-  <section class="honestly">
-    <h2>Where it is, honestly</h2>
-    <div class="cols">
-      <div>
-        <h3>Solid today</h3>
-        <ul>
-          <li><strong>Multi-actor browser driving</strong> — independent sessions with real isolation.</li>
-          <li><strong>The typed vocabulary discipline</strong> — validated at bind time, with suggestions.</li>
-          <li><strong>The <code>sl</code> CLI</strong> — run, format, dry-run, diagnose; JUnit XML, HTML, and EDN output; tag filtering; parallel scenarios.</li>
-          <li><strong>Gherkin parsing &amp; lossless formatting</strong> — 46/46 official Cucumber test files, usable as a CI formatting gate.</li>
-          <li><strong>Scenario lifecycle hooks</strong> — named in the feature file (<code>@hook=</code>), registered next to your config. Befores fail fast before a browser ever opens; afters run while it’s still alive; every hook that ran is in the report.</li>
-          <li><strong>A scenario data plane</strong> — regex named captures with <code>{name}</code> interpolation, so a value captured in one step is usable in the next.</li>
-        </ul>
-      </div>
-      <div>
-        <h3>Building toward</h3>
-        <ul>
-          <li><strong>The traceability graph</strong> — requirements ↔ use cases ↔ features ↔ the runs that prove them.</li>
-          <li><strong>Semantic diffing of live pages</strong> — ships today as a dev/REPL preview (SIEVE), heading for the CLI.</li>
-          <li><strong>Not just <em>what</em> changed — how, and what it puts at risk.</strong></li>
-          <li><strong>First-class fixtures</strong> and brownfield suite migration.</li>
-        </ul>
-      </div>
-    </div>
-    <p class="baton">The baton pass: agents write good end-to-end tests against this surface <em>now</em>; the same vocabulary is the foundation they’ll use to map tests to requirements, use cases, and provenance. Adopt it for the left column; the right column is why the discipline compounds.</p>
+{% include home/install.html %}
+
+  <p class="who">For whoever owns a Cucumber or Playwright suite that fails for reasons nobody can read — and, increasingly, for whoever’s coding agent writes tests nobody will maintain.</p>
+
+  <section class="agent-door" id="agents">
+    <h2>If you brought an agent</h2>
+    <p>Install, then <code>sl orient</code>. The documentation is in the jar, from a machine that has never seen the repository; hand it a suite nobody has typed and it parses everything, runs nothing, and names the next command. <a href="/agents/">For agents →</a></p>
   </section>
 
-  <section class="agents" id="agents">
-    <h2>For AI agents</h2>
-    <p>If you’re an agent (or you brought one): install, then ask the tool itself.</p>
-    <pre><code>curl -fsSL https://raw.githubusercontent.com/SHIFT-LEFTER/shiftlefter/main/release/install.sh | bash
-./sl/sl orient        <span class="c-com"># where am I, what would fail, what to read next</span>
-./sl/sl agent-doc --list</code></pre>
-    <p>The full agent surface is documented in <a href="https://github.com/shift-lefter/shiftlefter/blob/main/docs/AGENT.md" target="_blank" rel="noopener">docs/AGENT.md</a>; the installer prints a breadcrumb stanza to paste into your <code>AGENTS.md</code>. A plain-text pointer lives at <a href="/llms.txt">/llms.txt</a>.</p>
-  </section>
+{% include home/honestly.html %}
 
-  <footer class="site-footer">
-    <p class="footer-hello">See the code, or say hello.</p>
-    <p class="footer-links">
-      <a href="https://github.com/shift-lefter/shiftlefter" target="_blank" rel="noopener">View ShiftLefter on GitHub</a>
-      <a href="https://www.linkedin.com/in/Gabriel-Wilkins" target="_blank" rel="noopener">Connect on LinkedIn</a>
-      <a href="mailto:gabriel@shiftlefter.com">Email gabriel@shiftlefter.com</a>
-    </p>
-    <p class="colophon">© 2026 ShiftLefter. Built by Gabriel Wilkins.</p>
-  </footer>
+{% include home/future.html %}
+
+  <ul class="numbers" aria-label="By the numbers">
+    {%- comment -%} Verified values only (amendment A7). Releases: v0.1.0 … v0.5.7
+    = 15 tags, true from the 0.5.7 tag this page ships with; recount at each
+    release. Conformance: test/shiftlefter/gherkin/compliance_test.clj:89,
+    cucumber/gherkin v42.0.1. Verbs: `sl agent-doc builtins` (4 SMS + 26 web).
+    Topics: `sl agent-doc --list`. {%- endcomment %}
+    <li><strong>15</strong> tagged releases</li>
+    <li><strong>50 of 50</strong> official Gherkin files parse; <strong>12 of 12</strong> invalid ones rejected</li>
+    <li><strong>30</strong> built-in verbs, web and SMS</li>
+    <li><strong>16</strong> documentation topics inside the jar</li>
+    <li><strong>1</strong> author</li>
+  </ul>
+
+{% include home/footer.html %}
 </main>

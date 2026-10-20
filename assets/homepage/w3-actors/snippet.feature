@@ -1,0 +1,6 @@
+    When :user/alice opens the browser to 'http://127.0.0.1:9095/login'
+    And :user/alice fills Login.username with 'alice'
+    And :user/bob opens the browser to 'http://127.0.0.1:9095/login'
+    And :user/bob fills Login.username with 'bob'
+    And :user/bob should see 'Welcome, bob!'
+    And :user/alice should see 'Welcome, alice!'

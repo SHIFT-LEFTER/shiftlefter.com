@@ -1,0 +1,27 @@
+{:issues [],
+ :svo-issues
+ [{:type :svo/unknown-subject,
+   :subject :user/alicce,
+   :known [:user/alice :user/bob],
+   :suggestion :user/alice,
+   :def-site {:file "sl/glossary/subjects.edn", :line 10, :entry :user/alice},
+   :location
+   {:step-text ":user/alicce opens the browser to 'http://127.0.0.1:9095/login'",
+    :step-id #uuid "00000000-0000-0000-0000-000000000000",
+    :uri "sl/features/login.feature",
+    :line 5,
+    :column 5},
+   :severity :error}
+  {:type :svo/unknown-object,
+   :object "Login.sumbit",
+   :interface :web,
+   :severity :error,
+   :message "Unknown intent/element: Login.sumbit. Did you mean: Login.submit?",
+   :suggestion "Login.submit",
+   :def-site {:file "sl/glossary/intents/login.edn", :line 7, :entry "Login.submit"},
+   :location
+   {:step-text ":user/alice clicks Login.sumbit",
+    :step-id #uuid "00000000-0000-0000-0000-000000000000",
+    :uri "sl/features/login.feature",
+    :line 7,
+    :column 5}}]}

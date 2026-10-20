@@ -1,0 +1,2 @@
+Checking features/checkout.feature... OK
+# exit 0
