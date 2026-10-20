@@ -6,7 +6,7 @@ kind: Architecture
 permalink: /docs/architecture/repl-lifetimes/
 source: docs/architecture/repl-lifetimes.md
 source_url: https://github.com/shift-lefter/shiftlefter/blob/main/docs/architecture/repl-lifetimes.md
-synced_from: a426a777
+synced_from: d6e8ac59
 ---
 {% raw %}
 
@@ -18,11 +18,11 @@ matter are *custody* (which verb owns this resource) and *lifetime*
 
 **Why this map exists:** every REPL bug of an internal exercise cycle
 just before v0.5.5 was a
-misplacement on the ladder below. The chromedriver leak was a
-JVM-scoped resource nobody owned; the durability overclaim put
-a JVM-scoped Chrome on the disk layer; the missing relaunch
+misplacement on the ladder below. The chromedriver leak (sl-34fu) was a
+JVM-scoped resource nobody owned; the durability overclaim (sl-t8bj) put
+a JVM-scoped Chrome on the disk layer; the missing relaunch (sl-2de7)
 was a state-machine edge nobody had drawn; the bare-browser gap and the
-broken `:closed` branch were a context-scoped resource that
+broken `:closed` branch (sl-vmc5) were a context-scoped resource that
 could neither be created nor reaped. This is the diagram that would have
 prevented all five. Placements below cite recorded measurements rather
 than re-measuring.
@@ -36,13 +36,15 @@ differences are exactly two, and both are lifetime facts:
 
 - **`repl/as`** (`repl.clj:682`) executes a **single step with no plan
   and no hooks**: it calls `exec/invoke-step` directly (`repl.clj:655`)
-  with a hand-built ctx. Since the bare-browser fix it lazily provisions a bare
+  with a hand-built ctx. Since the bare-browser fix (sl-vmc5) it lazily provisions a bare
   browser for a subject with no costume, through the engine's own
   primitive: `ensure-step-capability` (`repl.clj:615`) →
   `exec/ensure-capability-for-svo` → `provisioning.clj:201`, yielding a
-  `:mode :ephemeral` capability. Gated on `shifted!` — provisioning
-  reads `(:interfaces @repl-config)`; in vanilla mode nothing provisions
-  and browser steps fail honestly with `:browser/no-session`. Custody
+  `:mode :ephemeral` capability. Provisioning reads the effective
+  config's `:interfaces` (`load-config!`, or the built-in defaults —
+  sl-6wh9: the bare REPL mirrors `sl run` with no config file); with no
+  entry for the step's interface nothing provisions and browser steps
+  fail honestly with `:browser/no-session`. Custody
   rule (`repl.clj:663-672`): if provisioning succeeded and the step then
   failed, the ctx is **kept** — dropping it would strand a live browser
   where no cleanup verb could ever reach it.
@@ -60,7 +62,7 @@ differences are exactly two, and both are lifetime facts:
   timing surface** — `binding` any of `*retry-timeout-ms*` /
   `*wait-timeout-ms*` / `*receive-timeout-ms*` / `*poll-interval-ms*`
   enters the `:timing` resolution ladder at the top `:override` rung
-  (`step.clj:134`).
+  (`step.clj:134`, sl-99u2).
 
 
 {: id="two-reapers-two-lifetimes"}
@@ -108,7 +110,7 @@ Placement notes:
   `:dead`; `connect-costume!` relaunched from the persisted profiles.
   The user-visible durability promise holds — its mechanism is the disk
   layer, not the process.
-- **The chromedriver custody answer:** each costume owns at
+- **The chromedriver custody answer (sl-34fu):** each costume owns at
   most one live driver, held in the `live-drivers` registry
   (`costume.clj:157`). `adopt-driver!` (`:160`) replaces-and-reaps on
   every `connect-costume!` (`:384`, `:410`) and every auto-reconnect
@@ -132,8 +134,8 @@ Placement notes:
   cleanup verbs.
 
 
-{: id="the-daemon-jvm--same-ladder-different-jvm"}
-## The daemon JVM — same ladder, different JVM
+{: id="the-daemon-jvm--same-ladder-different-jvm-sl-s35y"}
+## The daemon JVM — same ladder, different JVM (sl-s35y)
 
 The warm daemon is a second long-lived JVM this map previously did not
 place: everything JVM-scoped above is
@@ -162,7 +164,7 @@ process). The reaper-decides-the-layer law applied:
 ## Overlay 1 — cleanup-verb reach
 
 Which layers each verb may touch. The geometry is the cleanup contract
-(close-leak + mode-awareness landed as one interlocked change);
+(sl-tss7; close-leak + mode-awareness landed as one interlocked change);
 cited to its regression tests, not re-proven.
 
 | Verb | Reaches | Never touches | Contract pins |
@@ -172,7 +174,7 @@ cited to its regression tests, not re-proven.
 | `run` (engine reaper) | its own scenario's ephemerals, per scenario | anything `as` provisioned; costumes | `repl_bare_browser_test.clj:84` |
 | `destroy-costume!` (costume.clj:589) | JVM + disk: kills Chrome by **port truth** (not recorded pid), reaps the owned driver, deletes the profile dir | other costumes' resources | `costume_test.clj:551` (reap+forget), `:569` (failed destroy keeps the handle) |
 | `sieve-stop!` (user.clj:71) | the sieve server + its driver | everything else | code-read (dev tooling) |
-| JVM death | everything JVM-scoped (child processes die with it) | the disk layer | the JVM-bounce measurement |
+| JVM death | everything JVM-scoped (child processes die with it) | the disk layer | the JVM-bounce measurement (sl-t8bj) |
 
 The asymmetry is the lesson: **only `destroy-costume!` ever kills a
 costume's Chrome** (`repl_close_leak_test.clj:16`), and nothing
@@ -193,7 +195,7 @@ mode-awareness half of the cleanup contract.
   <img class="diagram-dark" src="/assets/docs/architecture-repl-lifetimes-1-dark.svg" alt="diagram">
 </figure>
 
-The relaunch edge is the one the original machine lacked: once a costume
+The relaunch edge (sl-2de7) is the one the original machine lacked: once a costume
 existed, launch-only (browser open, **no** session attached — what
 re-authentication needs) was unreachable without dropping to internals.
 
