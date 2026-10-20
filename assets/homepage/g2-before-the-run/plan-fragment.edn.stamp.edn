@@ -1,12 +1,13 @@
 {:artifact "g2-before-the-run/plan-fragment.edn"
- :dev-commit "d573b865"
+ :dev-commit "d6e8ac59"
+ :tag "v0.5.7"
  :dev-tree-dirty? false
- :sl-version "0.5.6"
+ :sl-version "0.5.7"
  :source "examples/02b-browser-multi-actor"
  :staged-at "/private/tmp/sl-homepage/02b"
  :command "edn-select.clj plan g2-before-the-run/plan.edn"
  :exit 0
- :date "2026-10-19"
+ :date "2026-10-20"
  :browser {:chrome "154.0.8037.100" :chromedriver "154.0.8037.92" :backend :etaoin}
  :scrubbed []
  :derived-from "g2-before-the-run/plan.edn"
