@@ -21,6 +21,17 @@ timezone: America/Chicago
 title: ShiftLefter
 author: Gabriel Wilkins
 url: https://shiftlefter.com
+# Explicit empty baseurl: the site lives at the apex (CNAME). Without this a
+# local build lets jekyll-github-metadata guess a project-page prefix
+# (/pages/SHIFT-LEFTER/shiftlefter.com) into every canonical and sitemap URL.
+baseurl: ""
+lang: en
+# Site-wide description: jekyll-seo-tag's fallback for pages without their own,
+# and the SoftwareApplication description in _includes/jsonld-software.html.
+description: "A type checker for your test suite. Gherkin end-to-end tests compiled against a vocabulary you own, so a typo or a dangling rename fails before the browser opens, and a run that could not measure says so in its exit code."
+logo: /shiftlefter-noname.png
+# Current released version, read by the home page's structured data. Bump at release.
+sl_version: "0.5.7"
 
 # Explicit because jekyll-github-metadata otherwise infers the repo from the
 # `origin` remote — which is the GitLab working remote here, not GitHub.
@@ -32,6 +43,13 @@ repository: SHIFT-LEFTER/shiftlefter.com
 # untouched, so anything parked outside /writing/ serves byte-identical.
 plugins:
   - jekyll-feed
+  # Findability (2026-10-30): both are on GH Pages' plugin whitelist.
+  # jekyll-seo-tag: per-page canonical link, Open Graph, Twitter card, and a
+  # WebSite/WebPage JSON-LD graph, emitted by {% seo %} in _layouts/default.html.
+  # jekyll-sitemap: /sitemap.xml over pages, posts, and static files, plus a
+  # /robots.txt pointing at it when the source has none.
+  - jekyll-seo-tag
+  - jekyll-sitemap
 feed:
   path: writing/feed.xml
 

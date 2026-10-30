@@ -1,0 +1,49 @@
+{%- comment -%}
+Structured data for the home page only (findability, 2026-10-30). jekyll-seo-tag
+emits the generic WebSite/WebPage graph; this adds the SoftwareApplication entity
+so search engines learn "ShiftLefter" is a product name, not a misspelling of
+ShiftLeft. Bump softwareVersion with each release (reads site.sl_version).
+{%- endcomment -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      "@id": "{{ site.url }}/#software",
+      "name": "ShiftLefter",
+      "alternateName": "Shift Lefter",
+      "url": "{{ site.url }}/",
+      "description": {{ site.description | jsonify }},
+      "applicationCategory": "DeveloperApplication",
+      "applicationSubCategory": "Test automation framework",
+      "operatingSystem": "Linux, macOS, Windows",
+      "softwareVersion": "{{ site.sl_version }}",
+      "license": "https://opensource.org/licenses/MIT",
+      "isAccessibleForFree": true,
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "programmingLanguage": "Clojure",
+      "keywords": "BDD, Gherkin, end-to-end testing, test automation, Playwright, WebDriver, Clojure, exit codes",
+      "codeRepository": "https://github.com/SHIFT-LEFTER/shiftlefter",
+      "author": { "@id": "{{ site.url }}/#author" }
+    },
+    {
+      "@type": "SoftwareSourceCode",
+      "@id": "{{ site.url }}/#source",
+      "name": "ShiftLefter",
+      "codeRepository": "https://github.com/SHIFT-LEFTER/shiftlefter",
+      "programmingLanguage": "Clojure",
+      "license": "https://opensource.org/licenses/MIT",
+      "runtimePlatform": "Java 21",
+      "targetProduct": { "@id": "{{ site.url }}/#software" }
+    },
+    {
+      "@type": "Person",
+      "@id": "{{ site.url }}/#author",
+      "name": "{{ site.author }}",
+      "url": "{{ site.url }}/",
+      "sameAs": ["https://github.com/gjw"]
+    }
+  ]
+}
+</script>
